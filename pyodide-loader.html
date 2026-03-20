@@ -46,16 +46,16 @@ plt.show = lambda *args, **kwargs: None
     outputEl.textContent = stdout || "(no text output)";
 
     // Capture plot if any
-    const plotData = pyodide.runPython(`
-import base64
-buf = io.BytesIO()
+    pyodide.runPython(`
+_plot_result = ''
 if plt.get_fignums():
-    plt.savefig(buf, format='svg', bbox_inches='tight')
-    buf.seek(0)
-    base64.b64encode(buf.read()).decode('utf-8')
-else:
-    ''
+    import base64 as _b64
+    _buf = io.BytesIO()
+    plt.savefig(_buf, format='svg', bbox_inches='tight')
+    _buf.seek(0)
+    _plot_result = _b64.b64encode(_buf.read()).decode('utf-8')
     `);
+    const plotData = pyodide.runPython("_plot_result");
 
     if (plotData) {
       const svgData = atob(plotData);
