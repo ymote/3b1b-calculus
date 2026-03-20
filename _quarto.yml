@@ -22,4 +22,4 @@ format:
       text: |
         <script src="https://cdn.jsdelivr.net/pyodide/v0.25.1/full/pyodide.js"></script>
     include-after-body:
-      file: pyodide-loader.js
+      file: pyodide-loader.html
