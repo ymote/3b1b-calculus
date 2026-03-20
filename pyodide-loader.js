@@ -1,0 +1,68 @@
+let pyodideReady = null;
+
+async function loadPyodideAndPackages() {
+  if (pyodideReady) return pyodideReady;
+  pyodideReady = (async () => {
+    let pyodide = await loadPyodide();
+    await pyodide.loadPackage(["numpy", "matplotlib"]);
+    return pyodide;
+  })();
+  return pyodideReady;
+}
+
+async function runPyodide(codeId, outputId, plotId) {
+  const codeEl = document.getElementById(codeId);
+  const outputEl = document.getElementById(outputId);
+  const plotEl = document.getElementById(plotId);
+
+  outputEl.textContent = "Loading Python environment...";
+  plotEl.innerHTML = "";
+
+  try {
+    const pyodide = await loadPyodideAndPackages();
+
+    // Redirect stdout
+    pyodide.runPython(`
+import sys, io
+sys.stdout = io.StringIO()
+    `);
+
+    // Set up matplotlib for SVG output
+    pyodide.runPython(`
+import matplotlib
+matplotlib.use('AGG')
+import matplotlib.pyplot as plt
+import io, base64
+plt.close('all')
+    `);
+
+    const code = codeEl.value;
+    pyodide.runPython(code);
+
+    // Capture stdout
+    const stdout = pyodide.runPython("sys.stdout.getvalue()");
+    outputEl.textContent = stdout || "(no text output)";
+
+    // Capture plot if any
+    const plotData = pyodide.runPython(`
+import base64
+buf = io.BytesIO()
+if plt.get_fignums():
+    plt.savefig(buf, format='svg', bbox_inches='tight')
+    buf.seek(0)
+    base64.b64encode(buf.read()).decode('utf-8')
+else:
+    ''
+    `);
+
+    if (plotData) {
+      const svgData = atob(plotData);
+      plotEl.innerHTML = svgData;
+    }
+
+    pyodide.runPython("sys.stdout = sys.__stdout__");
+
+  } catch (err) {
+    outputEl.textContent = "Error: " + err.message;
+  }
+}

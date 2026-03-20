@@ -1,0 +1,25 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Essence of Calculus — 3Blue1Brown"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: index-zh.qmd
+        text: 中文版
+      - href: lessons.qmd
+        text: Lessons
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+    include-in-header:
+      text: |
+        <script src="https://cdn.jsdelivr.net/pyodide/v0.25.1/full/pyodide.js"></script>
+    include-after-body:
+      file: pyodide-loader.js
