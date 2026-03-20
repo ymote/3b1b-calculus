@@ -1,0 +1,344 @@
+---
+title: "导数的另一种可视化方式"
+subtitle: "第十二章"
+date: 2023-04-01
+---
+
+本课引入导数的一种互补视角：将函数视为**变换**，把数轴上的输入点映射到另一条数轴上的输出点。我们不再把导数解释为图像的斜率，而是将其解释为局部的伸缩因子。随后我们将这一观点应用于分析迭代函数不动点的稳定性，解决一个关于无穷连分数的疑问。
+
+::: {.callout-note collapse="true"}
+## 预备知识
+
+- 理解导数作为极限 $\lim_{h \to 0} \frac{f(x+h) - f(x)}{h}$
+- 熟悉导数作为斜率的图形解释（第二至三章）
+- 具备函数复合与迭代的基本经验
+:::
+
+## 本课内容
+
+- 变换视角：函数作为从一条数轴到另一条数轴的映射
+- 导数作为局部伸缩因子
+- 迭代函数的不动点
+- 通过导数进行稳定性分析：稳定与不稳定不动点
+- 应用于无穷连分数 $1 + \cfrac{1}{1 + \cfrac{1}{1 + \cdots}}$
+
+## 课程视频
+
+```{=html}
+<video controls width="100%" preload="metadata">
+  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/12_The%20other%20way%20to%20visualize%20derivatives%20%EF%BD%9C%20Chapter%2012%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
+</video>
+```
+
+## 课程关键帧
+
+![函数被视为将输入点映射到数轴上输出点的变换](../images/ch12/frame_01.jpg)
+
+![在 $x = 1$ 附近放大观察 $f(x) = x^2$：局部邻域被拉伸了 $2$ 倍](../images/ch12/frame_02.jpg)
+
+![反复应用 $g(x) = 1 + 1/x$：采样点收敛到黄金比例 $\phi$](../images/ch12/frame_03.jpg)
+
+![稳定性分析：稳定不动点附近的收缩与不稳定不动点附近的扩张](../images/ch12/frame_04.jpg)
+
+## 核心要点
+
+### 标准视角：导数即斜率
+
+我们首先回顾传统图像。给定函数 $f : \mathbb{R} \to \mathbb{R}$，通常在笛卡尔平面上绘制其图像，并将导数 $f'(x_0)$ 理解为点 $(x_0, f(x_0))$ 处切线的斜率。
+
+这是一个强大且不可或缺的视角。然而，当我们超越单变量实函数——进入多变量微积分、复分析或微分几何时——"图像斜率"的解释不再直接适用。因此，一种更具普适性的直觉是值得追求的。
+
+### 变换视角
+
+现在我们将函数 $f$ 不看作平面上的曲线，而是看作一种**变换**（或映射），它将输入数轴上的每个点送到输出数轴上的对应点。
+
+在这种解释下，导数 $f'(x_0)$ 衡量 $x_0$ 处的**局部伸缩因子**。具体地说，考虑输入线上以 $x_0$ 为中心、宽度为 $\delta$ 的一个小区间。经过 $f$ 的作用后，该区间被近似映射为输出线上以 $f(x_0)$ 为中心、宽度为 $|f'(x_0)| \cdot \delta$ 的区间。
+
+更精确地说，对于较小的 $h$，
+
+$$
+f(x_0 + h) \approx f(x_0) + f'(x_0) \cdot h.
+$$
+
+这个一阶近似告诉我们，在局部范围内，函数的作用相当于一个以 $f'(x_0)$ 为比例因子的线性映射。
+
+- 若 $|f'(x_0)| > 1$，函数**拉伸** $x_0$ 周围的邻域。
+- 若 $|f'(x_0)| < 1$，函数**压缩** $x_0$ 周围的邻域。
+- 若 $f'(x_0) < 0$，函数还会**反转方向**（翻转邻域）。
+- 若 $f'(x_0) = 0$，邻域被压缩到一个点。
+
+### 示例：$f(x) = x^2$
+
+考虑 $f(x) = x^2$，其导数为 $f'(x) = 2x$。我们考察几个输入值：
+
+| 输入 $x_0$ | 输出 $f(x_0)$ | 导数 $f'(x_0)$ | 局部行为 |
+|---|---|---|---|
+| $1$ | $1$ | $2$ | 拉伸 $2$ 倍 |
+| $3$ | $9$ | $6$ | 拉伸 $6$ 倍 |
+| $\tfrac{1}{4}$ | $\tfrac{1}{16}$ | $\tfrac{1}{2}$ | 压缩为 $\tfrac{1}{2}$ |
+| $0$ | $0$ | $0$ | 压缩到一个点 |
+| $-2$ | $4$ | $-4$ | 拉伸 $4$ 倍并反转 |
+
+在 $x_0 = 1$ 附近，一组均匀分布在 $1$ 周围的输入点，经过 $f$ 作用后，在输出值 $1$ 周围的分布大约扩散为原来的两倍。在 $x_0 = 0$ 附近，任何小邻域都会被压向原点。
+
+### 交互演示：$f(x) = x^2$ 的变换视角（Desmos）
+
+```{=html}
+<div id="calc_ch12_1" class="desmos-container"></div>
+<script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+<script>
+  var calc_ch12_1 = Desmos.GraphingCalculator(document.getElementById('calc_ch12_1'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'f(x)'
+  });
+  calc_ch12_1.setExpression({ id: 'func', latex: 'y = x^2', color: '#2d70b3' });
+  calc_ch12_1.setExpression({ id: 'a', latex: 'a = 1', sliderBounds: { min: -3, max: 3, step: 0.01 } });
+  calc_ch12_1.setExpression({ id: 'tangent', latex: 'y = a^2 + 2a(x - a)', color: '#c74440', lineStyle: Desmos.Styles.DASHED });
+  calc_ch12_1.setExpression({ id: 'pt', latex: '(a, a^2)', color: '#388c46', pointSize: 10 });
+  calc_ch12_1.setExpression({ id: 'deriv_label', latex: 'f\'(a) = 2a', color: '#6042a6' });
+  calc_ch12_1.setMathBounds({ left: -4, right: 4, bottom: -2, top: 12 });
+</script>
+```
+
+拖动滑块 $a$ 沿曲线 $f(x) = x^2$ 移动。切线（虚线）的斜率为 $2a$，即局部伸缩因子。在 $a = 0$ 附近，切线是水平的（零伸缩）；在 $a = 2$ 附近，斜率为 $4$（四倍伸缩）。
+
+### 不动点与迭代函数
+
+现在我们转向变换视角的一个引人入胜的应用。考虑函数
+
+$$
+g(x) = 1 + \frac{1}{x}.
+$$
+
+$g$ 的**不动点**是满足 $g(x^*) = x^*$ 的值 $x^*$，即
+
+$$
+x^* = 1 + \frac{1}{x^*}.
+$$
+
+两边乘以 $x^*$ 并整理，得到
+
+$$
+(x^*)^2 - x^* - 1 = 0,
+$$
+
+其两个解为
+
+$$
+x^* = \frac{1 \pm \sqrt{5}}{2}.
+$$
+
+它们分别是**黄金比例** $\phi = \frac{1 + \sqrt{5}}{2} \approx 1.618$ 及其伴随值 $\psi = \frac{1 - \sqrt{5}}{2} \approx -0.618$。注意 $\psi = -1/\phi$。
+
+### 无穷连分数
+
+表达式
+
+$$
+1 + \cfrac{1}{1 + \cfrac{1}{1 + \cfrac{1}{\ddots}}}
+$$
+
+可以被解释为通过迭代 $g$ 所得序列的极限。我们选取一个初始值 $x_0$，定义
+
+$$
+x_{n+1} = g(x_n) = 1 + \frac{1}{x_n}.
+$$
+
+由于 $\phi$ 和 $\psi$ 都是不动点，两者都是无穷连分数值的候选。然而数值实验表明，对于几乎任何正的初始值，序列都收敛到 $\phi$，而从不收敛到 $\psi$。导数的变换视角解释了这一现象。
+
+### 不动点的稳定性
+
+我们计算 $g$ 的导数：
+
+$$
+g'(x) = -\frac{1}{x^2}.
+$$
+
+在两个不动点处：
+
+$$
+g'(\phi) = -\frac{1}{\phi^2} \approx -0.382, \qquad |g'(\phi)| \approx 0.382 < 1,
+$$
+
+$$
+g'(\psi) = -\frac{1}{\psi^2} \approx -2.618, \qquad |g'(\psi)| \approx 2.618 > 1.
+$$
+
+从变换的角度看，当我们在 $\phi$ 附近施加 $g$ 时，一个小邻域被**压缩**了大约 $0.38$ 倍。每次后续迭代都将点越挤越靠近 $\phi$。这使得 $\phi$ 成为一个**稳定的**（或**吸引的**）不动点。
+
+反之，在 $\psi$ 附近，一个小邻域在每次迭代中被**扩张**了大约 $2.6$ 倍。点被推离 $\psi$。这使得 $\psi$ 成为一个**不稳定的**（或**排斥的**）不动点。
+
+一般原理可以表述如下：
+
+> 设 $x^*$ 为可微函数 $g$ 的不动点。若 $|g'(x^*)| < 1$，则 $x^*$ 在 $g$ 的迭代下是**稳定的**；若 $|g'(x^*)| > 1$，则是**不稳定的**。
+
+### 交互演示：$g(x) = 1 + 1/x$ 的迭代（蛛网图，Desmos）
+
+```{=html}
+<div id="calc_ch12_2" class="desmos-container"></div>
+<script>
+  var calc_ch12_2 = Desmos.GraphingCalculator(document.getElementById('calc_ch12_2'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'g(x)'
+  });
+  calc_ch12_2.setExpression({ id: 'g', latex: 'g(x) = 1 + \\frac{1}{x}', color: '#2d70b3' });
+  calc_ch12_2.setExpression({ id: 'diag', latex: 'y = x', color: '#888888', lineStyle: Desmos.Styles.DASHED });
+  calc_ch12_2.setExpression({ id: 'phi_pt', latex: '\\left(\\frac{1+\\sqrt{5}}{2},\\frac{1+\\sqrt{5}}{2}\\right)', color: '#388c46', pointSize: 10, label: 'phi', showLabel: true });
+  calc_ch12_2.setExpression({ id: 'psi_pt', latex: '\\left(\\frac{1-\\sqrt{5}}{2},\\frac{1-\\sqrt{5}}{2}\\right)', color: '#c74440', pointSize: 10, label: 'psi', showLabel: true });
+  calc_ch12_2.setExpression({ id: 'x0', latex: 'x_0 = 0.5', sliderBounds: { min: 0.1, max: 5, step: 0.01 } });
+  calc_ch12_2.setExpression({ id: 'x1', latex: 'x_1 = g(x_0)' });
+  calc_ch12_2.setExpression({ id: 'x2', latex: 'x_2 = g(x_1)' });
+  calc_ch12_2.setExpression({ id: 'x3', latex: 'x_3 = g(x_2)' });
+  calc_ch12_2.setExpression({ id: 'x4', latex: 'x_4 = g(x_3)' });
+  calc_ch12_2.setExpression({ id: 'x5', latex: 'x_5 = g(x_4)' });
+  calc_ch12_2.setMathBounds({ left: -2, right: 5, bottom: -1, top: 5 });
+</script>
+```
+
+不动点 $\phi$（绿色）和 $\psi$（红色）标记在 $g(x)$ 与直线 $y = x$ 的交点处。调节初始值 $x_0$，观察迭代序列 $x_1, x_2, \ldots$ 无论起始点如何都收敛到 $\phi$。
+
+### 交互演示：不动点附近的局部伸缩（Desmos）
+
+```{=html}
+<div id="calc_ch12_3" class="desmos-container"></div>
+<script>
+  var calc_ch12_3 = Desmos.GraphingCalculator(document.getElementById('calc_ch12_3'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: ''
+  });
+  calc_ch12_3.setExpression({ id: 'gprime', latex: 'y = -\\frac{1}{x^2}', color: '#2d70b3' });
+  calc_ch12_3.setExpression({ id: 'upper', latex: 'y = 1', color: '#c74440', lineStyle: Desmos.Styles.DASHED });
+  calc_ch12_3.setExpression({ id: 'lower', latex: 'y = -1', color: '#c74440', lineStyle: Desmos.Styles.DASHED });
+  calc_ch12_3.setExpression({ id: 'phi_line', latex: 'x = \\frac{1+\\sqrt{5}}{2}', color: '#388c46', lineStyle: Desmos.Styles.DASHED });
+  calc_ch12_3.setExpression({ id: 'psi_line', latex: 'x = \\frac{1-\\sqrt{5}}{2}', color: '#6042a6', lineStyle: Desmos.Styles.DASHED });
+  calc_ch12_3.setExpression({ id: 'shade', latex: '-1 < y < 1', color: '#388c46', fillOpacity: 0.1 });
+  calc_ch12_3.setMathBounds({ left: -3, right: 4, bottom: -4, top: 2 });
+</script>
+```
+
+此图绘制了 $g'(x) = -1/x^2$。阴影带标记了**稳定区域** $|g'| < 1$。在 $x = \phi$（绿色虚线）处，导数落在此带内，确认了稳定性。在 $x = \psi$（紫色虚线）处，导数远在带外，确认了不稳定性。
+
+### 交互演示：迭代收敛到黄金比例（Python）
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch12_1">
+import numpy as np
+import matplotlib.pyplot as plt
+
+def g(x):
+    return 1 + 1/x
+
+# Iterate from several seed values
+seeds = [0.5, 2.0, 5.0, 0.2, 10.0]
+n_iter = 20
+phi = (1 + np.sqrt(5)) / 2
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4))
+
+for x0 in seeds:
+    xs = [x0]
+    for _ in range(n_iter):
+        xs.append(g(xs[-1]))
+    ax1.plot(range(len(xs)), xs, 'o-', markersize=3, label=f'$x_0 = {x0}$')
+
+ax1.axhline(y=phi, color='black', linestyle='--', label=f'$\\phi = {phi:.4f}$')
+ax1.set_xlabel('Iteration n')
+ax1.set_ylabel('$x_n$')
+ax1.set_title('Convergence to $\\phi$ from various seeds')
+ax1.legend(fontsize=8)
+ax1.grid(True, alpha=0.3)
+
+# Show the derivative magnitude at each iterate from x0 = 2
+x0 = 2.0
+xs = [x0]
+derivs = []
+for _ in range(n_iter):
+    derivs.append(abs(-1 / xs[-1]**2))
+    xs.append(g(xs[-1]))
+
+ax2.plot(range(len(derivs)), derivs, 's-', color='steelblue', markersize=4)
+ax2.axhline(y=1, color='red', linestyle='--', label='$|g\'| = 1$ threshold')
+ax2.axhline(y=1/phi**2, color='green', linestyle=':', label=f'$1/\\phi^2 \\approx {1/phi**2:.3f}$')
+ax2.set_xlabel('Iteration n')
+ax2.set_ylabel("$|g'(x_n)|$")
+ax2.set_title("Derivative magnitude along iterates")
+ax2.legend(fontsize=8)
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch12_1', 'output_ch12_1', 'plot_ch12_1')">Run ▶</button>
+  <div class="output" id="output_ch12_1"></div>
+  <div class="plot-output" id="plot_ch12_1"></div>
+</div>
+```
+
+### 交互演示：数轴上的变换可视化（Python）
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch12_2">
+import numpy as np
+import matplotlib.pyplot as plt
+
+def g(x):
+    return 1 + 1/x
+
+phi = (1 + np.sqrt(5)) / 2
+
+# Show how a cluster of points near phi contracts under iteration
+fig, axes = plt.subplots(4, 1, figsize=(10, 6), sharex=True)
+
+center = phi
+spread = 0.5
+n_pts = 21
+pts = np.linspace(center - spread, center + spread, n_pts)
+
+for i, ax in enumerate(axes):
+    ax.scatter(pts, np.zeros_like(pts), c='steelblue', s=30, zorder=3)
+    ax.axvline(x=phi, color='green', linestyle='--', alpha=0.7, label='$\\phi$' if i == 0 else '')
+    ax.set_xlim(0.5, 2.8)
+    ax.set_yticks([])
+    ax.set_ylabel(f'Iter {i}', rotation=0, labelpad=30)
+    ax.axhline(y=0, color='gray', linewidth=0.5)
+
+    # Compute width of cluster
+    width = pts.max() - pts.min()
+    ax.set_title(f'Cluster width: {width:.4f}', fontsize=9, loc='right')
+
+    # Apply g for next iteration
+    pts = g(pts)
+
+axes[0].legend(fontsize=9)
+axes[-1].set_xlabel('Number line')
+fig.suptitle('Contraction of a neighborhood near $\\phi$ under iteration of $g$',
+             fontsize=11, y=1.02)
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch12_2', 'output_ch12_2', 'plot_ch12_2')">Run ▶</button>
+  <div class="output" id="output_ch12_2"></div>
+  <div class="plot-output" id="plot_ch12_2"></div>
+</div>
+```
+
+### 这一视角为何重要
+
+导数的图形解释（切线斜率）仅限于在笛卡尔平面中绘制的函数 $f : \mathbb{R} \to \mathbb{R}$。变换解释——导数作为局部线性缩放因子——自然地推广到：
+
+- **多变量微积分**，其中导数变为雅可比矩阵，描述映射如何拉伸、旋转和剪切 $\mathbb{R}^n$ 中的小区域。
+- **复分析**，其中解析函数作为共形映射，导数描述复平面中的局部旋转和缩放。
+- **微分几何**，其中流形之间映射的导数是切空间之间的线性映射。
+
+在所有这些场景中，核心思想保持不变：导数描述的是函数在某一点的最佳局部线性近似，编码了它如何变换该点的无穷小邻域。
+
+## 速查表
+
+::: {.key-formula}
+| 概念 | 核心结论 |
+|---|---|
+| 变换视角下的导数 | $f(x_0 + h) \approx f(x_0) + f'(x_0) \cdot h$；导数是局部伸缩因子 |
+| 拉伸与压缩 | $|f'(x_0)| > 1$：拉伸；$|f'(x_0)| < 1$：压缩；$f'(x_0) < 0$：反转 |
+| $g(x) = 1 + 1/x$ 的不动点方程 | $(x^*)^2 - x^* - 1 = 0 \implies x^* = \phi$ 或 $x^* = \psi = -1/\phi$ |
+| 稳定性判据 | 不动点 $x^*$ 在 $|g'(x^*)| < 1$ 时稳定，在 $|g'(x^*)| > 1$ 时不稳定 |
+| 黄金比例作为吸引子 | $|g'(\phi)| = 1/\phi^2 \approx 0.382 < 1$，因此 $\phi$ 是稳定不动点 |
+:::

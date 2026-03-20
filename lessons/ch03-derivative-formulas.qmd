@@ -1,0 +1,338 @@
+---
+title: "Derivative Formulas Through Geometry"
+subtitle: "Chapter 3"
+date: 2023-04-01
+---
+
+This lesson develops the standard derivative formulas -- the power rule, the
+derivative of $1/x$, and the derivative of $\sin(\theta)$ -- not through
+algebraic manipulation alone, but through geometric reasoning. By visualising
+each function as a concrete geometric quantity (an area, a volume, a height on
+the unit circle), we see why the formulas must take the forms they do.
+
+::: {.callout-note collapse="true"}
+## Prerequisites
+
+- Understanding of the derivative as the ratio $df/dx$ for a small nudge $dx$ (Chapter 2)
+- Familiarity with polynomial expressions and basic exponent rules
+- Knowledge of the unit-circle definitions of $\sin\theta$ and $\cos\theta$
+:::
+
+## Topics Covered
+
+- Geometric derivation of $\frac{d}{dx}x^2 = 2x$ via area of a square
+- Geometric derivation of $\frac{d}{dx}x^3 = 3x^2$ via volume of a cube
+- The general power rule: $\frac{d}{dx}x^n = nx^{n-1}$
+- Geometric derivation of $\frac{d}{dx}(1/x) = -1/x^2$ via a constant-area rectangle
+- Geometric derivation of $\frac{d}{dx}\sin\theta = \cos\theta$ via the unit circle
+
+## Lecture Video
+
+```{=html}
+<video controls width="100%" preload="metadata">
+  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/03_Derivative%20formulas%20through%20geometry%20%EF%BD%9C%20Chapter%203%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
+</video>
+```
+
+## Key Video Frames
+
+![Visualising $x^2$ as the area of a square and the three new pieces of area produced by a nudge $dx$](../images/ch03/frame_01.jpg)
+
+![Visualising $x^3$ as the volume of a cube; the three thin square faces contribute $3x^2\,dx$](../images/ch03/frame_02.jpg)
+
+![The constant-area rectangle interpretation of $1/x$ and its derivative](../images/ch03/frame_03.jpg)
+
+![The unit-circle argument: a nudge $d\theta$ along the arc produces a height change $d(\sin\theta) = \cos\theta\,d\theta$](../images/ch03/frame_04.jpg)
+
+## Key Concepts
+
+### The Derivative of $x^2$: Area of a Square
+
+We interpret $f(x) = x^2$ literally as the area of a square with side length
+$x$. When we increase $x$ by a small nudge $dx$, the new area is
+$(x + dx)^2$. The change in area consists of three pieces:
+
+- two thin rectangles, each of area $x \cdot dx$,
+- one tiny square of area $(dx)^2$.
+
+Since $(dx)^2$ is negligible compared with $dx$ as $dx \to 0$, the change in
+area is
+
+$$
+df = 2x\,dx + (dx)^2 \approx 2x\,dx.
+$$
+
+Dividing both sides by $dx$,
+
+$$
+\frac{df}{dx} = 2x.
+$$
+
+### The Derivative of $x^3$: Volume of a Cube
+
+We interpret $g(x) = x^3$ as the volume of a cube with side length $x$.
+Increasing $x$ by $dx$ adds new volume that is dominated by three thin
+square slabs, each with volume $x^2 \cdot dx$. The remaining slivers along
+the edges (proportional to $dx^2$) and the tiny corner cube (proportional
+to $dx^3$) are all negligible. Therefore,
+
+$$
+dg = 3x^2\,dx + \mathcal{O}(dx^2),
+$$
+
+and
+
+$$
+\frac{dg}{dx} = 3x^2.
+$$
+
+### The General Power Rule
+
+The pattern above extends to any positive integer $n$. When we expand
+$(x + dx)^n$, the first term is $x^n$ (the original value). The next
+collection of terms arises from choosing $dx$ from exactly one of the $n$
+factors and $x$ from the remaining $n - 1$ factors. There are $n$ such
+choices, giving
+
+$$
+(x + dx)^n = x^n + n\,x^{n-1}\,dx + \mathcal{O}(dx^2).
+$$
+
+All higher-order terms involve $dx^2$ or higher powers and therefore vanish
+in the limit. We conclude:
+
+$$
+\boxed{\frac{d}{dx}\,x^n = n\,x^{n-1}.}
+$$
+
+This is the **power rule**. Although it is often applied mechanically -- "bring
+the exponent down and subtract one" -- the geometric picture reminds us that
+each of the $n$ terms $x^{n-1}\,dx$ corresponds to one "face" of the
+higher-dimensional cube that gains a thin layer of thickness $dx$.
+
+### Interactive Desmos Graph: The Power Rule
+
+```{=html}
+<div id="calc_ch03_1" class="desmos-container"></div>
+<script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+<script>
+  var calc_ch03_1 = Desmos.GraphingCalculator(document.getElementById('calc_ch03_1'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'y'
+  });
+  calc_ch03_1.setExpression({ id: 'n', latex: 'n = 2', sliderBounds: { min: 1, max: 6, step: 1 } });
+  calc_ch03_1.setExpression({ id: 'f', latex: 'f(x) = x^{n}', color: '#2d70b3' });
+  calc_ch03_1.setExpression({ id: 'df', latex: 'g(x) = n \\cdot x^{n-1}', color: '#c74440' });
+  calc_ch03_1.setExpression({ id: 'a', latex: 'a = 1.5', sliderBounds: { min: -3, max: 3, step: 0.01 } });
+  calc_ch03_1.setExpression({ id: 'tangent', latex: 'y - a^{n} = n a^{n-1}(x - a)', color: '#388c46', lineStyle: Desmos.Styles.DASHED });
+  calc_ch03_1.setExpression({ id: 'pt', latex: '(a, a^{n})', color: '#388c46', pointSize: 8 });
+  calc_ch03_1.setMathBounds({ left: -3, right: 4, bottom: -5, top: 20 });
+</script>
+```
+
+Use the slider $n$ to select different powers. The blue curve is $x^n$, the
+red curve is its derivative $nx^{n-1}$, and the dashed green line is the
+tangent to $x^n$ at the point $x = a$. Adjusting $a$ confirms that the slope
+of the tangent equals the value of the derivative at that point.
+
+### The Derivative of $1/x$: A Constant-Area Rectangle
+
+We consider $f(x) = 1/x$ and interpret it geometrically. Picture a rectangle
+of fixed area $1$ whose width is $x$; its height must then be $1/x$. If the
+width increases by $dx$, the rectangle gains a thin vertical strip of area
+$(1/x)\,dx$ on the right. To keep the total area equal to $1$, the height
+must decrease by some amount $d(1/x)$, removing a thin horizontal strip of
+area approximately $x \cdot |d(1/x)|$ from the top. Setting the gained area
+equal to the lost area:
+
+$$
+\frac{1}{x}\,dx \approx -\,x\,d\!\left(\frac{1}{x}\right).
+$$
+
+(The negative sign accounts for the fact that the height decreases.) Solving
+for the derivative,
+
+$$
+\frac{d}{dx}\!\left(\frac{1}{x}\right) = -\frac{1}{x^2}.
+$$
+
+This is consistent with the power rule applied to $x^{-1}$: bringing the
+exponent $-1$ down and reducing it by one gives $-1 \cdot x^{-2} = -1/x^2$.
+
+### Interactive Desmos Graph: The Constant-Area Rectangle for $1/x$
+
+```{=html}
+<div id="calc_ch03_2" class="desmos-container"></div>
+<script>
+  var calc_ch03_2 = Desmos.GraphingCalculator(document.getElementById('calc_ch03_2'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'y'
+  });
+  calc_ch03_2.setExpression({ id: 'curve', latex: 'y = \\frac{1}{x} \\left\\{x > 0\\right\\}', color: '#2d70b3' });
+  calc_ch03_2.setExpression({ id: 'x0', latex: 'x_0 = 2', sliderBounds: { min: 0.5, max: 5, step: 0.01 } });
+  calc_ch03_2.setExpression({ id: 'rect', latex: '0 \\le y \\le \\frac{1}{x_0} \\left\\{0 \\le x \\le x_0\\right\\}', color: '#388c46', fillOpacity: 0.25 });
+  calc_ch03_2.setExpression({ id: 'deriv', latex: 'y = -\\frac{1}{x^2} \\left\\{x > 0\\right\\}', color: '#c74440' });
+  calc_ch03_2.setExpression({ id: 'pt', latex: '(x_0, \\frac{1}{x_0})', color: '#388c46', pointSize: 8 });
+  calc_ch03_2.setMathBounds({ left: -0.5, right: 6, bottom: -2, top: 3 });
+</script>
+```
+
+The green shaded region always has area $1$. Move the slider $x_0$ and observe
+how the rectangle reshapes itself: as the width grows, the height $1/x_0$
+shrinks. The red curve shows the derivative $-1/x^2$, which is always negative,
+confirming that $1/x$ is a decreasing function for $x > 0$.
+
+### The Derivative of $\sin\theta$: The Unit Circle
+
+We recall that $\sin\theta$ is defined as the $y$-coordinate (height) of the
+point on the unit circle after traversing an arc of length $\theta$ from the
+rightmost point. To find the derivative, we consider what happens when
+$\theta$ increases by a tiny amount $d\theta$.
+
+The small arc of length $d\theta$ along the circumference, when the circle is
+viewed up close, is essentially the hypotenuse of a tiny right triangle. The
+vertical leg of this triangle -- the change in height -- is $d(\sin\theta)$.
+The angle that this small triangle makes with the vertical is itself $\theta$
+(by a similar-triangles argument with the large triangle formed by the radius).
+
+From the geometry of this small right triangle,
+
+$$
+\frac{d(\sin\theta)}{d\theta} = \frac{\text{adjacent side}}{\text{hypotenuse}} = \cos\theta.
+$$
+
+Therefore,
+
+$$
+\boxed{\frac{d}{d\theta}\sin\theta = \cos\theta.}
+$$
+
+An analogous argument on the unit circle (examining the change in the
+$x$-coordinate) yields the companion result:
+
+$$
+\frac{d}{d\theta}\cos\theta = -\sin\theta.
+$$
+
+### Interactive Desmos Graph: Derivative of Sine on the Unit Circle
+
+```{=html}
+<div id="calc_ch03_3" class="desmos-container"></div>
+<script>
+  var calc_ch03_3 = Desmos.GraphingCalculator(document.getElementById('calc_ch03_3'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'θ', yAxisLabel: 'y'
+  });
+  calc_ch03_3.setExpression({ id: 'sin', latex: 'y = \\sin(x)', color: '#2d70b3' });
+  calc_ch03_3.setExpression({ id: 'cos', latex: 'y = \\cos(x)', color: '#c74440' });
+  calc_ch03_3.setExpression({ id: 't', latex: 't = 1', sliderBounds: { min: 0, max: 6.28, step: 0.01 } });
+  calc_ch03_3.setExpression({ id: 'tangent', latex: 'y - \\sin(t) = \\cos(t)(x - t)', color: '#388c46', lineStyle: Desmos.Styles.DASHED });
+  calc_ch03_3.setExpression({ id: 'pt', latex: '(t, \\sin(t))', color: '#388c46', pointSize: 8 });
+  calc_ch03_3.setMathBounds({ left: -0.5, right: 7, bottom: -2, top: 2 });
+</script>
+```
+
+The blue curve is $\sin\theta$ and the red curve is $\cos\theta$. The dashed
+green line is the tangent to the sine curve at $\theta = t$. Observe that the
+slope of this tangent always equals the value of the cosine at that point.
+
+### Interactive Python: Verifying the Power Rule Numerically
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch03_1">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Numerically verify the power rule for several values of n
+dx = 1e-8
+x = np.linspace(0.5, 3, 200)
+
+fig, axes = plt.subplots(2, 2, figsize=(10, 8))
+
+for idx, n in enumerate([2, 3, 4, 5]):
+    ax = axes[idx // 2][idx % 2]
+    # Numerical derivative via symmetric difference quotient
+    numerical = (((x + dx)**n) - ((x - dx)**n)) / (2 * dx)
+    # Analytical derivative from the power rule
+    analytical = n * x**(n - 1)
+
+    ax.plot(x, analytical, label=f'Power rule: ${n}x^{{{n-1}}}$', linewidth=2)
+    ax.plot(x, numerical, '--', label='Numerical derivative', linewidth=2)
+    ax.set_title(f'$f(x) = x^{{{n}}}$')
+    ax.set_xlabel('x')
+    ax.set_ylabel("f'(x)")
+    ax.legend(fontsize=9)
+    ax.grid(True, alpha=0.3)
+
+plt.suptitle('Numerical verification of the power rule', fontsize=14)
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch03_1', 'output_ch03_1', 'plot_ch03_1')">Run ▶</button>
+  <div class="output" id="output_ch03_1"></div>
+  <div class="plot-output" id="plot_ch03_1"></div>
+</div>
+```
+
+### Interactive Python: Geometric Area Argument for $x^2$
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch03_2">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Visualise the "nudged square" argument for d/dx(x^2) = 2x
+x = 2.0
+dx_vals = [0.5, 0.3, 0.1]
+
+fig, axes = plt.subplots(1, 3, figsize=(12, 4))
+
+for ax, dx in zip(axes, dx_vals):
+    # Original square
+    sq = plt.Rectangle((0, 0), x, x, facecolor='#2d70b3', alpha=0.4,
+                        edgecolor='black', linewidth=1.5)
+    ax.add_patch(sq)
+    # Right thin rectangle
+    r1 = plt.Rectangle((x, 0), dx, x, facecolor='#c74440', alpha=0.5,
+                        edgecolor='black', linewidth=1)
+    ax.add_patch(r1)
+    # Top thin rectangle
+    r2 = plt.Rectangle((0, x), x, dx, facecolor='#c74440', alpha=0.5,
+                        edgecolor='black', linewidth=1)
+    ax.add_patch(r2)
+    # Corner square
+    c = plt.Rectangle((x, x), dx, dx, facecolor='#388c46', alpha=0.6,
+                       edgecolor='black', linewidth=1)
+    ax.add_patch(c)
+
+    total_new = 2 * x * dx + dx**2
+    approx_new = 2 * x * dx
+    ax.set_xlim(-0.2, x + dx + 0.3)
+    ax.set_ylim(-0.2, x + dx + 0.3)
+    ax.set_aspect('equal')
+    ax.set_title(f'dx = {dx}\nnew area = {total_new:.4f}\n2x dx = {approx_new:.4f}')
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+
+fig.suptitle(f'Nudged square for x = {x}: red = 2x dx, green = (dx)²',
+             fontsize=12)
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch03_2', 'output_ch03_2', 'plot_ch03_2')">Run ▶</button>
+  <div class="output" id="output_ch03_2"></div>
+  <div class="plot-output" id="plot_ch03_2"></div>
+</div>
+```
+
+## Summary
+
+::: {.key-formula}
+| Concept | Key Result |
+|---|---|
+| Derivative of $x^2$ (area of a square) | $\frac{d}{dx}x^2 = 2x$ |
+| Derivative of $x^3$ (volume of a cube) | $\frac{d}{dx}x^3 = 3x^2$ |
+| Power rule | $\frac{d}{dx}x^n = nx^{n-1}$ |
+| Derivative of $1/x$ (constant-area rectangle) | $\frac{d}{dx}\frac{1}{x} = -\frac{1}{x^2}$ |
+| Derivative of $\sin\theta$ (unit circle) | $\frac{d}{d\theta}\sin\theta = \cos\theta$ |
+| Derivative of $\cos\theta$ (unit circle) | $\frac{d}{d\theta}\cos\theta = -\sin\theta$ |
+:::

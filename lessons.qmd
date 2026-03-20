@@ -1,0 +1,8 @@
+---
+title: "All Lessons"
+listing:
+  contents: lessons/*.qmd
+  sort: "date"
+  type: table
+  fields: [title, date]
+---

@@ -1,0 +1,348 @@
+---
+title: "The Paradox of the Derivative"
+subtitle: "Chapter 2"
+date: 2023-04-08
+---
+
+This lesson confronts a fundamental conceptual difficulty: the phrase
+"instantaneous rate of change" is, strictly speaking, an oxymoron. Change
+requires two distinct moments in time, yet we speak of velocity *at* a single
+instant. We resolve this paradox by defining the derivative as the limit of
+the difference quotient $ds/dt$ as $dt \to 0$, and we illustrate the definition
+with the concrete example $s(t) = t^3$.
+
+::: {.callout-note collapse="true"}
+## Prerequisites
+
+- The concept of a function $f(x)$ and its graph
+- Basic algebraic manipulation (expanding a binomial cube)
+- The idea of an integral and area under a curve (Chapter 1)
+:::
+
+## Topics Covered
+
+- The paradox of "instantaneous rate of change"
+- Velocity as the ratio $ds/dt$ for a small but finite $dt$
+- The derivative as the limit of $ds/dt$ as $dt \to 0$
+- The tangent line as a geometric interpretation of the derivative
+- Worked derivation: $\frac{d}{dt} t^3 = 3t^2$
+- The derivative as a "best constant approximation" for the rate of change
+
+## Lecture Video
+
+```{=html}
+<video controls width="100%" preload="metadata">
+  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/02_The%20paradox%20of%20the%20derivative%20%EF%BD%9C%20Chapter%202%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
+</video>
+```
+
+## Key Video Frames
+
+![The distance function $s(t)$ for a car traveling from A to B](../images/ch02/frame_01.jpg)
+
+![The velocity curve as the derivative of the distance function](../images/ch02/frame_02.jpg)
+
+![Zooming in: the ratio $ds/dt$ as the slope between two nearby points](../images/ch02/frame_03.jpg)
+
+![The tangent line at a single point emerges as $dt \to 0$](../images/ch02/frame_04.jpg)
+
+## Key Concepts
+
+### The Paradox: Change in an Instant
+
+We begin with a deceptively simple question: what does it mean for a car to
+have a velocity at a single moment in time?
+
+Consider a car that starts at rest, accelerates, and then decelerates to a stop
+at a point 100 meters away, with the entire journey taking 10 seconds. We
+denote the distance traveled as a function of time by $s(t)$, and we seek the
+velocity at any given instant.
+
+Intuitively, velocity is "distance traveled per unit time." To compute it, we
+need *two* distinct moments:
+
+$$
+v = \frac{\Delta s}{\Delta t} = \frac{s(t_2) - s(t_1)}{t_2 - t_1}.
+$$
+
+Yet a speedometer appears to report a speed at a *single* moment. If we
+restrict our attention to one instant, there is no elapsed time, no distance
+traversed, and hence no meaningful ratio. The notion of "instantaneous rate
+of change" is, in this sense, contradictory.
+
+### Resolving the Paradox with Small Nudges
+
+A physical speedometer sidesteps this difficulty by measuring the distance
+traveled over a *very small* interval of time. We formalize this idea as
+follows. Let $dt$ denote a small, positive increment in time, and let
+
+$$
+ds = s(t + dt) - s(t)
+$$
+
+be the corresponding change in distance. Then the ratio
+
+$$
+\frac{ds}{dt} = \frac{s(t + dt) - s(t)}{dt}
+$$
+
+represents the average velocity over the interval $[t, \, t + dt]$.
+Geometrically, this ratio is the slope of the **secant line** passing through
+the two points $(t, s(t))$ and $(t + dt, \, s(t + dt))$ on the graph of $s$.
+
+### The Derivative as a Limit
+
+In pure mathematics, the derivative is *not* the ratio $ds/dt$ for any
+particular finite choice of $dt$. Rather, it is the value that this ratio
+approaches as $dt \to 0$:
+
+$$
+\frac{ds}{dt} \;=\; \lim_{dt \to 0} \frac{s(t + dt) - s(t)}{dt}.
+$$
+
+As $dt$ shrinks, the two points on the graph draw closer together, and the
+secant line converges to the **tangent line** at the point $(t, s(t))$. The
+slope of this tangent line is the derivative.
+
+It is important to note what this definition does *not* say. We do not set
+$dt = 0$ (which would produce $0/0$), nor do we claim that $dt$ is
+"infinitely small." The quantity $dt$ remains finite and nonzero throughout;
+we simply examine the *trend* of the ratio as $dt$ becomes arbitrarily small.
+
+### Interactive Desmos Graph: Secant to Tangent Line
+
+```{=html}
+<div id="calc_ch02_1" class="desmos-container"></div>
+<script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+<script>
+  var calc_ch02_1 = Desmos.GraphingCalculator(document.getElementById('calc_ch02_1'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 't', yAxisLabel: 's(t)'
+  });
+  calc_ch02_1.setExpression({ id: 'st', latex: 's(t) = t^3', color: '#2d70b3' });
+  calc_ch02_1.setExpression({ id: 'a', latex: 'a = 2', sliderBounds: { min: 0, max: 3, step: 0.01 } });
+  calc_ch02_1.setExpression({ id: 'dt', latex: 'd = 1.0', sliderBounds: { min: 0.01, max: 2, step: 0.01 } });
+  calc_ch02_1.setExpression({ id: 'pt1', latex: '(a, a^3)', color: '#c74440', pointStyle: 'POINT', pointSize: 8 });
+  calc_ch02_1.setExpression({ id: 'pt2', latex: '(a+d, (a+d)^3)', color: '#c74440', pointStyle: 'POINT', pointSize: 8 });
+  calc_ch02_1.setExpression({ id: 'secant', latex: 'y - a^3 = \\frac{(a+d)^3 - a^3}{d}(x - a)', color: '#388c46', lineWidth: 2 });
+  calc_ch02_1.setExpression({ id: 'tangent', latex: 'y - a^3 = 3a^2(x - a)', color: '#c74440', lineStyle: Desmos.Styles.DASHED, lineWidth: 1.5 });
+  calc_ch02_1.setMathBounds({ left: -0.5, right: 4, bottom: -5, top: 30 });
+</script>
+```
+
+Adjust the slider $d$ (representing $dt$) toward zero and observe how the
+green secant line converges to the dashed red tangent line. The slope of the
+tangent line at $t = a$ is $3a^2$, the derivative of $t^3$.
+
+### A Concrete Derivation: $s(t) = t^3$
+
+To make the definition concrete, suppose the distance function is
+$s(t) = t^3$. We compute the derivative at a specific time, say $t = 2$.
+
+The difference quotient is
+
+$$
+\frac{ds}{dt} = \frac{(2 + dt)^3 - 2^3}{dt}.
+$$
+
+Expanding the cube:
+
+$$
+(2 + dt)^3 = 2^3 + 3 \cdot 2^2 \cdot dt + 3 \cdot 2 \cdot dt^2 + dt^3
+            = 8 + 12\,dt + 6\,dt^2 + dt^3.
+$$
+
+Subtracting $2^3 = 8$:
+
+$$
+(2 + dt)^3 - 8 = 12\,dt + 6\,dt^2 + dt^3.
+$$
+
+Dividing by $dt$:
+
+$$
+\frac{ds}{dt} = 12 + 6\,dt + dt^2.
+$$
+
+As $dt \to 0$, the terms $6\,dt$ and $dt^2$ vanish, leaving
+
+$$
+\left.\frac{ds}{dt}\right|_{t=2} = 12 = 3 \cdot 2^2.
+$$
+
+There is nothing special about $t = 2$. Repeating the same argument at a
+general time $t$, we replace 2 with $t$ and expand $(t + dt)^3$:
+
+$$
+\frac{(t + dt)^3 - t^3}{dt}
+= \frac{3t^2\,dt + 3t\,dt^2 + dt^3}{dt}
+= 3t^2 + 3t\,dt + dt^2.
+$$
+
+Taking the limit as $dt \to 0$:
+
+$$
+\frac{d}{dt}\, t^3 = 3t^2.
+$$
+
+### Interactive Desmos Graph: The Power Rule in Action
+
+```{=html}
+<div id="calc_ch02_2" class="desmos-container"></div>
+<script>
+  var calc_ch02_2 = Desmos.GraphingCalculator(document.getElementById('calc_ch02_2'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 't', yAxisLabel: ''
+  });
+  calc_ch02_2.setExpression({ id: 'st', latex: 's(t) = t^3', color: '#2d70b3' });
+  calc_ch02_2.setExpression({ id: 'v', latex: 'v(t) = 3t^2', color: '#388c46' });
+  calc_ch02_2.setExpression({ id: 'a', latex: 'a = 1.5', sliderBounds: { min: 0, max: 3, step: 0.01 } });
+  calc_ch02_2.setExpression({ id: 'pt_s', latex: '(a, a^3)', color: '#2d70b3', pointStyle: 'POINT', pointSize: 8, label: 's(a)', showLabel: true });
+  calc_ch02_2.setExpression({ id: 'pt_v', latex: '(a, 3a^2)', color: '#388c46', pointStyle: 'POINT', pointSize: 8, label: 'v(a)', showLabel: true });
+  calc_ch02_2.setMathBounds({ left: -0.5, right: 4, bottom: -2, top: 30 });
+</script>
+```
+
+Move the slider $a$ to trace both the distance function $s(t) = t^3$ (blue) and
+its derivative $v(t) = 3t^2$ (green) simultaneously. Notice that when $s(t)$ is
+steep, $v(t)$ is large, and when $s(t)$ flattens, $v(t)$ approaches zero.
+
+### Interactive Desmos Graph: The Difference Quotient Surface
+
+```{=html}
+<div id="calc_ch02_3" class="desmos-container"></div>
+<script>
+  var calc_ch02_3 = Desmos.GraphingCalculator(document.getElementById('calc_ch02_3'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 't', yAxisLabel: 'ds/dt'
+  });
+  calc_ch02_3.setExpression({ id: 'true_deriv', latex: 'y = 3x^2', color: '#c74440', lineWidth: 2.5 });
+  calc_ch02_3.setExpression({ id: 'dt_val', latex: 'h = 1.0', sliderBounds: { min: 0.01, max: 2, step: 0.01 } });
+  calc_ch02_3.setExpression({ id: 'diff_quot', latex: 'y = \\frac{(x+h)^3 - x^3}{h}', color: '#2d70b3', lineWidth: 1.5 });
+  calc_ch02_3.setExpression({ id: 'label_true', latex: 'y = 3x^2', color: '#c74440', label: '3t²  (derivative)', showLabel: true, hidden: true });
+  calc_ch02_3.setMathBounds({ left: -0.5, right: 4, bottom: -2, top: 50 });
+</script>
+```
+
+Drag the slider $h$ (representing $dt$) toward zero. The blue curve shows
+the difference quotient $\frac{(t+h)^3 - t^3}{h}$ for the current value of
+$h$, while the red curve shows the true derivative $3t^2$. As $h \to 0$, the
+two curves coincide.
+
+### The Derivative is Not "Change at an Instant"
+
+Consider the car traveling according to $s(t) = t^3$. At $t = 0$, the
+derivative is $3(0)^2 = 0$. Does this mean the car is *not moving* at $t = 0$?
+
+If we examine an actual interval, say $[0, 0.1]$, we find that the car
+travels $s(0.1) - s(0) = 0.001$ meters in $0.1$ seconds, giving an average
+velocity of $0.01$ m/s. The car *is* moving, but the ratio $ds/dt$ becomes
+arbitrarily small as $dt \to 0$.
+
+The correct interpretation is: a derivative of zero at $t = 0$ means that
+the **best constant approximation** for the velocity near $t = 0$ is zero.
+The phrase "instantaneous rate of change" should therefore be understood as a
+convenient shorthand for this limiting notion, not as a literal description
+of change occurring at a single instant.
+
+### Interactive Python: Computing the Difference Quotient
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch02_1">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Distance function and its true derivative
+def s(t):
+    return t**3
+
+def ds_dt_exact(t):
+    return 3 * t**2
+
+# Compute the difference quotient for several values of dt
+t_vals = np.linspace(0, 3, 300)
+dt_values = [1.0, 0.5, 0.1, 0.01]
+
+fig, ax = plt.subplots(figsize=(9, 5))
+
+for dt in dt_values:
+    dq = (s(t_vals + dt) - s(t_vals)) / dt
+    ax.plot(t_vals, dq, alpha=0.7, label=f'dt = {dt}')
+
+ax.plot(t_vals, ds_dt_exact(t_vals), 'k--', linewidth=2, label='True derivative $3t^2$')
+ax.set_xlabel('t')
+ax.set_ylabel('ds / dt')
+ax.set_title('Difference quotient approaching the derivative')
+ax.legend()
+ax.set_ylim(-1, 30)
+ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch02_1', 'output_ch02_1', 'plot_ch02_1')">Run ▶</button>
+  <div class="output" id="output_ch02_1"></div>
+  <div class="plot-output" id="plot_ch02_1"></div>
+</div>
+```
+
+### Interactive Python: The Paradox at $t = 0$
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch02_2">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Demonstrate the "paradox" at t = 0 for s(t) = t^3
+# The derivative is 0, but the car does move over any finite interval.
+
+dt_values = np.logspace(-1, -8, 50)
+avg_velocities = []
+
+for dt in dt_values:
+    avg_v = ((0 + dt)**3 - 0**3) / dt   # = dt^2
+    avg_velocities.append(avg_v)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4))
+
+# Left: average velocity vs dt (log-log)
+ax1.loglog(dt_values, avg_velocities, 'o-', markersize=3, color='#2d70b3')
+ax1.set_xlabel('dt  (seconds)')
+ax1.set_ylabel('Average velocity  (m/s)')
+ax1.set_title('Average velocity near t = 0')
+ax1.grid(True, alpha=0.3, which='both')
+
+# Right: zoom into s(t) = t^3 near t = 0
+t = np.linspace(-0.5, 0.5, 400)
+ax2.plot(t, t**3, color='#2d70b3', linewidth=2, label='$s(t) = t^3$')
+ax2.plot(t, 0*t, 'r--', linewidth=1, label='Tangent at $t=0$')
+ax2.plot(0, 0, 'ko', markersize=6)
+ax2.set_xlabel('t')
+ax2.set_ylabel('s(t)')
+ax2.set_title('Distance near t = 0 (flat tangent)')
+ax2.legend()
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+print("As dt shrinks, the average velocity near t = 0 tends to 0,")
+print("confirming that the derivative (best constant approximation) is 0.")
+print(f"Example: dt = 0.1 => avg velocity = {0.1**2:.4f} m/s")
+print(f"         dt = 0.001 => avg velocity = {0.001**2:.8f} m/s")
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch02_2', 'output_ch02_2', 'plot_ch02_2')">Run ▶</button>
+  <div class="output" id="output_ch02_2"></div>
+  <div class="plot-output" id="plot_ch02_2"></div>
+</div>
+```
+
+## Summary
+
+::: {.key-formula}
+| Concept | Key Result |
+|---|---|
+| Difference quotient | $\dfrac{s(t + dt) - s(t)}{dt}$ (average rate of change over $[t, t+dt]$) |
+| Derivative (limit definition) | $\dfrac{ds}{dt} = \displaystyle\lim_{dt \to 0} \frac{s(t+dt) - s(t)}{dt}$ |
+| Geometric interpretation | Slope of the tangent line to $s(t)$ at the point $t$ |
+| Worked example | $\dfrac{d}{dt}\, t^3 = 3t^2$ |
+| Conceptual interpretation | The derivative is the best constant approximation for the rate of change near a point |
+:::

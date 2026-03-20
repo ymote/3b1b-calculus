@@ -1,0 +1,381 @@
+---
+title: "Implicit Differentiation"
+subtitle: "Chapter 6"
+date: 2023-04-06
+---
+
+This lesson examines implicit differentiation, a technique for finding the slope
+of tangent lines to curves defined by equations in two variables rather than by
+explicit functions. We develop the method through the geometry of the circle
+$x^2 + y^2 = 25$, connect it to related rates problems, and then generalise
+to arbitrary implicit curves.
+
+::: {.callout-note collapse="true"}
+## Prerequisites
+
+- The chain rule and product rule for single-variable derivatives (Chapters 3--4)
+- Familiarity with the equation of a circle and the Pythagorean theorem
+- Basic algebraic manipulation of equations involving $dx$ and $dy$
+:::
+
+## Topics Covered
+
+- Curves defined implicitly by equations in $x$ and $y$
+- Differentiating both sides of an implicit equation
+- The multivariable perspective: $s(x,y) = x^2 + y^2$ and its total differential
+- Connection between implicit differentiation and related rates
+- Deriving $\frac{d}{dx}\ln(x) = \frac{1}{x}$ via implicit differentiation
+
+## Lecture Video
+
+```{=html}
+<video controls width="100%" preload="metadata">
+  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/06_Implicit%20differentiation%2C%20what%27s%20going%20on%20here%EF%BC%9F%20%EF%BD%9C%20Chapter%206%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
+</video>
+```
+
+## Key Video Frames
+
+![The circle $x^2 + y^2 = 25$ and its tangent line at $(3,4)$](../images/ch06/frame_01.jpg)
+
+![Taking the derivative of both sides: $2x\,dx + 2y\,dy = 0$](../images/ch06/frame_02.jpg)
+
+![The function $s(x,y) = x^2 + y^2$ evaluated across the plane](../images/ch06/frame_03.jpg)
+
+![Implicit differentiation applied to $\sin(x) \cdot y^2 = x$](../images/ch06/frame_04.jpg)
+
+## Key Concepts
+
+### The Problem: Slopes on Implicit Curves
+
+Consider a circle of radius 5 centred at the origin, defined by the equation
+
+$$
+x^2 + y^2 = 25.
+$$
+
+We wish to find the slope of the tangent line at a point such as $(3, 4)$.
+Unlike the curves we have encountered previously, this circle is not the graph
+of a single function $y = f(x)$. The variables $x$ and $y$ are interdependent
+values related by an equation rather than an explicit input-output relationship.
+Such a curve is called an **implicit curve**.
+
+### Differentiating Both Sides
+
+The central technique is to treat both sides of the equation as quantities that
+change when we take a tiny step $(dx, dy)$ along the curve, and then
+differentiate accordingly.
+
+Beginning with $x^2 + y^2 = 25$, we differentiate each term:
+
+$$
+2x\,dx + 2y\,dy = 0.
+$$
+
+Solving for the slope $\dfrac{dy}{dx}$, we divide through by $dx$ and
+rearrange:
+
+$$
+\frac{dy}{dx} = -\frac{x}{y}.
+$$
+
+At the point $(3, 4)$, this gives
+
+$$
+\frac{dy}{dx}\bigg|_{(3,4)} = -\frac{3}{4}.
+$$
+
+This result is consistent with the geometric fact that the tangent to a circle
+is perpendicular to the radius at the point of tangency, but the method itself
+generalises far beyond circles.
+
+### Interactive Desmos Graph: Tangent Line to the Circle
+
+```{=html}
+<div id="calc_ch06_1" class="desmos-container"></div>
+<script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+<script>
+  var calc_ch06_1 = Desmos.GraphingCalculator(document.getElementById('calc_ch06_1'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'y'
+  });
+  calc_ch06_1.setExpression({ id: 'circle', latex: 'x^2 + y^2 = 25', color: '#2d70b3' });
+  calc_ch06_1.setExpression({ id: 'a', latex: 'a = 3', sliderBounds: { min: -5, max: 5, step: 0.01 } });
+  calc_ch06_1.setExpression({ id: 'b', latex: 'b = \\sqrt{25 - a^2}', color: '#388c46' });
+  calc_ch06_1.setExpression({ id: 'tangent', latex: 'y - b = -\\frac{a}{b}(x - a)', color: '#c74440' });
+  calc_ch06_1.setExpression({ id: 'pt', latex: '(a, b)', color: '#c74440', pointStyle: 'POINT', pointSize: 9 });
+  calc_ch06_1.setMathBounds({ left: -8, right: 8, bottom: -8, top: 8 });
+</script>
+```
+
+Drag the slider $a$ to move the point along the upper semicircle. The red
+tangent line has slope $-a/b = -x/y$, as predicted by implicit differentiation.
+
+### The Multivariable Perspective
+
+To understand *why* this procedure works, we introduce a function of two
+variables:
+
+$$
+s(x, y) = x^2 + y^2.
+$$
+
+This function assigns to every point $(x, y)$ in the plane a single number.
+Points on our circle are precisely those where $s(x, y) = 25$. Points farther
+from the origin yield larger values of $s$; points closer to the origin yield
+smaller values.
+
+A tiny step $(dx, dy)$ from any point $(x, y)$ produces a change in $s$ of
+
+$$
+ds = 2x\,dx + 2y\,dy.
+$$
+
+This expression is the **total differential** of $s$. It tells us how much
+$s$ changes for an arbitrary small displacement, and it depends both on the
+starting point $(x, y)$ and on the step $(dx, dy)$.
+
+When we restrict ourselves to steps that remain on the circle, we require
+$s$ to remain constant at 25. This means $ds = 0$, and so
+
+$$
+2x\,dx + 2y\,dy = 0,
+$$
+
+which is exactly the equation we obtained by "differentiating both sides."
+
+### Connection to Related Rates
+
+The same equation $x^2 + y^2 = 25$ appears in a different guise when we
+consider a 5-metre ladder sliding down a wall. If $y(t)$ denotes the height
+of the top of the ladder and $x(t)$ the distance of its base from the wall,
+then the Pythagorean theorem gives
+
+$$
+x(t)^2 + y(t)^2 = 25
+$$
+
+at all times $t$. Differentiating with respect to $t$:
+
+$$
+2x\,\frac{dx}{dt} + 2y\,\frac{dy}{dt} = 0.
+$$
+
+If, at $t = 0$, we have $y = 4$, $x = 3$, and $\dfrac{dy}{dt} = -1$ m/s
+(the ladder is sliding down), then
+
+$$
+2(3)\frac{dx}{dt} + 2(4)(-1) = 0
+\quad\Longrightarrow\quad
+\frac{dx}{dt} = \frac{4}{3} \text{ m/s}.
+$$
+
+The algebraic structure is identical to the implicit differentiation problem.
+The only difference is that in the related rates setting the tiny nudges $dx$
+and $dy$ are tied to a common parameter $t$, whereas in implicit
+differentiation they float freely as displacements along the curve.
+
+### A More Complex Example
+
+Consider the implicit curve defined by
+
+$$
+\sin(x) \cdot y^2 = x.
+$$
+
+To find $\dfrac{dy}{dx}$, we differentiate both sides. On the left we apply the
+product rule:
+
+$$
+\cos(x)\,dx \cdot y^2 + \sin(x) \cdot 2y\,dy = dx.
+$$
+
+Dividing through by $dx$ and solving for $\dfrac{dy}{dx}$:
+
+$$
+\frac{dy}{dx} = \frac{1 - y^2 \cos(x)}{2y\sin(x)}.
+$$
+
+This formula gives the slope of the tangent line at any point $(x, y)$ that
+lies on the curve.
+
+### Interactive Desmos Graph: Implicit Curve $\sin(x)\cdot y^2 = x$
+
+```{=html}
+<div id="calc_ch06_2" class="desmos-container"></div>
+<script>
+  var calc_ch06_2 = Desmos.GraphingCalculator(document.getElementById('calc_ch06_2'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'y'
+  });
+  calc_ch06_2.setExpression({ id: 'curve', latex: '\\sin(x) \\cdot y^2 = x', color: '#2d70b3' });
+  calc_ch06_2.setExpression({ id: 'a', latex: 'a = 1.5', sliderBounds: { min: 0.1, max: 6, step: 0.01 } });
+  calc_ch06_2.setExpression({ id: 'b', latex: 'b = \\sqrt{\\frac{a}{\\sin(a)}}', color: '#388c46' });
+  calc_ch06_2.setExpression({ id: 'slope', latex: 'm = \\frac{1 - b^2 \\cos(a)}{2 b \\sin(a)}', color: '#c74440' });
+  calc_ch06_2.setExpression({ id: 'tangent', latex: 'y - b = m(x - a)', color: '#c74440' });
+  calc_ch06_2.setExpression({ id: 'pt', latex: '(a, b)', color: '#c74440', pointStyle: 'POINT', pointSize: 9 });
+  calc_ch06_2.setMathBounds({ left: -1, right: 10, bottom: -5, top: 5 });
+</script>
+```
+
+Adjust the slider $a$ to trace along the upper branch of the curve. The tangent
+line slope is computed from the implicit derivative formula derived above.
+
+### Deriving $\frac{d}{dx}\ln(x)$ via Implicit Differentiation
+
+Implicit differentiation also provides an elegant route to new derivative
+formulas. Suppose we wish to compute the derivative of $\ln(x)$. We set
+
+$$
+y = \ln(x),
+$$
+
+and rewrite this as
+
+$$
+e^y = x.
+$$
+
+Differentiating both sides implicitly:
+
+$$
+e^y\,dy = dx.
+$$
+
+Solving for $\dfrac{dy}{dx}$:
+
+$$
+\frac{dy}{dx} = \frac{1}{e^y}.
+$$
+
+Since $e^y = x$ on the curve, we conclude
+
+$$
+\frac{d}{dx}\ln(x) = \frac{1}{x}.
+$$
+
+### Interactive Desmos Graph: The Natural Logarithm and Its Tangent
+
+```{=html}
+<div id="calc_ch06_3" class="desmos-container"></div>
+<script>
+  var calc_ch06_3 = Desmos.GraphingCalculator(document.getElementById('calc_ch06_3'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'y'
+  });
+  calc_ch06_3.setExpression({ id: 'ln', latex: 'y = \\ln(x)', color: '#2d70b3' });
+  calc_ch06_3.setExpression({ id: 'a', latex: 'a = 2', sliderBounds: { min: 0.1, max: 8, step: 0.01 } });
+  calc_ch06_3.setExpression({ id: 'tangent', latex: 'y - \\ln(a) = \\frac{1}{a}(x - a)', color: '#c74440' });
+  calc_ch06_3.setExpression({ id: 'pt', latex: '(a, \\ln(a))', color: '#c74440', pointStyle: 'POINT', pointSize: 9 });
+  calc_ch06_3.setMathBounds({ left: -1, right: 10, bottom: -4, top: 4 });
+</script>
+```
+
+Move the slider $a$ to observe how the tangent slope $1/a$ matches the
+derivative of $\ln(x)$ at each point.
+
+### Interactive Python: Implicit Differentiation on the Circle
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch06_1">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Plot the circle and tangent lines at several points
+theta = np.linspace(0, 2 * np.pi, 500)
+cx, cy = 5 * np.cos(theta), 5 * np.sin(theta)
+
+fig, ax = plt.subplots(figsize=(6, 6))
+ax.plot(cx, cy, color='steelblue', linewidth=2, label='$x^2 + y^2 = 25$')
+ax.set_aspect('equal')
+
+# Tangent lines at selected points on the upper semicircle
+for x0 in [1, 2, 3, 4]:
+    y0 = np.sqrt(25 - x0**2)
+    slope = -x0 / y0            # dy/dx from implicit differentiation
+    xs = np.linspace(x0 - 2, x0 + 2, 50)
+    ys = y0 + slope * (xs - x0)
+    ax.plot(xs, ys, '--', linewidth=1.2,
+            label=f'Tangent at ({x0}, {y0:.2f}), slope = {slope:.3f}')
+    ax.plot(x0, y0, 'o', markersize=6)
+
+ax.set_xlim(-7, 7)
+ax.set_ylim(-7, 7)
+ax.set_xlabel('x')
+ax.set_ylabel('y')
+ax.set_title('Tangent lines to $x^2+y^2=25$ via implicit differentiation')
+ax.legend(fontsize=8, loc='lower right')
+ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch06_1', 'output_ch06_1', 'plot_ch06_1')">Run ▶</button>
+  <div class="output" id="output_ch06_1"></div>
+  <div class="plot-output" id="plot_ch06_1"></div>
+</div>
+```
+
+### Interactive Python: Related Rates -- Sliding Ladder
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch06_2">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Simulate the sliding ladder problem
+# x(t)^2 + y(t)^2 = 25, dy/dt = -1 m/s initially
+# From 2x dx/dt + 2y dy/dt = 0  =>  dx/dt = -y dy/dt / x
+
+dt = 0.01
+t_max = 3.5
+times, xs, ys, dxdt_vals = [], [], [], []
+
+x, y = 3.0, 4.0
+t = 0.0
+
+while y > 0.05 and t < t_max:
+    times.append(t)
+    xs.append(x)
+    ys.append(y)
+    dydt = -1.0
+    dxdt = -y * dydt / x     # from implicit differentiation
+    dxdt_vals.append(dxdt)
+    x += dxdt * dt
+    y += dydt * dt
+    t += dt
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
+
+ax1.plot(times, xs, label='x(t) -- base distance', color='steelblue')
+ax1.plot(times, ys, label='y(t) -- height', color='coral')
+ax1.set_xlabel('Time (s)')
+ax1.set_ylabel('Distance (m)')
+ax1.set_title('Ladder positions over time')
+ax1.legend()
+ax1.grid(True, alpha=0.3)
+
+ax2.plot(times, dxdt_vals, color='#6a0dad')
+ax2.set_xlabel('Time (s)')
+ax2.set_ylabel('dx/dt (m/s)')
+ax2.set_title('Rate at which base moves away from wall')
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch06_2', 'output_ch06_2', 'plot_ch06_2')">Run ▶</button>
+  <div class="output" id="output_ch06_2"></div>
+  <div class="plot-output" id="plot_ch06_2"></div>
+</div>
+```
+
+## Summary
+
+::: {.key-formula}
+| Concept | Key Result |
+|---|---|
+| Circle tangent slope | $x^2 + y^2 = r^2 \;\Longrightarrow\; \dfrac{dy}{dx} = -\dfrac{x}{y}$ |
+| Total differential | $ds = 2x\,dx + 2y\,dy$ for $s = x^2 + y^2$ |
+| Implicit differentiation (general) | Differentiate both sides, set $ds = 0$, solve for $\dfrac{dy}{dx}$ |
+| Related rates connection | Same algebra, but $dx$ and $dy$ are tied to $dt$ |
+| Derivative of $\ln(x)$ | $y = \ln(x) \;\Longrightarrow\; e^y = x \;\Longrightarrow\; \dfrac{dy}{dx} = \dfrac{1}{x}$ |
+:::

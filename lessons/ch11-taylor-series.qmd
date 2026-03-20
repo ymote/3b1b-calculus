@@ -1,0 +1,438 @@
+---
+title: "Taylor Series"
+subtitle: "Chapter 11"
+date: 2023-04-01
+---
+
+This lesson develops the theory of Taylor series -- the systematic approximation
+of functions by polynomials. We begin by constructing a quadratic approximation
+of $\cos(x)$ near $x = 0$, then generalize to higher-order Taylor polynomials,
+and finally examine convergence properties of the resulting infinite series.
+
+::: {.callout-note collapse="true"}
+## Prerequisites
+
+- Familiarity with derivatives through higher orders (Chapters 2--4, 10)
+- Understanding of $e^x$, $\sin(x)$, $\cos(x)$, and $\ln(x)$ (Chapter 5)
+- The Fundamental Theorem of Calculus (Chapters 1, 8)
+- Comfort with factorial notation: $n! = 1 \cdot 2 \cdot 3 \cdots n$
+:::
+
+## Topics Covered
+
+- Constructing polynomial approximations by matching derivatives at a point
+- The role of factorials in Taylor coefficients
+- Taylor polynomials for $\cos(x)$, $e^x$, and $\ln(x)$
+- The geometric interpretation of the second-order term via the Fundamental Theorem
+- Convergence, divergence, and the radius of convergence of Taylor series
+
+## Lecture Video
+
+```{=html}
+<video controls width="100%" preload="metadata">
+  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/11_Taylor%20series%20%EF%BD%9C%20Chapter%2011%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
+</video>
+```
+
+## Key Video Frames
+
+![Quadratic approximation of $\cos(x)$ near $x = 0$](../images/ch11/frame_01.jpg)
+
+![Higher-order Taylor polynomials for $\cos(x)$](../images/ch11/frame_02.jpg)
+
+![Taylor polynomials for $e^x$ converging at every input](../images/ch11/frame_03.jpg)
+
+![Radius of convergence for the Taylor series of $\ln(x)$](../images/ch11/frame_04.jpg)
+
+## Key Concepts
+
+### Motivation: Why Approximate with Polynomials?
+
+Many functions arising in mathematics and physics -- $\cos(\theta)$, $e^x$,
+$\ln(x)$ -- are difficult to compute, differentiate, or integrate in their
+exact form. Polynomials, by contrast, are straightforward: they require only
+addition and multiplication, and their derivatives and integrals follow
+elementary rules. The central idea of this chapter is that we can systematically
+construct polynomials that approximate a given function near a chosen point,
+with accuracy that improves as we include more terms.
+
+A classic example from physics is the pendulum. The potential energy of a
+pendulum involves $1 - \cos(\theta)$, which leads to unwieldy equations. If we
+replace $\cos(\theta)$ with the approximation $1 - \theta^2/2$, the problem
+reduces to the familiar harmonic oscillator, and the physics becomes transparent.
+
+### Constructing the Quadratic Approximation of $\cos(x)$
+
+We seek a polynomial $P(x) = c_0 + c_1 x + c_2 x^2$ that best resembles
+$\cos(x)$ near $x = 0$. We determine the three coefficients by imposing three
+conditions: the polynomial and $\cos(x)$ must agree in value, first derivative,
+and second derivative at $x = 0$.
+
+**Matching the value.** At $x = 0$, $\cos(0) = 1$. Evaluating the polynomial
+at $x = 0$ gives $P(0) = c_0$. Therefore,
+
+$$
+c_0 = 1.
+$$
+
+**Matching the first derivative.** The derivative of $\cos(x)$ is $-\sin(x)$,
+which equals $0$ at $x = 0$. The derivative of $P(x)$ is $c_1 + 2c_2 x$,
+which equals $c_1$ at $x = 0$. Therefore,
+
+$$
+c_1 = 0.
+$$
+
+**Matching the second derivative.** The second derivative of $\cos(x)$ is
+$-\cos(x)$, which equals $-1$ at $x = 0$. The second derivative of $P(x)$ is
+$2c_2$. Setting these equal:
+
+$$
+2c_2 = -1 \quad \Longrightarrow \quad c_2 = -\frac{1}{2}.
+$$
+
+The quadratic approximation is therefore
+
+$$
+\cos(x) \approx 1 - \frac{x^2}{2}.
+$$
+
+As a concrete verification: $P(0.1) = 1 - 0.005 = 0.995$, which matches the
+true value $\cos(0.1) = 0.99500\ldots$ to five decimal places.
+
+### Higher-Order Terms and the Role of Factorials
+
+We can improve the approximation by adding higher-order terms. Suppose we
+extend to a general degree-$n$ polynomial:
+
+$$
+P(x) = c_0 + c_1 x + c_2 x^2 + c_3 x^3 + c_4 x^4 + \cdots
+$$
+
+A key structural observation is that when we take $n$ successive derivatives of
+$x^n$, the power rule cascades to produce the coefficient $n!$. For instance,
+the fourth derivative of $x^4$ is $4 \cdot 3 \cdot 2 \cdot 1 = 4! = 24$. This
+means that the $n$-th derivative of $P(x)$ evaluated at $x = 0$ is $n! \cdot c_n$.
+
+To match the $n$-th derivative of $f$ at $x = 0$, we therefore require
+
+$$
+n! \cdot c_n = f^{(n)}(0) \quad \Longrightarrow \quad c_n = \frac{f^{(n)}(0)}{n!}.
+$$
+
+Another important property is that adding higher-order terms does not disturb
+the coefficients already determined. When we evaluate the $k$-th derivative at
+$x = 0$, every term of degree greater than $k$ vanishes (since each such term
+retains a factor of $x$ after $k$ differentiations). Each coefficient is thus
+controlled by one and only one derivative.
+
+### Taylor Polynomials for $\cos(x)$
+
+The successive derivatives of $\cos(x)$ follow a cyclic pattern:
+
+| $n$ | $f^{(n)}(x)$ | $f^{(n)}(0)$ |
+|-----|---------------|---------------|
+| 0   | $\cos(x)$     | $1$           |
+| 1   | $-\sin(x)$    | $0$           |
+| 2   | $-\cos(x)$    | $-1$          |
+| 3   | $\sin(x)$     | $0$           |
+| 4   | $\cos(x)$     | $1$           |
+
+The pattern $1, 0, -1, 0$ repeats with period four. Inserting these values into
+the general formula, the Taylor polynomial of degree $2N$ for $\cos(x)$ is
+
+$$
+\cos(x) \approx \sum_{k=0}^{N} \frac{(-1)^k}{(2k)!} x^{2k} = 1 - \frac{x^2}{2!} + \frac{x^4}{4!} - \frac{x^6}{6!} + \cdots
+$$
+
+Each successive term further constrains the polynomial to mimic the curvature,
+rate of curvature change, and higher-order behavior of $\cos(x)$ near the origin.
+
+### Interactive Desmos Graph: Taylor Polynomials for $\cos(x)$
+
+```{=html}
+<div id="calc_ch11_1" class="desmos-container"></div>
+<script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+<script>
+  var calc_ch11_1 = Desmos.GraphingCalculator(document.getElementById('calc_ch11_1'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'y'
+  });
+  calc_ch11_1.setExpression({ id: 'cos', latex: 'y = \\cos(x)', color: '#2d70b3', lineWidth: 3 });
+  calc_ch11_1.setExpression({ id: 'n', latex: 'N = 2', sliderBounds: { min: 0, max: 10, step: 1 } });
+  calc_ch11_1.setExpression({ id: 'T2', latex: 'y = 1 - \\frac{x^2}{2} \\left\\{N \\ge 1\\right\\}', color: '#c74440', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_1.setExpression({ id: 'T4', latex: 'y = 1 - \\frac{x^2}{2} + \\frac{x^4}{24} \\left\\{N \\ge 2\\right\\}', color: '#388c46', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_1.setExpression({ id: 'T6', latex: 'y = 1 - \\frac{x^2}{2} + \\frac{x^4}{24} - \\frac{x^6}{720} \\left\\{N \\ge 3\\right\\}', color: '#6042a6', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_1.setExpression({ id: 'T8', latex: 'y = 1 - \\frac{x^2}{2} + \\frac{x^4}{24} - \\frac{x^6}{720} + \\frac{x^8}{40320} \\left\\{N \\ge 4\\right\\}', color: '#e07020', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_1.setExpression({ id: 'T10', latex: 'y = 1 - \\frac{x^2}{2} + \\frac{x^4}{24} - \\frac{x^6}{720} + \\frac{x^8}{40320} - \\frac{x^{10}}{3628800} \\left\\{N \\ge 5\\right\\}', color: '#c7a540', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_1.setMathBounds({ left: -7, right: 7, bottom: -2, top: 2 });
+</script>
+```
+
+Adjust the slider $N$ to reveal successive Taylor polynomial approximations of
+$\cos(x)$. As the degree increases, the approximation remains accurate over a
+wider interval around the origin.
+
+### The General Taylor Polynomial
+
+For a general function $f$ that is sufficiently differentiable, the Taylor
+polynomial of degree $n$ centered at $x = 0$ (also known as a Maclaurin
+polynomial) is
+
+$$
+P_n(x) = \sum_{k=0}^{n} \frac{f^{(k)}(0)}{k!} \, x^k = f(0) + f'(0)\,x + \frac{f''(0)}{2!}\,x^2 + \frac{f'''(0)}{3!}\,x^3 + \cdots
+$$
+
+Each term carries a precise interpretation:
+
+- The constant term $f(0)$ matches the value of $f$ at the origin.
+- The linear term $f'(0) \, x$ matches the slope (first derivative).
+- The quadratic term $\frac{f''(0)}{2!} x^2$ matches the concavity (second derivative).
+- Each subsequent term matches the next higher-order derivative.
+
+### Taylor Polynomials Centered at an Arbitrary Point
+
+If we wish to approximate $f$ near some point $x = a$ rather than $x = 0$, we
+write the polynomial in powers of $(x - a)$:
+
+$$
+P_n(x) = \sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!} (x - a)^k.
+$$
+
+This ensures that all derivatives of $P_n$ match those of $f$ at $x = a$.
+Geometrically, changing $a$ shifts the region where the approximation is most
+accurate.
+
+### Taylor Polynomials for $e^x$
+
+The function $e^x$ provides an especially elegant example. Since the derivative
+of $e^x$ is itself, every derivative evaluated at $x = 0$ equals $1$. The
+Taylor polynomial is therefore
+
+$$
+e^x \approx \sum_{k=0}^{n} \frac{x^k}{k!} = 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + \frac{x^4}{4!} + \cdots
+$$
+
+### Interactive Desmos Graph: Taylor Polynomials for $e^x$
+
+```{=html}
+<div id="calc_ch11_2" class="desmos-container"></div>
+<script>
+  var calc_ch11_2 = Desmos.GraphingCalculator(document.getElementById('calc_ch11_2'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'y'
+  });
+  calc_ch11_2.setExpression({ id: 'exp', latex: 'y = e^x', color: '#2d70b3', lineWidth: 3 });
+  calc_ch11_2.setExpression({ id: 'n', latex: 'n = 1', sliderBounds: { min: 1, max: 10, step: 1 } });
+  calc_ch11_2.setExpression({ id: 'T1', latex: 'y = 1 + x \\left\\{n \\ge 1\\right\\}', color: '#c74440', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_2.setExpression({ id: 'T2', latex: 'y = 1 + x + \\frac{x^2}{2} \\left\\{n \\ge 2\\right\\}', color: '#388c46', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_2.setExpression({ id: 'T3', latex: 'y = 1 + x + \\frac{x^2}{2} + \\frac{x^3}{6} \\left\\{n \\ge 3\\right\\}', color: '#6042a6', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_2.setExpression({ id: 'T4', latex: 'y = 1 + x + \\frac{x^2}{2} + \\frac{x^3}{6} + \\frac{x^4}{24} \\left\\{n \\ge 4\\right\\}', color: '#e07020', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_2.setExpression({ id: 'T5', latex: 'y = 1 + x + \\frac{x^2}{2} + \\frac{x^3}{6} + \\frac{x^4}{24} + \\frac{x^5}{120} \\left\\{n \\ge 5\\right\\}', color: '#c7a540', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_2.setMathBounds({ left: -5, right: 5, bottom: -5, top: 30 });
+</script>
+```
+
+Increase the slider $n$ to add more terms. The Taylor polynomials for $e^x$
+converge to the true function at every input, no matter how far from the origin.
+
+### Geometric Interpretation via the Fundamental Theorem
+
+There is an illuminating geometric perspective on the second-order Taylor term.
+Consider a function $F(x) = \int_a^x g(t)\, dt$, where $g$ is the derivative
+of $F$. By the Fundamental Theorem of Calculus, $F'(x) = g(x)$.
+
+For a finite step from $a$ to $x$, the change in $F$ can be decomposed as
+follows. The first-order approximation gives a rectangle of area
+$g(a) \cdot (x - a)$. The second-order correction accounts for the fact that
+$g$ itself is changing: the additional area forms approximately a triangle with
+base $(x - a)$ and height $g'(a)(x - a)$. The area of this triangle is
+
+$$
+\frac{1}{2} g'(a)(x - a)^2 = \frac{1}{2} F''(a)(x - a)^2.
+$$
+
+This is precisely the second-order term of the Taylor polynomial for $F$
+centered at $a$. Each term in the Taylor expansion thus has a direct geometric
+counterpart in terms of area increments under the curve.
+
+### From Taylor Polynomials to Taylor Series
+
+A Taylor polynomial with finitely many terms is called a **Taylor polynomial**.
+When we allow infinitely many terms, the resulting expression is a **Taylor
+series**:
+
+$$
+\sum_{k=0}^{\infty} \frac{f^{(k)}(a)}{k!} (x - a)^k.
+$$
+
+Whether this infinite sum equals $f(x)$ depends on whether the partial sums
+converge. We say the series **converges** at a point $x$ if the sequence of
+partial sums $P_1(x), P_2(x), P_3(x), \ldots$ approaches a definite value.
+
+### Convergence and the Radius of Convergence
+
+Different functions exhibit different convergence behavior:
+
+- **$e^x$:** The Taylor series converges to $e^x$ for every real number $x$.
+  The radius of convergence is infinite.
+
+- **$\sin(x)$ and $\cos(x)$:** These series also converge for all $x$,
+  reflecting the fact that trigonometric functions are "entire" (analytic
+  everywhere).
+
+- **$\ln(x)$ centered at $x = 1$:** The Taylor series is
+  $$
+  \ln(x) = (x-1) - \frac{(x-1)^2}{2} + \frac{(x-1)^3}{3} - \cdots
+  $$
+  This series converges only for $0 < x \le 2$. Outside this interval, the
+  partial sums oscillate wildly and fail to approach $\ln(x)$, even though the
+  function itself is well-defined. The **radius of convergence** is $1$.
+
+The radius of convergence defines the distance from the center $a$ within which
+the series faithfully represents $f$. Beyond this radius, the derivative
+information at the single point $a$ is insufficient to determine the function's
+behavior.
+
+### Interactive Desmos Graph: Convergence of the $\ln(x)$ Series
+
+```{=html}
+<div id="calc_ch11_3" class="desmos-container"></div>
+<script>
+  var calc_ch11_3 = Desmos.GraphingCalculator(document.getElementById('calc_ch11_3'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'y'
+  });
+  calc_ch11_3.setExpression({ id: 'ln', latex: 'y = \\ln(x)', color: '#2d70b3', lineWidth: 3 });
+  calc_ch11_3.setExpression({ id: 'n', latex: 'n = 1', sliderBounds: { min: 1, max: 12, step: 1 } });
+  calc_ch11_3.setExpression({ id: 'T1', latex: 'y = (x-1) \\left\\{n \\ge 1\\right\\}', color: '#c74440', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_3.setExpression({ id: 'T2', latex: 'y = (x-1) - \\frac{(x-1)^2}{2} \\left\\{n \\ge 2\\right\\}', color: '#388c46', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_3.setExpression({ id: 'T3', latex: 'y = (x-1) - \\frac{(x-1)^2}{2} + \\frac{(x-1)^3}{3} \\left\\{n \\ge 3\\right\\}', color: '#6042a6', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_3.setExpression({ id: 'T4', latex: 'y = (x-1) - \\frac{(x-1)^2}{2} + \\frac{(x-1)^3}{3} - \\frac{(x-1)^4}{4} \\left\\{n \\ge 4\\right\\}', color: '#e07020', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_3.setExpression({ id: 'T5', latex: 'y = (x-1) - \\frac{(x-1)^2}{2} + \\frac{(x-1)^3}{3} - \\frac{(x-1)^4}{4} + \\frac{(x-1)^5}{5} \\left\\{n \\ge 5\\right\\}', color: '#c7a540', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_3.setExpression({ id: 'bound1', latex: 'x = 0', color: '#aaaaaa', lineStyle: Desmos.Styles.DOTTED });
+  calc_ch11_3.setExpression({ id: 'bound2', latex: 'x = 2', color: '#aaaaaa', lineStyle: Desmos.Styles.DOTTED });
+  calc_ch11_3.setMathBounds({ left: -1, right: 4, bottom: -4, top: 4 });
+</script>
+```
+
+Increase the slider $n$ to add terms to the Taylor series for $\ln(x)$ centered
+at $x = 1$. Within the interval $(0, 2]$, the approximations converge to the
+true function. Outside this interval, the partial sums diverge, illustrating the
+finite radius of convergence.
+
+### The Central Insight
+
+The entire construction of Taylor series rests on a single principle: **the
+derivatives of a function at a single point encode information about the
+function's behavior near that point.** A Taylor polynomial translates this
+derivative information into an explicit polynomial approximation. Each
+additional term incorporates one more order of derivative, yielding a more
+faithful approximation over a wider neighborhood of the center.
+
+### Interactive Python: Taylor Polynomial Approximation Error
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch11_1">
+import numpy as np
+import matplotlib.pyplot as plt
+from math import factorial
+
+# Compute Taylor polynomials for cos(x) of various degrees
+x = np.linspace(-2 * np.pi, 2 * np.pi, 500)
+true_cos = np.cos(x)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+
+# Left panel: cos(x) and its Taylor approximations
+ax1.plot(x, true_cos, 'k-', linewidth=2, label='$\\cos(x)$')
+colors = ['#c74440', '#388c46', '#6042a6', '#e07020']
+for i, deg in enumerate([2, 4, 6, 8]):
+    T = np.zeros_like(x)
+    for k in range(deg // 2 + 1):
+        T += ((-1)**k / factorial(2*k)) * x**(2*k)
+    ax1.plot(x, T, '--', color=colors[i], label=f'Degree {deg}')
+
+ax1.set_ylim(-2, 2)
+ax1.set_xlabel('x')
+ax1.set_ylabel('y')
+ax1.set_title('Taylor polynomials for cos(x)')
+ax1.legend(fontsize=9)
+ax1.grid(True, alpha=0.3)
+
+# Right panel: absolute error at x = 1 vs. polynomial degree
+x_val = 1.0
+degrees = list(range(0, 21, 2))
+errors = []
+for deg in degrees:
+    T = sum(((-1)**k / factorial(2*k)) * x_val**(2*k) for k in range(deg // 2 + 1))
+    errors.append(abs(T - np.cos(x_val)))
+
+ax2.semilogy(degrees, [e if e > 0 else 1e-17 for e in errors], 'o-', color='#2d70b3')
+ax2.set_xlabel('Polynomial degree')
+ax2.set_ylabel('$|P_n(1) - \\cos(1)|$')
+ax2.set_title('Approximation error at $x = 1$')
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch11_1', 'output_ch11_1', 'plot_ch11_1')">Run ▶</button>
+  <div class="output" id="output_ch11_1"></div>
+  <div class="plot-output" id="plot_ch11_1"></div>
+</div>
+```
+
+### Interactive Python: Convergence of the $e^x$ Series
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch11_2">
+import numpy as np
+import matplotlib.pyplot as plt
+from math import factorial
+
+# Demonstrate convergence of the Taylor series for e^x
+x_values = [1.0, 2.0, -3.0]
+max_terms = 20
+
+fig, axes = plt.subplots(1, 3, figsize=(14, 4))
+
+for idx, x_val in enumerate(x_values):
+    partial_sums = []
+    s = 0
+    for k in range(max_terms):
+        s += x_val**k / factorial(k)
+        partial_sums.append(s)
+
+    ax = axes[idx]
+    ax.plot(range(max_terms), partial_sums, 'o-', markersize=4, color='#2d70b3',
+            label='Partial sums')
+    ax.axhline(y=np.exp(x_val), color='#c74440', linestyle='--',
+               label=f'$e^{{{x_val:.0f}}} = {np.exp(x_val):.4f}$')
+    ax.set_xlabel('Number of terms')
+    ax.set_ylabel('Partial sum')
+    ax.set_title(f'$x = {x_val}$')
+    ax.legend(fontsize=8)
+    ax.grid(True, alpha=0.3)
+
+plt.suptitle('Convergence of the Taylor series for $e^x$', fontsize=13)
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch11_2', 'output_ch11_2', 'plot_ch11_2')">Run ▶</button>
+  <div class="output" id="output_ch11_2"></div>
+  <div class="plot-output" id="plot_ch11_2"></div>
+</div>
+```
+
+## Summary
+
+::: {.key-formula}
+| Concept | Key Result |
+|---|---|
+| Taylor polynomial (at $x = 0$) | $P_n(x) = \displaystyle\sum_{k=0}^{n} \frac{f^{(k)}(0)}{k!}\, x^k$ |
+| Taylor polynomial (at $x = a$) | $P_n(x) = \displaystyle\sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!}\, (x-a)^k$ |
+| Cosine series | $\cos(x) = 1 - \frac{x^2}{2!} + \frac{x^4}{4!} - \frac{x^6}{6!} + \cdots$ |
+| Exponential series | $e^x = 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + \cdots$ |
+| Coefficient formula | $c_n = \frac{f^{(n)}(a)}{n!}$ |
+| Radius of convergence | Maximum distance from $a$ for which the series converges |
+:::

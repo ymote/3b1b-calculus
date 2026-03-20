@@ -1,0 +1,348 @@
+---
+title: "隐函数求导"
+subtitle: "第六章"
+date: 2023-04-06
+---
+
+本课研究隐函数求导——一种用于求解由两个变量之间的方程（而非显式函数）所定义的曲线的切线斜率的技术。我们通过圆 $x^2 + y^2 = 25$ 的几何来发展这一方法，将其与相关变化率问题联系起来，然后推广到一般的隐式曲线。
+
+::: {.callout-note collapse="true"}
+## 预备知识
+
+- 单变量导数的链式法则和乘积法则（第三至四章）
+- 熟悉圆的方程和勾股定理
+- 能够对含 $dx$ 和 $dy$ 的方程进行基本代数运算
+:::
+
+## 本课内容
+
+- 由 $x$ 和 $y$ 的方程隐式定义的曲线
+- 对隐式方程两边求导
+- 多变量视角：$s(x,y) = x^2 + y^2$ 及其全微分
+- 隐函数求导与相关变化率之间的联系
+- 通过隐函数求导推导 $\frac{d}{dx}\ln(x) = \frac{1}{x}$
+
+## 课程视频
+
+```{=html}
+<video controls width="100%" preload="metadata">
+  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/06_Implicit%20differentiation%2C%20what%27s%20going%20on%20here%EF%BC%9F%20%EF%BD%9C%20Chapter%206%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
+</video>
+```
+
+## 课程关键帧
+
+![圆 $x^2 + y^2 = 25$ 及其在 $(3,4)$ 处的切线](../images/ch06/frame_01.jpg)
+
+![对两边求导：$2x\,dx + 2y\,dy = 0$](../images/ch06/frame_02.jpg)
+
+![函数 $s(x,y) = x^2 + y^2$ 在平面上的取值](../images/ch06/frame_03.jpg)
+
+![将隐函数求导应用于 $\sin(x) \cdot y^2 = x$](../images/ch06/frame_04.jpg)
+
+## 核心要点
+
+### 问题的提出：隐式曲线上的斜率
+
+考虑一个以原点为圆心、半径为 5 的圆，由方程
+
+$$
+x^2 + y^2 = 25
+$$
+
+定义。我们希望求出在某个点（例如 $(3, 4)$）处切线的斜率。与我们之前遇到的曲线不同，这个圆不是某个函数 $y = f(x)$ 的图像。变量 $x$ 和 $y$ 是通过方程相互关联的相互依赖的量，而非显式的输入-输出关系。这样的曲线称为**隐式曲线**。
+
+### 对两边求导
+
+核心技术是将方程两边视为在沿曲线取一个微小步长 $(dx, dy)$ 时发生变化的量，然后相应地求导。
+
+从 $x^2 + y^2 = 25$ 出发，对每一项求导：
+
+$$
+2x\,dx + 2y\,dy = 0.
+$$
+
+为求斜率 $\dfrac{dy}{dx}$，两边除以 $dx$ 并整理：
+
+$$
+\frac{dy}{dx} = -\frac{x}{y}.
+$$
+
+在点 $(3, 4)$ 处，得到
+
+$$
+\frac{dy}{dx}\bigg|_{(3,4)} = -\frac{3}{4}.
+$$
+
+这个结果与几何事实一致——圆的切线与过切点的半径垂直——但该方法本身的适用范围远不止圆。
+
+### 交互演示：圆的切线（Desmos）
+
+```{=html}
+<div id="calc_ch06_1" class="desmos-container"></div>
+<script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+<script>
+  var calc_ch06_1 = Desmos.GraphingCalculator(document.getElementById('calc_ch06_1'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'y'
+  });
+  calc_ch06_1.setExpression({ id: 'circle', latex: 'x^2 + y^2 = 25', color: '#2d70b3' });
+  calc_ch06_1.setExpression({ id: 'a', latex: 'a = 3', sliderBounds: { min: -5, max: 5, step: 0.01 } });
+  calc_ch06_1.setExpression({ id: 'b', latex: 'b = \\sqrt{25 - a^2}', color: '#388c46' });
+  calc_ch06_1.setExpression({ id: 'tangent', latex: 'y - b = -\\frac{a}{b}(x - a)', color: '#c74440' });
+  calc_ch06_1.setExpression({ id: 'pt', latex: '(a, b)', color: '#c74440', pointStyle: 'POINT', pointSize: 9 });
+  calc_ch06_1.setMathBounds({ left: -8, right: 8, bottom: -8, top: 8 });
+</script>
+```
+
+拖动滑块 $a$ 使点沿上半圆移动。红色切线的斜率为 $-a/b = -x/y$，与隐函数求导的预测一致。
+
+### 多变量视角
+
+为了理解*为什么*这一过程有效，我们引入一个二元函数：
+
+$$
+s(x, y) = x^2 + y^2.
+$$
+
+这个函数为平面上的每个点 $(x, y)$ 赋予一个数值。我们的圆上的点恰好就是使 $s(x, y) = 25$ 的点。距原点更远的点给出更大的 $s$ 值；距原点更近的点给出更小的 $s$ 值。
+
+从任意点 $(x, y)$ 出发的微小步长 $(dx, dy)$ 使 $s$ 产生变化
+
+$$
+ds = 2x\,dx + 2y\,dy.
+$$
+
+这个表达式是 $s$ 的**全微分**。它告诉我们对于任意小位移 $s$ 的变化量，且同时依赖于起始点 $(x, y)$ 和步长 $(dx, dy)$。
+
+当我们限制步长保持在圆上时，要求 $s$ 恒等于 25。这意味着 $ds = 0$，因此
+
+$$
+2x\,dx + 2y\,dy = 0,
+$$
+
+这恰好就是我们通过"对两边求导"得到的方程。
+
+### 与相关变化率的联系
+
+同样的方程 $x^2 + y^2 = 25$ 在另一种场景中出现：一架 5 米长的梯子沿墙滑落。设 $y(t)$ 表示梯子顶端的高度，$x(t)$ 表示梯子底端到墙的距离，则由勾股定理得
+
+$$
+x(t)^2 + y(t)^2 = 25
+$$
+
+在所有时刻 $t$ 成立。对 $t$ 求导：
+
+$$
+2x\,\frac{dx}{dt} + 2y\,\frac{dy}{dt} = 0.
+$$
+
+若在 $t = 0$ 时，$y = 4$，$x = 3$，且 $\dfrac{dy}{dt} = -1$ 米/秒（梯子在下滑），则
+
+$$
+2(3)\frac{dx}{dt} + 2(4)(-1) = 0
+\quad\Longrightarrow\quad
+\frac{dx}{dt} = \frac{4}{3} \text{ 米/秒}.
+$$
+
+其代数结构与隐函数求导问题完全相同。唯一的区别在于，在相关变化率问题中，微小增量 $dx$ 和 $dy$ 与一个共同参数 $t$ 相关联，而在隐函数求导中它们作为沿曲线的位移自由浮动。
+
+### 一个更复杂的例子
+
+考虑由以下方程定义的隐式曲线：
+
+$$
+\sin(x) \cdot y^2 = x.
+$$
+
+为求 $\dfrac{dy}{dx}$，我们对两边求导。对左边应用乘积法则：
+
+$$
+\cos(x)\,dx \cdot y^2 + \sin(x) \cdot 2y\,dy = dx.
+$$
+
+两边除以 $dx$ 并求解 $\dfrac{dy}{dx}$：
+
+$$
+\frac{dy}{dx} = \frac{1 - y^2 \cos(x)}{2y\sin(x)}.
+$$
+
+这个公式给出了曲线上任意一点 $(x, y)$ 处切线的斜率。
+
+### 交互演示：隐式曲线 $\sin(x)\cdot y^2 = x$（Desmos）
+
+```{=html}
+<div id="calc_ch06_2" class="desmos-container"></div>
+<script>
+  var calc_ch06_2 = Desmos.GraphingCalculator(document.getElementById('calc_ch06_2'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'y'
+  });
+  calc_ch06_2.setExpression({ id: 'curve', latex: '\\sin(x) \\cdot y^2 = x', color: '#2d70b3' });
+  calc_ch06_2.setExpression({ id: 'a', latex: 'a = 1.5', sliderBounds: { min: 0.1, max: 6, step: 0.01 } });
+  calc_ch06_2.setExpression({ id: 'b', latex: 'b = \\sqrt{\\frac{a}{\\sin(a)}}', color: '#388c46' });
+  calc_ch06_2.setExpression({ id: 'slope', latex: 'm = \\frac{1 - b^2 \\cos(a)}{2 b \\sin(a)}', color: '#c74440' });
+  calc_ch06_2.setExpression({ id: 'tangent', latex: 'y - b = m(x - a)', color: '#c74440' });
+  calc_ch06_2.setExpression({ id: 'pt', latex: '(a, b)', color: '#c74440', pointStyle: 'POINT', pointSize: 9 });
+  calc_ch06_2.setMathBounds({ left: -1, right: 10, bottom: -5, top: 5 });
+</script>
+```
+
+调整滑块 $a$ 以沿曲线的上半支移动。切线斜率由上面推导的隐函数导数公式计算得出。
+
+### 通过隐函数求导推导 $\frac{d}{dx}\ln(x)$
+
+隐函数求导还为推导新的导数公式提供了一条优雅的途径。假设我们要计算 $\ln(x)$ 的导数。设
+
+$$
+y = \ln(x),
+$$
+
+将其改写为
+
+$$
+e^y = x.
+$$
+
+对两边隐式求导：
+
+$$
+e^y\,dy = dx.
+$$
+
+求解 $\dfrac{dy}{dx}$：
+
+$$
+\frac{dy}{dx} = \frac{1}{e^y}.
+$$
+
+由于在曲线上 $e^y = x$，我们得出
+
+$$
+\frac{d}{dx}\ln(x) = \frac{1}{x}.
+$$
+
+### 交互演示：自然对数及其切线（Desmos）
+
+```{=html}
+<div id="calc_ch06_3" class="desmos-container"></div>
+<script>
+  var calc_ch06_3 = Desmos.GraphingCalculator(document.getElementById('calc_ch06_3'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'y'
+  });
+  calc_ch06_3.setExpression({ id: 'ln', latex: 'y = \\ln(x)', color: '#2d70b3' });
+  calc_ch06_3.setExpression({ id: 'a', latex: 'a = 2', sliderBounds: { min: 0.1, max: 8, step: 0.01 } });
+  calc_ch06_3.setExpression({ id: 'tangent', latex: 'y - \\ln(a) = \\frac{1}{a}(x - a)', color: '#c74440' });
+  calc_ch06_3.setExpression({ id: 'pt', latex: '(a, \\ln(a))', color: '#c74440', pointStyle: 'POINT', pointSize: 9 });
+  calc_ch06_3.setMathBounds({ left: -1, right: 10, bottom: -4, top: 4 });
+</script>
+```
+
+移动滑块 $a$ 观察切线斜率 $1/a$ 如何与每个点处 $\ln(x)$ 的导数吻合。
+
+### 交互演示：圆上的隐函数求导（Python）
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch06_1">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Plot the circle and tangent lines at several points
+theta = np.linspace(0, 2 * np.pi, 500)
+cx, cy = 5 * np.cos(theta), 5 * np.sin(theta)
+
+fig, ax = plt.subplots(figsize=(6, 6))
+ax.plot(cx, cy, color='steelblue', linewidth=2, label='$x^2 + y^2 = 25$')
+ax.set_aspect('equal')
+
+# Tangent lines at selected points on the upper semicircle
+for x0 in [1, 2, 3, 4]:
+    y0 = np.sqrt(25 - x0**2)
+    slope = -x0 / y0            # dy/dx from implicit differentiation
+    xs = np.linspace(x0 - 2, x0 + 2, 50)
+    ys = y0 + slope * (xs - x0)
+    ax.plot(xs, ys, '--', linewidth=1.2,
+            label=f'Tangent at ({x0}, {y0:.2f}), slope = {slope:.3f}')
+    ax.plot(x0, y0, 'o', markersize=6)
+
+ax.set_xlim(-7, 7)
+ax.set_ylim(-7, 7)
+ax.set_xlabel('x')
+ax.set_ylabel('y')
+ax.set_title('Tangent lines to $x^2+y^2=25$ via implicit differentiation')
+ax.legend(fontsize=8, loc='lower right')
+ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch06_1', 'output_ch06_1', 'plot_ch06_1')">Run ▶</button>
+  <div class="output" id="output_ch06_1"></div>
+  <div class="plot-output" id="plot_ch06_1"></div>
+</div>
+```
+
+### 交互演示：相关变化率——滑落的梯子（Python）
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch06_2">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Simulate the sliding ladder problem
+# x(t)^2 + y(t)^2 = 25, dy/dt = -1 m/s initially
+# From 2x dx/dt + 2y dy/dt = 0  =>  dx/dt = -y dy/dt / x
+
+dt = 0.01
+t_max = 3.5
+times, xs, ys, dxdt_vals = [], [], [], []
+
+x, y = 3.0, 4.0
+t = 0.0
+
+while y > 0.05 and t < t_max:
+    times.append(t)
+    xs.append(x)
+    ys.append(y)
+    dydt = -1.0
+    dxdt = -y * dydt / x     # from implicit differentiation
+    dxdt_vals.append(dxdt)
+    x += dxdt * dt
+    y += dydt * dt
+    t += dt
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
+
+ax1.plot(times, xs, label='x(t) -- base distance', color='steelblue')
+ax1.plot(times, ys, label='y(t) -- height', color='coral')
+ax1.set_xlabel('Time (s)')
+ax1.set_ylabel('Distance (m)')
+ax1.set_title('Ladder positions over time')
+ax1.legend()
+ax1.grid(True, alpha=0.3)
+
+ax2.plot(times, dxdt_vals, color='#6a0dad')
+ax2.set_xlabel('Time (s)')
+ax2.set_ylabel('dx/dt (m/s)')
+ax2.set_title('Rate at which base moves away from wall')
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch06_2', 'output_ch06_2', 'plot_ch06_2')">Run ▶</button>
+  <div class="output" id="output_ch06_2"></div>
+  <div class="plot-output" id="plot_ch06_2"></div>
+</div>
+```
+
+## 速查表
+
+::: {.key-formula}
+| 概念 | 核心结论 |
+|---|---|
+| 圆的切线斜率 | $x^2 + y^2 = r^2 \;\Longrightarrow\; \dfrac{dy}{dx} = -\dfrac{x}{y}$ |
+| 全微分 | $ds = 2x\,dx + 2y\,dy$，其中 $s = x^2 + y^2$ |
+| 隐函数求导（一般情形） | 对两边求导，令 $ds = 0$，解出 $\dfrac{dy}{dx}$ |
+| 与相关变化率的联系 | 相同的代数结构，但 $dx$ 和 $dy$ 与 $dt$ 相关联 |
+| $\ln(x)$ 的导数 | $y = \ln(x) \;\Longrightarrow\; e^y = x \;\Longrightarrow\; \dfrac{dy}{dx} = \dfrac{1}{x}$ |
+:::

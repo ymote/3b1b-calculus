@@ -1,0 +1,329 @@
+---
+title: "Higher Order Derivatives"
+subtitle: "Chapter 10"
+date: 2023-04-01
+---
+
+This lesson introduces higher order derivatives, with particular emphasis on the
+second derivative, its geometric interpretation in terms of concavity, and its
+physical interpretation as acceleration. We also briefly address the third
+derivative and the role higher order derivatives play in approximating functions.
+
+::: {.callout-note collapse="true"}
+## Prerequisites
+
+- Understanding of the derivative as instantaneous rate of change (Chapters 2--3)
+- Familiarity with standard derivative formulas and notation $\frac{df}{dx}$ (Chapter 3)
+- Basic knowledge of position, velocity, and acceleration in one-dimensional motion
+:::
+
+## Topics Covered
+
+- The second derivative as the derivative of the derivative
+- Concavity: curvature of a graph and the sign of $f''(x)$
+- Interpreting the notation $\frac{d^2 f}{dx^2}$
+- Physical interpretation: acceleration and jerk
+- The role of higher order derivatives in function approximation
+
+## Lecture Video
+
+```{=html}
+<video controls width="100%" preload="metadata">
+  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/10_Higher%20order%20derivatives%20%EF%BD%9C%20Chapter%2010%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
+</video>
+```
+
+## Key Video Frames
+
+![The second derivative measures how the slope of $f$ is changing](../images/ch10/frame_01.jpg)
+
+![Concave up regions correspond to positive second derivative](../images/ch10/frame_02.jpg)
+
+![Position, velocity, and acceleration as successive derivatives](../images/ch10/frame_03.jpg)
+
+![Reading the notation $d^2f/dx^2$ in terms of small steps](../images/ch10/frame_04.jpg)
+
+## Key Concepts
+
+### The Second Derivative
+
+Given a function $f(x)$, its first derivative $f'(x)$ measures the rate at which
+$f$ changes with respect to $x$. The **second derivative** is simply the derivative
+of the first derivative:
+
+$$
+f''(x) = \frac{d}{dx}\bigl[f'(x)\bigr].
+$$
+
+In Leibniz notation, we write this as
+
+$$
+\frac{d^2 f}{dx^2}.
+$$
+
+While $f'(x)$ tells us the slope of the graph of $f$ at each point, $f''(x)$ tells
+us how that slope itself is changing. It is, in a precise sense, the "rate of change
+of the rate of change."
+
+### Understanding the Notation
+
+The notation $\frac{d^2 f}{dx^2}$ can be read as follows. We begin at some input
+$x$ and take two small steps of size $dx$ to the right. The first step produces a
+change $df_1$ in the function value, and the second step produces a change $df_2$.
+The quantity
+
+$$
+d(df) = df_2 - df_1
+$$
+
+measures the change in how $f$ changes --- that is, the "change of the change." For
+small $dx$, this quantity $d(df)$ is typically proportional to $dx^2$. The second
+derivative is then defined as the limiting ratio:
+
+$$
+\frac{d^2 f}{dx^2} = \lim_{dx \to 0} \frac{d(df)}{dx^2}.
+$$
+
+For example, if $dx = 0.01$, we would expect $d(df)$ to be on the order of $0.0001$,
+so the ratio remains finite and meaningful in the limit.
+
+### Concavity and the Sign of $f''(x)$
+
+The second derivative provides immediate information about the **concavity** (curvature)
+of the graph of $f$:
+
+- **Concave up** ($f''(x) > 0$): The graph curves upward, and the slope $f'(x)$ is
+  increasing. Geometrically, the tangent line lies below the curve.
+
+- **Concave down** ($f''(x) < 0$): The graph curves downward, and the slope $f'(x)$
+  is decreasing. The tangent line lies above the curve.
+
+- **Inflection point** ($f''(x) = 0$ with a sign change): The concavity transitions
+  from up to down or vice versa. At such points, there is no curvature in a local sense.
+
+A function with a large positive second derivative at a point curves sharply upward
+there, whereas a function with a small positive second derivative curves only gently.
+
+### Interactive Desmos Graph: Concavity and the Second Derivative
+
+```{=html}
+<div id="calc_ch10_1" class="desmos-container"></div>
+<script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+<script>
+  var calc_ch10_1 = Desmos.GraphingCalculator(document.getElementById('calc_ch10_1'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: ''
+  });
+  calc_ch10_1.setExpression({ id: 'f', latex: 'f(x) = x^3 - 3x', color: '#2d70b3' });
+  calc_ch10_1.setExpression({ id: 'fp', latex: 'g(x) = 3x^2 - 3', color: '#388c46' });
+  calc_ch10_1.setExpression({ id: 'fpp', latex: 'h(x) = 6x', color: '#c74440' });
+  calc_ch10_1.setExpression({ id: 'a', latex: 'a = 0', sliderBounds: { min: -2.5, max: 2.5, step: 0.01 } });
+  calc_ch10_1.setExpression({ id: 'pt_f', latex: '(a, f(a))', color: '#2d70b3', showLabel: true, label: 'f(a)' });
+  calc_ch10_1.setExpression({ id: 'pt_fp', latex: '(a, g(a))', color: '#388c46', showLabel: true, label: "f'(a)" });
+  calc_ch10_1.setExpression({ id: 'pt_fpp', latex: '(a, h(a))', color: '#c74440', showLabel: true, label: "f''(a)" });
+  calc_ch10_1.setExpression({ id: 'tangent', latex: 'y = g(a)(x - a) + f(a)', color: '#6042a6', lineStyle: Desmos.Styles.DASHED });
+  calc_ch10_1.setMathBounds({ left: -3, right: 3, bottom: -5, top: 5 });
+</script>
+```
+
+Drag the slider $a$ to move along the curve $f(x) = x^3 - 3x$ (blue). The green
+curve shows $f'(x) = 3x^2 - 3$, and the red curve shows $f''(x) = 6x$. Observe
+that when $f''(a) > 0$ (i.e., $a > 0$), the graph of $f$ is concave up, and the
+dashed tangent line sits below the curve.
+
+### The Physical Interpretation: Acceleration
+
+One of the most concrete interpretations of the second derivative arises in the
+study of motion. Suppose $s(t)$ denotes the position of an object moving along a
+line as a function of time $t$. Then:
+
+- The first derivative $s'(t) = v(t)$ is the **velocity** --- the rate of change of
+  position.
+
+- The second derivative $s''(t) = a(t)$ is the **acceleration** --- the rate of change
+  of velocity.
+
+Acceleration tells us how the velocity itself is changing. A positive second
+derivative indicates that the object is speeding up (in the positive direction),
+producing the sensation of being pressed back into one's seat. A negative second
+derivative indicates deceleration.
+
+For example, consider the position function $s(t) = t^3 - 6t^2 + 9t$. Then:
+
+$$
+v(t) = s'(t) = 3t^2 - 12t + 9, \qquad a(t) = s''(t) = 6t - 12.
+$$
+
+The acceleration is zero at $t = 2$, negative for $t < 2$ (the object is decelerating),
+and positive for $t > 2$ (the object is accelerating).
+
+### Interactive Desmos Graph: Position, Velocity, and Acceleration
+
+```{=html}
+<div id="calc_ch10_2" class="desmos-container"></div>
+<script>
+  var calc_ch10_2 = Desmos.GraphingCalculator(document.getElementById('calc_ch10_2'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 't', yAxisLabel: ''
+  });
+  calc_ch10_2.setExpression({ id: 's', latex: 's(t) = t^3 - 6t^2 + 9t', color: '#2d70b3' });
+  calc_ch10_2.setExpression({ id: 'v', latex: 'v(t) = 3t^2 - 12t + 9', color: '#388c46' });
+  calc_ch10_2.setExpression({ id: 'acc', latex: 'a(t) = 6t - 12', color: '#c74440' });
+  calc_ch10_2.setExpression({ id: 't0', latex: 't_0 = 1', sliderBounds: { min: 0, max: 4, step: 0.01 } });
+  calc_ch10_2.setExpression({ id: 'pt_s', latex: '(t_0, s(t_0))', color: '#2d70b3', showLabel: true, label: 's(t)' });
+  calc_ch10_2.setExpression({ id: 'pt_v', latex: '(t_0, v(t_0))', color: '#388c46', showLabel: true, label: 'v(t)' });
+  calc_ch10_2.setExpression({ id: 'pt_a', latex: '(t_0, a(t_0))', color: '#c74440', showLabel: true, label: 'a(t)' });
+  calc_ch10_2.setMathBounds({ left: -0.5, right: 4.5, bottom: -8, top: 12 });
+</script>
+```
+
+Use the slider $t_0$ to trace the position $s(t)$ (blue), velocity $v(t)$ (green),
+and acceleration $a(t)$ (red) for the motion $s(t) = t^3 - 6t^2 + 9t$. Note that
+when the acceleration crosses zero at $t = 2$, the velocity reaches its minimum.
+
+### The Third Derivative and Beyond
+
+The **third derivative** $f'''(x) = \frac{d^3 f}{dx^3}$ measures the rate at which
+the acceleration changes. In physics, this quantity is known as **jerk**. When jerk
+is nonzero, the strength of the acceleration itself is varying, which produces the
+sensation of a changing force.
+
+More generally, one may define the $n$-th derivative $f^{(n)}(x)$ recursively:
+
+$$
+f^{(n)}(x) = \frac{d}{dx}\bigl[f^{(n-1)}(x)\bigr], \quad n \geq 1,
+$$
+
+with $f^{(0)}(x) = f(x)$. Higher order derivatives become essential in the theory
+of Taylor series, where the $n$-th derivative evaluated at a point $a$ determines
+the $n$-th coefficient of the polynomial approximation to $f$ near $a$.
+
+### Interactive Desmos Graph: Taylor Polynomial and Higher Derivatives
+
+```{=html}
+<div id="calc_ch10_3" class="desmos-container"></div>
+<script>
+  var calc_ch10_3 = Desmos.GraphingCalculator(document.getElementById('calc_ch10_3'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: ''
+  });
+  calc_ch10_3.setExpression({ id: 'f', latex: 'f(x) = \\cos(x)', color: '#2d70b3' });
+  calc_ch10_3.setExpression({ id: 'n', latex: 'n = 2', sliderBounds: { min: 0, max: 8, step: 2 } });
+  calc_ch10_3.setExpression({ id: 'T0', latex: 'T_0(x) = 1', color: '#bbbbbb', lineStyle: Desmos.Styles.DASHED });
+  calc_ch10_3.setExpression({ id: 'T2', latex: 'T_2(x) = 1 - \\frac{x^2}{2}', color: '#388c46', lineStyle: Desmos.Styles.DASHED });
+  calc_ch10_3.setExpression({ id: 'T4', latex: 'T_4(x) = 1 - \\frac{x^2}{2} + \\frac{x^4}{24}', color: '#c74440', lineStyle: Desmos.Styles.DASHED });
+  calc_ch10_3.setExpression({ id: 'T6', latex: 'T_6(x) = 1 - \\frac{x^2}{2} + \\frac{x^4}{24} - \\frac{x^6}{720}', color: '#6042a6', lineStyle: Desmos.Styles.DASHED });
+  calc_ch10_3.setExpression({ id: 'T8', latex: 'T_8(x) = 1 - \\frac{x^2}{2} + \\frac{x^4}{24} - \\frac{x^6}{720} + \\frac{x^8}{40320}', color: '#000000', lineStyle: Desmos.Styles.DASHED });
+  calc_ch10_3.setMathBounds({ left: -5, right: 5, bottom: -2, top: 2 });
+</script>
+```
+
+The solid blue curve is $f(x) = \cos(x)$. The dashed curves show Taylor polynomial
+approximations of increasing degree centered at $x = 0$. Each successive term in
+the approximation depends on a higher order derivative of $\cos(x)$ evaluated at
+the origin, illustrating why these derivatives are indispensable for function
+approximation.
+
+### Interactive Python: Computing and Visualising Higher Derivatives
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch10_1">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define f(x) = x^3 - 6x^2 + 9x and its derivatives
+x = np.linspace(-0.5, 4.5, 300)
+f  = x**3 - 6*x**2 + 9*x
+fp = 3*x**2 - 12*x + 9
+fpp = 6*x - 12
+
+fig, axes = plt.subplots(1, 3, figsize=(12, 4), sharex=True)
+
+axes[0].plot(x, f, color='#2d70b3', linewidth=2)
+axes[0].axhline(0, color='grey', linewidth=0.5)
+axes[0].set_title("$s(t) = t^3 - 6t^2 + 9t$")
+axes[0].set_ylabel("Position")
+axes[0].set_xlabel("t")
+
+axes[1].plot(x, fp, color='#388c46', linewidth=2)
+axes[1].axhline(0, color='grey', linewidth=0.5)
+axes[1].set_title("$v(t) = 3t^2 - 12t + 9$")
+axes[1].set_ylabel("Velocity")
+axes[1].set_xlabel("t")
+
+axes[2].plot(x, fpp, color='#c74440', linewidth=2)
+axes[2].axhline(0, color='grey', linewidth=0.5)
+axes[2].set_title("$a(t) = 6t - 12$")
+axes[2].set_ylabel("Acceleration")
+axes[2].set_xlabel("t")
+
+# Shade concavity regions on the position plot
+axes[0].fill_between(x, f, where=(fpp > 0), alpha=0.15, color='green', label='Concave up')
+axes[0].fill_between(x, f, where=(fpp < 0), alpha=0.15, color='red', label='Concave down')
+axes[0].legend(fontsize=8)
+
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch10_1', 'output_ch10_1', 'plot_ch10_1')">Run ▶</button>
+  <div class="output" id="output_ch10_1"></div>
+  <div class="plot-output" id="plot_ch10_1"></div>
+</div>
+```
+
+### Interactive Python: Numerical Second Derivative via Finite Differences
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch10_2">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Numerically approximate the second derivative using central differences
+def numerical_second_derivative(f, x, h=1e-4):
+    """Compute f''(x) using the central difference formula:
+       f''(x) ≈ [f(x+h) - 2f(x) + f(x-h)] / h^2
+    """
+    return (f(x + h) - 2*f(x) + f(x - h)) / h**2
+
+# Test with f(x) = sin(x), whose exact second derivative is -sin(x)
+f = np.sin
+x = np.linspace(0, 2*np.pi, 200)
+
+exact = -np.sin(x)
+numerical = numerical_second_derivative(f, x)
+
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 6), sharex=True)
+
+ax1.plot(x, np.sin(x), color='#2d70b3', linewidth=2, label='$f(x) = \\sin(x)$')
+ax1.plot(x, exact, color='#c74440', linewidth=2, label="$f''(x) = -\\sin(x)$")
+ax1.plot(x, numerical, 'k--', linewidth=1, alpha=0.7, label='Numerical approx')
+ax1.legend()
+ax1.set_ylabel('Value')
+ax1.set_title('Exact vs. numerical second derivative')
+ax1.grid(True, alpha=0.3)
+
+ax2.semilogy(x, np.abs(exact - numerical) + 1e-16, color='#6042a6')
+ax2.set_xlabel('x')
+ax2.set_ylabel('Absolute error')
+ax2.set_title('Error in numerical second derivative ($h = 10^{-4}$)')
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch10_2', 'output_ch10_2', 'plot_ch10_2')">Run ▶</button>
+  <div class="output" id="output_ch10_2"></div>
+  <div class="plot-output" id="plot_ch10_2"></div>
+</div>
+```
+
+## Summary
+
+::: {.key-formula}
+| Concept | Key Result |
+|---|---|
+| Second derivative | $f''(x) = \frac{d^2 f}{dx^2} = \lim_{dx \to 0} \frac{f(x + 2dx) - 2f(x+dx) + f(x)}{dx^2}$ |
+| Concave up | $f''(x) > 0$: slope is increasing, tangent line lies below the curve |
+| Concave down | $f''(x) < 0$: slope is decreasing, tangent line lies above the curve |
+| Acceleration | If $s(t)$ is position, then $s''(t) = a(t)$ is acceleration |
+| Jerk (third derivative) | $f'''(x) = \frac{d^3 f}{dx^3}$: rate of change of acceleration |
+:::

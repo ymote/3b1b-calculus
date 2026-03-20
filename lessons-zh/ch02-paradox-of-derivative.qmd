@@ -1,0 +1,307 @@
+---
+title: "导数的悖论"
+subtitle: "第二章"
+date: 2023-04-08
+---
+
+本课面对一个根本性的概念难题：严格来说，"瞬时变化率"是一个自相矛盾的说法。变化需要两个不同的时刻，然而我们却在谈论某一*单一*瞬间的速度。我们通过将导数定义为差商 $ds/dt$ 在 $dt \to 0$ 时的极限来解决这个悖论，并以具体例子 $s(t) = t^3$ 来阐述这一定义。
+
+::: {.callout-note collapse="true"}
+## 预备知识
+
+- 函数 $f(x)$ 及其图像的概念
+- 基本代数运算（展开立方二项式）
+- 积分与曲线下面积的概念（第一章）
+:::
+
+## 本课内容
+
+- "瞬时变化率"的悖论
+- 速度作为微小但有限 $dt$ 下的比值 $ds/dt$
+- 导数作为 $dt \to 0$ 时 $ds/dt$ 的极限
+- 切线作为导数的几何解释
+- 推导实例：$\frac{d}{dt} t^3 = 3t^2$
+- 导数作为变化率的"最佳常数逼近"
+
+## 课程视频
+
+```{=html}
+<video controls width="100%" preload="metadata">
+  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/02_The%20paradox%20of%20the%20derivative%20%EF%BD%9C%20Chapter%202%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
+</video>
+```
+
+## 课程关键帧
+
+![从 A 到 B 行驶的汽车的距离函数 $s(t)$](../images/ch02/frame_01.jpg)
+
+![速度曲线作为距离函数的导数](../images/ch02/frame_02.jpg)
+
+![放大观察：$ds/dt$ 作为两个邻近点之间的斜率](../images/ch02/frame_03.jpg)
+
+![当 $dt \to 0$ 时，在单个点处产生切线](../images/ch02/frame_04.jpg)
+
+## 核心要点
+
+### 悖论：瞬间的变化
+
+我们从一个看似简单的问题开始：一辆汽车在某一时刻具有速度，这意味着什么？
+
+设想一辆汽车从静止出发，先加速再减速，最终在100米外停下，整个过程耗时10秒。我们用 $s(t)$ 表示距离关于时间的函数，并试图求出任意给定时刻的速度。
+
+直观上，速度就是"单位时间内行驶的距离"。为了计算它，我们需要*两个*不同的时刻：
+
+$$
+v = \frac{\Delta s}{\Delta t} = \frac{s(t_2) - s(t_1)}{t_2 - t_1}.
+$$
+
+然而速度表似乎在报告*单一*时刻的速度。如果我们只关注一个瞬间，就没有经过的时间，没有行驶的距离，因此也没有有意义的比值。从这个意义上说，"瞬时变化率"的概念是自相矛盾的。
+
+### 用微小增量化解悖论
+
+物理上的速度表通过测量*极短*时间间隔内行驶的距离来回避这个困难。我们将这一思想形式化如下。设 $dt$ 为一个微小的正时间增量，令
+
+$$
+ds = s(t + dt) - s(t)
+$$
+
+为相应的距离变化。则比值
+
+$$
+\frac{ds}{dt} = \frac{s(t + dt) - s(t)}{dt}
+$$
+
+表示在区间 $[t, \, t + dt]$ 上的平均速度。从几何上看，这个比值就是通过 $s$ 图像上两点 $(t, s(t))$ 与 $(t + dt, \, s(t + dt))$ 的**割线**的斜率。
+
+### 导数作为极限
+
+在纯数学中，导数*不是*对某个特定有限 $dt$ 取值的比值 $ds/dt$。它是当 $dt \to 0$ 时该比值所趋近的值：
+
+$$
+\frac{ds}{dt} \;=\; \lim_{dt \to 0} \frac{s(t + dt) - s(t)}{dt}.
+$$
+
+随着 $dt$ 缩小，图像上的两点越来越近，割线收敛为在点 $(t, s(t))$ 处的**切线**。这条切线的斜率就是导数。
+
+需要注意的是，这个定义*没有*说我们令 $dt = 0$（那样会得到 $0/0$），也没有声称 $dt$ 是"无穷小的"。$dt$ 始终是有限且非零的；我们只是考察当 $dt$ 变得任意小时比值的*趋势*。
+
+### 交互演示：割线到切线（Desmos）
+
+```{=html}
+<div id="calc_ch02_1" class="desmos-container"></div>
+<script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+<script>
+  var calc_ch02_1 = Desmos.GraphingCalculator(document.getElementById('calc_ch02_1'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 't', yAxisLabel: 's(t)'
+  });
+  calc_ch02_1.setExpression({ id: 'st', latex: 's(t) = t^3', color: '#2d70b3' });
+  calc_ch02_1.setExpression({ id: 'a', latex: 'a = 2', sliderBounds: { min: 0, max: 3, step: 0.01 } });
+  calc_ch02_1.setExpression({ id: 'dt', latex: 'd = 1.0', sliderBounds: { min: 0.01, max: 2, step: 0.01 } });
+  calc_ch02_1.setExpression({ id: 'pt1', latex: '(a, a^3)', color: '#c74440', pointStyle: 'POINT', pointSize: 8 });
+  calc_ch02_1.setExpression({ id: 'pt2', latex: '(a+d, (a+d)^3)', color: '#c74440', pointStyle: 'POINT', pointSize: 8 });
+  calc_ch02_1.setExpression({ id: 'secant', latex: 'y - a^3 = \\frac{(a+d)^3 - a^3}{d}(x - a)', color: '#388c46', lineWidth: 2 });
+  calc_ch02_1.setExpression({ id: 'tangent', latex: 'y - a^3 = 3a^2(x - a)', color: '#c74440', lineStyle: Desmos.Styles.DASHED, lineWidth: 1.5 });
+  calc_ch02_1.setMathBounds({ left: -0.5, right: 4, bottom: -5, top: 30 });
+</script>
+```
+
+将滑块 $d$（代表 $dt$）向零调节，观察绿色割线如何收敛到红色虚线切线。在 $t = a$ 处切线的斜率为 $3a^2$，即 $t^3$ 的导数。
+
+### 具体推导：$s(t) = t^3$
+
+为使定义具体化，设距离函数为 $s(t) = t^3$。我们计算某一特定时刻（例如 $t = 2$）的导数。
+
+差商为
+
+$$
+\frac{ds}{dt} = \frac{(2 + dt)^3 - 2^3}{dt}.
+$$
+
+展开立方：
+
+$$
+(2 + dt)^3 = 2^3 + 3 \cdot 2^2 \cdot dt + 3 \cdot 2 \cdot dt^2 + dt^3
+            = 8 + 12\,dt + 6\,dt^2 + dt^3.
+$$
+
+减去 $2^3 = 8$：
+
+$$
+(2 + dt)^3 - 8 = 12\,dt + 6\,dt^2 + dt^3.
+$$
+
+除以 $dt$：
+
+$$
+\frac{ds}{dt} = 12 + 6\,dt + dt^2.
+$$
+
+当 $dt \to 0$ 时，$6\,dt$ 和 $dt^2$ 两项消失，剩下
+
+$$
+\left.\frac{ds}{dt}\right|_{t=2} = 12 = 3 \cdot 2^2.
+$$
+
+$t = 2$ 并无特殊之处。在一般的时刻 $t$ 重复相同的论证，将 2 替换为 $t$ 并展开 $(t + dt)^3$：
+
+$$
+\frac{(t + dt)^3 - t^3}{dt}
+= \frac{3t^2\,dt + 3t\,dt^2 + dt^3}{dt}
+= 3t^2 + 3t\,dt + dt^2.
+$$
+
+取 $dt \to 0$ 的极限：
+
+$$
+\frac{d}{dt}\, t^3 = 3t^2.
+$$
+
+### 交互演示：幂法则的实际效果（Desmos）
+
+```{=html}
+<div id="calc_ch02_2" class="desmos-container"></div>
+<script>
+  var calc_ch02_2 = Desmos.GraphingCalculator(document.getElementById('calc_ch02_2'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 't', yAxisLabel: ''
+  });
+  calc_ch02_2.setExpression({ id: 'st', latex: 's(t) = t^3', color: '#2d70b3' });
+  calc_ch02_2.setExpression({ id: 'v', latex: 'v(t) = 3t^2', color: '#388c46' });
+  calc_ch02_2.setExpression({ id: 'a', latex: 'a = 1.5', sliderBounds: { min: 0, max: 3, step: 0.01 } });
+  calc_ch02_2.setExpression({ id: 'pt_s', latex: '(a, a^3)', color: '#2d70b3', pointStyle: 'POINT', pointSize: 8, label: 's(a)', showLabel: true });
+  calc_ch02_2.setExpression({ id: 'pt_v', latex: '(a, 3a^2)', color: '#388c46', pointStyle: 'POINT', pointSize: 8, label: 'v(a)', showLabel: true });
+  calc_ch02_2.setMathBounds({ left: -0.5, right: 4, bottom: -2, top: 30 });
+</script>
+```
+
+移动滑块 $a$，同时追踪距离函数 $s(t) = t^3$（蓝色）及其导数 $v(t) = 3t^2$（绿色）。注意当 $s(t)$ 陡峭时 $v(t)$ 较大，当 $s(t)$ 平坦时 $v(t)$ 趋近于零。
+
+### 交互演示：差商曲面（Desmos）
+
+```{=html}
+<div id="calc_ch02_3" class="desmos-container"></div>
+<script>
+  var calc_ch02_3 = Desmos.GraphingCalculator(document.getElementById('calc_ch02_3'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 't', yAxisLabel: 'ds/dt'
+  });
+  calc_ch02_3.setExpression({ id: 'true_deriv', latex: 'y = 3x^2', color: '#c74440', lineWidth: 2.5 });
+  calc_ch02_3.setExpression({ id: 'dt_val', latex: 'h = 1.0', sliderBounds: { min: 0.01, max: 2, step: 0.01 } });
+  calc_ch02_3.setExpression({ id: 'diff_quot', latex: 'y = \\frac{(x+h)^3 - x^3}{h}', color: '#2d70b3', lineWidth: 1.5 });
+  calc_ch02_3.setExpression({ id: 'label_true', latex: 'y = 3x^2', color: '#c74440', label: '3t²  (derivative)', showLabel: true, hidden: true });
+  calc_ch02_3.setMathBounds({ left: -0.5, right: 4, bottom: -2, top: 50 });
+</script>
+```
+
+将滑块 $h$（代表 $dt$）向零拖动。蓝色曲线显示当前 $h$ 值对应的差商 $\frac{(t+h)^3 - t^3}{h}$，红色曲线显示真实导数 $3t^2$。当 $h \to 0$ 时，两条曲线重合。
+
+### 导数不是"瞬间的变化"
+
+考虑一辆按 $s(t) = t^3$ 行驶的汽车。在 $t = 0$ 时，导数为 $3(0)^2 = 0$。这是否意味着汽车在 $t = 0$ 时*没有运动*？
+
+如果我们考察一个实际的区间，例如 $[0, 0.1]$，会发现汽车在 $0.1$ 秒内行驶了 $s(0.1) - s(0) = 0.001$ 米，平均速度为 $0.01$ 米/秒。汽车*确实在运动*，但比值 $ds/dt$ 随着 $dt \to 0$ 变得任意小。
+
+正确的理解是：$t = 0$ 处导数为零意味着在 $t = 0$ 附近速度的**最佳常数逼近**为零。因此，"瞬时变化率"这一说法应当理解为这个极限概念的简便表述，而非对单一瞬间发生变化的字面描述。
+
+### 交互演示：计算差商（Python）
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch02_1">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Distance function and its true derivative
+def s(t):
+    return t**3
+
+def ds_dt_exact(t):
+    return 3 * t**2
+
+# Compute the difference quotient for several values of dt
+t_vals = np.linspace(0, 3, 300)
+dt_values = [1.0, 0.5, 0.1, 0.01]
+
+fig, ax = plt.subplots(figsize=(9, 5))
+
+for dt in dt_values:
+    dq = (s(t_vals + dt) - s(t_vals)) / dt
+    ax.plot(t_vals, dq, alpha=0.7, label=f'dt = {dt}')
+
+ax.plot(t_vals, ds_dt_exact(t_vals), 'k--', linewidth=2, label='True derivative $3t^2$')
+ax.set_xlabel('t')
+ax.set_ylabel('ds / dt')
+ax.set_title('Difference quotient approaching the derivative')
+ax.legend()
+ax.set_ylim(-1, 30)
+ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch02_1', 'output_ch02_1', 'plot_ch02_1')">Run ▶</button>
+  <div class="output" id="output_ch02_1"></div>
+  <div class="plot-output" id="plot_ch02_1"></div>
+</div>
+```
+
+### 交互演示：$t = 0$ 处的悖论（Python）
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch02_2">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Demonstrate the "paradox" at t = 0 for s(t) = t^3
+# The derivative is 0, but the car does move over any finite interval.
+
+dt_values = np.logspace(-1, -8, 50)
+avg_velocities = []
+
+for dt in dt_values:
+    avg_v = ((0 + dt)**3 - 0**3) / dt   # = dt^2
+    avg_velocities.append(avg_v)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4))
+
+# Left: average velocity vs dt (log-log)
+ax1.loglog(dt_values, avg_velocities, 'o-', markersize=3, color='#2d70b3')
+ax1.set_xlabel('dt  (seconds)')
+ax1.set_ylabel('Average velocity  (m/s)')
+ax1.set_title('Average velocity near t = 0')
+ax1.grid(True, alpha=0.3, which='both')
+
+# Right: zoom into s(t) = t^3 near t = 0
+t = np.linspace(-0.5, 0.5, 400)
+ax2.plot(t, t**3, color='#2d70b3', linewidth=2, label='$s(t) = t^3$')
+ax2.plot(t, 0*t, 'r--', linewidth=1, label='Tangent at $t=0$')
+ax2.plot(0, 0, 'ko', markersize=6)
+ax2.set_xlabel('t')
+ax2.set_ylabel('s(t)')
+ax2.set_title('Distance near t = 0 (flat tangent)')
+ax2.legend()
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+print("As dt shrinks, the average velocity near t = 0 tends to 0,")
+print("confirming that the derivative (best constant approximation) is 0.")
+print(f"Example: dt = 0.1 => avg velocity = {0.1**2:.4f} m/s")
+print(f"         dt = 0.001 => avg velocity = {0.001**2:.8f} m/s")
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch02_2', 'output_ch02_2', 'plot_ch02_2')">Run ▶</button>
+  <div class="output" id="output_ch02_2"></div>
+  <div class="plot-output" id="plot_ch02_2"></div>
+</div>
+```
+
+## 速查表
+
+::: {.key-formula}
+| 概念 | 核心结论 |
+|---|---|
+| 差商 | $\dfrac{s(t + dt) - s(t)}{dt}$（$[t, t+dt]$ 上的平均变化率） |
+| 导数（极限定义） | $\dfrac{ds}{dt} = \displaystyle\lim_{dt \to 0} \frac{s(t+dt) - s(t)}{dt}$ |
+| 几何解释 | $s(t)$ 在点 $t$ 处切线的斜率 |
+| 推导实例 | $\dfrac{d}{dt}\, t^3 = 3t^2$ |
+| 概念解释 | 导数是某一点附近变化率的最佳常数逼近 |
+:::

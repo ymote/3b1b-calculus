@@ -1,0 +1,349 @@
+---
+title: "The Other Way to Visualize Derivatives"
+subtitle: "Chapter 12"
+date: 2023-04-01
+---
+
+This lesson introduces a complementary perspective on derivatives: viewing
+functions as **transformations** that map input points on the number line to
+output points on another number line. Rather than interpreting the derivative as
+the slope of a graph, we interpret it as a local stretching or squishing factor.
+We then apply this viewpoint to analyze the stability of fixed points in an
+iterated function, resolving a puzzle about infinite continued fractions.
+
+::: {.callout-note collapse="true"}
+## Prerequisites
+
+- Understanding of the derivative as the limit $\lim_{h \to 0} \frac{f(x+h) - f(x)}{h}$
+- Familiarity with the graphical interpretation of derivatives as slopes (Chapters 2--3)
+- Basic experience with function composition and iteration
+:::
+
+## Topics Covered
+
+- The transformational view: functions as mappings from one number line to another
+- The derivative as a local stretching/squishing factor
+- Fixed points of iterated functions
+- Stability analysis via the derivative: stable vs. unstable fixed points
+- Application to the infinite continued fraction $1 + \cfrac{1}{1 + \cfrac{1}{1 + \cdots}}$
+
+## Lecture Video
+
+```{=html}
+<video controls width="100%" preload="metadata">
+  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/12_The%20other%20way%20to%20visualize%20derivatives%20%EF%BD%9C%20Chapter%2012%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
+</video>
+```
+
+## Key Video Frames
+
+![A function viewed as a transformation mapping input points to output points on the number line](../images/ch12/frame_01.jpg)
+
+![Zooming in near $x = 1$ for $f(x) = x^2$: the local neighborhood is stretched by a factor of $2$](../images/ch12/frame_02.jpg)
+
+![Repeated application of $g(x) = 1 + 1/x$: sample points converge toward the golden ratio $\phi$](../images/ch12/frame_03.jpg)
+
+![Stability analysis: contraction near a stable fixed point vs. expansion near an unstable one](../images/ch12/frame_04.jpg)
+
+## Key Concepts
+
+### The Standard View: Derivative as Slope
+
+We begin by recalling the conventional picture. Given a function $f : \mathbb{R} \to \mathbb{R}$, we typically graph it in the Cartesian plane and identify the derivative $f'(x_0)$ with the slope of the tangent line at the point $(x_0, f(x_0))$.
+
+This is a powerful and indispensable perspective. However, when we move beyond functions of a single real variable -- into multivariable calculus, complex analysis, or differential geometry -- the "slope of a graph" interpretation ceases to apply directly. A more portable intuition is therefore desirable.
+
+### The Transformational View
+
+We now consider a function $f$ not as a curve in the plane, but as a **transformation** (or mapping) that sends each point on an input number line to a corresponding point on an output number line.
+
+Under this interpretation, the derivative $f'(x_0)$ measures the **local stretching factor** at $x_0$. Concretely, consider a small interval of width $\delta$ centered at $x_0$ on the input line. After applying $f$, that interval is mapped approximately to an interval of width $|f'(x_0)| \cdot \delta$ centered at $f(x_0)$ on the output line.
+
+More precisely, for $h$ small,
+
+$$
+f(x_0 + h) \approx f(x_0) + f'(x_0) \cdot h.
+$$
+
+This first-order approximation tells us that, locally, the function acts as a linear map that scales displacements by $f'(x_0)$.
+
+- If $|f'(x_0)| > 1$, the function **stretches** the neighborhood around $x_0$.
+- If $|f'(x_0)| < 1$, the function **contracts** (squishes) the neighborhood.
+- If $f'(x_0) < 0$, the function also **reverses orientation** (flips the neighborhood).
+- If $f'(x_0) = 0$, the neighborhood collapses toward a single point.
+
+### Example: $f(x) = x^2$
+
+Consider $f(x) = x^2$, whose derivative is $f'(x) = 2x$. We examine several input values:
+
+| Input $x_0$ | Output $f(x_0)$ | Derivative $f'(x_0)$ | Local behavior |
+|---|---|---|---|
+| $1$ | $1$ | $2$ | Stretches by factor $2$ |
+| $3$ | $9$ | $6$ | Stretches by factor $6$ |
+| $\tfrac{1}{4}$ | $\tfrac{1}{16}$ | $\tfrac{1}{2}$ | Contracts by factor $\tfrac{1}{2}$ |
+| $0$ | $0$ | $0$ | Collapses to a point |
+| $-2$ | $4$ | $-4$ | Stretches by $4$ and reverses |
+
+Near $x_0 = 1$, a cluster of input points spaced evenly around $1$ will, after applying $f$, appear roughly twice as spread out around the output value $1$. Near $x_0 = 0$, any small neighborhood is crushed down toward the origin.
+
+### Interactive Desmos Graph: Transformational View of $f(x) = x^2$
+
+```{=html}
+<div id="calc_ch12_1" class="desmos-container"></div>
+<script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+<script>
+  var calc_ch12_1 = Desmos.GraphingCalculator(document.getElementById('calc_ch12_1'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'f(x)'
+  });
+  calc_ch12_1.setExpression({ id: 'func', latex: 'y = x^2', color: '#2d70b3' });
+  calc_ch12_1.setExpression({ id: 'a', latex: 'a = 1', sliderBounds: { min: -3, max: 3, step: 0.01 } });
+  calc_ch12_1.setExpression({ id: 'tangent', latex: 'y = a^2 + 2a(x - a)', color: '#c74440', lineStyle: Desmos.Styles.DASHED });
+  calc_ch12_1.setExpression({ id: 'pt', latex: '(a, a^2)', color: '#388c46', pointSize: 10 });
+  calc_ch12_1.setExpression({ id: 'deriv_label', latex: 'f\'(a) = 2a', color: '#6042a6' });
+  calc_ch12_1.setMathBounds({ left: -4, right: 4, bottom: -2, top: 12 });
+</script>
+```
+
+Drag the slider $a$ to move along the curve $f(x) = x^2$. The tangent line (dashed) has slope $2a$, which equals the local stretching factor. Near $a = 0$, the tangent is flat (zero stretching); near $a = 2$, the slope is $4$ (fourfold stretching).
+
+### Fixed Points and Iterated Functions
+
+We now turn to a compelling application of the transformational viewpoint. Consider the function
+
+$$
+g(x) = 1 + \frac{1}{x}.
+$$
+
+A **fixed point** of $g$ is a value $x^*$ satisfying $g(x^*) = x^*$, i.e.,
+
+$$
+x^* = 1 + \frac{1}{x^*}.
+$$
+
+Multiplying both sides by $x^*$ and rearranging, we obtain
+
+$$
+(x^*)^2 - x^* - 1 = 0,
+$$
+
+which has two solutions:
+
+$$
+x^* = \frac{1 \pm \sqrt{5}}{2}.
+$$
+
+These are the **golden ratio** $\phi = \frac{1 + \sqrt{5}}{2} \approx 1.618$ and its companion $\psi = \frac{1 - \sqrt{5}}{2} \approx -0.618$. Note that $\psi = -1/\phi$.
+
+### The Infinite Continued Fraction
+
+The expression
+
+$$
+1 + \cfrac{1}{1 + \cfrac{1}{1 + \cfrac{1}{\ddots}}}
+$$
+
+can be interpreted as the limit of the sequence obtained by iterating $g$. We pick a seed value $x_0$ and define
+
+$$
+x_{n+1} = g(x_n) = 1 + \frac{1}{x_n}.
+$$
+
+Since both $\phi$ and $\psi$ are fixed points, both are candidates for the value of the infinite fraction. Yet numerical experimentation reveals that for virtually any positive starting value, the sequence converges to $\phi$, never to $\psi$. The transformational view of derivatives explains why.
+
+### Stability of Fixed Points
+
+We compute the derivative of $g$:
+
+$$
+g'(x) = -\frac{1}{x^2}.
+$$
+
+At the two fixed points:
+
+$$
+g'(\phi) = -\frac{1}{\phi^2} \approx -0.382, \qquad |g'(\phi)| \approx 0.382 < 1,
+$$
+
+$$
+g'(\psi) = -\frac{1}{\psi^2} \approx -2.618, \qquad |g'(\psi)| \approx 2.618 > 1.
+$$
+
+In the transformational picture, when we apply $g$ near $\phi$, a small neighborhood is **contracted** by a factor of approximately $0.38$. Each subsequent iteration of $g$ squeezes points ever closer to $\phi$. This makes $\phi$ a **stable** (or **attracting**) fixed point.
+
+Conversely, near $\psi$, a small neighborhood is **expanded** by a factor of approximately $2.6$ on each iteration. Points are pushed away from $\psi$. This makes $\psi$ an **unstable** (or **repelling**) fixed point.
+
+We may state the general principle as follows:
+
+> Let $x^*$ be a fixed point of a differentiable function $g$. Then $x^*$ is **stable** under iteration of $g$ if $|g'(x^*)| < 1$, and **unstable** if $|g'(x^*)| > 1$.
+
+### Interactive Desmos Graph: Iteration of $g(x) = 1 + 1/x$ (Cobweb Diagram)
+
+```{=html}
+<div id="calc_ch12_2" class="desmos-container"></div>
+<script>
+  var calc_ch12_2 = Desmos.GraphingCalculator(document.getElementById('calc_ch12_2'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'g(x)'
+  });
+  calc_ch12_2.setExpression({ id: 'g', latex: 'g(x) = 1 + \\frac{1}{x}', color: '#2d70b3' });
+  calc_ch12_2.setExpression({ id: 'diag', latex: 'y = x', color: '#888888', lineStyle: Desmos.Styles.DASHED });
+  calc_ch12_2.setExpression({ id: 'phi_pt', latex: '\\left(\\frac{1+\\sqrt{5}}{2},\\frac{1+\\sqrt{5}}{2}\\right)', color: '#388c46', pointSize: 10, label: 'phi', showLabel: true });
+  calc_ch12_2.setExpression({ id: 'psi_pt', latex: '\\left(\\frac{1-\\sqrt{5}}{2},\\frac{1-\\sqrt{5}}{2}\\right)', color: '#c74440', pointSize: 10, label: 'psi', showLabel: true });
+  calc_ch12_2.setExpression({ id: 'x0', latex: 'x_0 = 0.5', sliderBounds: { min: 0.1, max: 5, step: 0.01 } });
+  calc_ch12_2.setExpression({ id: 'x1', latex: 'x_1 = g(x_0)' });
+  calc_ch12_2.setExpression({ id: 'x2', latex: 'x_2 = g(x_1)' });
+  calc_ch12_2.setExpression({ id: 'x3', latex: 'x_3 = g(x_2)' });
+  calc_ch12_2.setExpression({ id: 'x4', latex: 'x_4 = g(x_3)' });
+  calc_ch12_2.setExpression({ id: 'x5', latex: 'x_5 = g(x_4)' });
+  calc_ch12_2.setMathBounds({ left: -2, right: 5, bottom: -1, top: 5 });
+</script>
+```
+
+The fixed points $\phi$ (green) and $\psi$ (red) are marked where $g(x)$ intersects the line $y = x$. Adjust the seed value $x_0$ and observe that the iterates $x_1, x_2, \ldots$ converge to $\phi$ regardless of the starting point.
+
+### Interactive Desmos Graph: Local Stretching Near Fixed Points
+
+```{=html}
+<div id="calc_ch12_3" class="desmos-container"></div>
+<script>
+  var calc_ch12_3 = Desmos.GraphingCalculator(document.getElementById('calc_ch12_3'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: ''
+  });
+  calc_ch12_3.setExpression({ id: 'gprime', latex: 'y = -\\frac{1}{x^2}', color: '#2d70b3' });
+  calc_ch12_3.setExpression({ id: 'upper', latex: 'y = 1', color: '#c74440', lineStyle: Desmos.Styles.DASHED });
+  calc_ch12_3.setExpression({ id: 'lower', latex: 'y = -1', color: '#c74440', lineStyle: Desmos.Styles.DASHED });
+  calc_ch12_3.setExpression({ id: 'phi_line', latex: 'x = \\frac{1+\\sqrt{5}}{2}', color: '#388c46', lineStyle: Desmos.Styles.DASHED });
+  calc_ch12_3.setExpression({ id: 'psi_line', latex: 'x = \\frac{1-\\sqrt{5}}{2}', color: '#6042a6', lineStyle: Desmos.Styles.DASHED });
+  calc_ch12_3.setExpression({ id: 'shade', latex: '-1 < y < 1', color: '#388c46', fillOpacity: 0.1 });
+  calc_ch12_3.setMathBounds({ left: -3, right: 4, bottom: -4, top: 2 });
+</script>
+```
+
+This graph plots $g'(x) = -1/x^2$. The shaded band marks the **stability region** $|g'| < 1$. At $x = \phi$ (green dashed line), the derivative falls inside this band, confirming stability. At $x = \psi$ (purple dashed line), it lies well outside, confirming instability.
+
+### Interactive Python: Iteration Toward the Golden Ratio
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch12_1">
+import numpy as np
+import matplotlib.pyplot as plt
+
+def g(x):
+    return 1 + 1/x
+
+# Iterate from several seed values
+seeds = [0.5, 2.0, 5.0, 0.2, 10.0]
+n_iter = 20
+phi = (1 + np.sqrt(5)) / 2
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4))
+
+for x0 in seeds:
+    xs = [x0]
+    for _ in range(n_iter):
+        xs.append(g(xs[-1]))
+    ax1.plot(range(len(xs)), xs, 'o-', markersize=3, label=f'$x_0 = {x0}$')
+
+ax1.axhline(y=phi, color='black', linestyle='--', label=f'$\\phi = {phi:.4f}$')
+ax1.set_xlabel('Iteration n')
+ax1.set_ylabel('$x_n$')
+ax1.set_title('Convergence to $\\phi$ from various seeds')
+ax1.legend(fontsize=8)
+ax1.grid(True, alpha=0.3)
+
+# Show the derivative magnitude at each iterate from x0 = 2
+x0 = 2.0
+xs = [x0]
+derivs = []
+for _ in range(n_iter):
+    derivs.append(abs(-1 / xs[-1]**2))
+    xs.append(g(xs[-1]))
+
+ax2.plot(range(len(derivs)), derivs, 's-', color='steelblue', markersize=4)
+ax2.axhline(y=1, color='red', linestyle='--', label='$|g\'| = 1$ threshold')
+ax2.axhline(y=1/phi**2, color='green', linestyle=':', label=f'$1/\\phi^2 \\approx {1/phi**2:.3f}$')
+ax2.set_xlabel('Iteration n')
+ax2.set_ylabel("$|g'(x_n)|$")
+ax2.set_title("Derivative magnitude along iterates")
+ax2.legend(fontsize=8)
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch12_1', 'output_ch12_1', 'plot_ch12_1')">Run ▶</button>
+  <div class="output" id="output_ch12_1"></div>
+  <div class="plot-output" id="plot_ch12_1"></div>
+</div>
+```
+
+### Interactive Python: Visualizing the Transformation on the Number Line
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch12_2">
+import numpy as np
+import matplotlib.pyplot as plt
+
+def g(x):
+    return 1 + 1/x
+
+phi = (1 + np.sqrt(5)) / 2
+
+# Show how a cluster of points near phi contracts under iteration
+fig, axes = plt.subplots(4, 1, figsize=(10, 6), sharex=True)
+
+center = phi
+spread = 0.5
+n_pts = 21
+pts = np.linspace(center - spread, center + spread, n_pts)
+
+for i, ax in enumerate(axes):
+    ax.scatter(pts, np.zeros_like(pts), c='steelblue', s=30, zorder=3)
+    ax.axvline(x=phi, color='green', linestyle='--', alpha=0.7, label='$\\phi$' if i == 0 else '')
+    ax.set_xlim(0.5, 2.8)
+    ax.set_yticks([])
+    ax.set_ylabel(f'Iter {i}', rotation=0, labelpad=30)
+    ax.axhline(y=0, color='gray', linewidth=0.5)
+
+    # Compute width of cluster
+    width = pts.max() - pts.min()
+    ax.set_title(f'Cluster width: {width:.4f}', fontsize=9, loc='right')
+
+    # Apply g for next iteration
+    pts = g(pts)
+
+axes[0].legend(fontsize=9)
+axes[-1].set_xlabel('Number line')
+fig.suptitle('Contraction of a neighborhood near $\\phi$ under iteration of $g$',
+             fontsize=11, y=1.02)
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch12_2', 'output_ch12_2', 'plot_ch12_2')">Run ▶</button>
+  <div class="output" id="output_ch12_2"></div>
+  <div class="plot-output" id="plot_ch12_2"></div>
+</div>
+```
+
+### Why This Perspective Matters
+
+The graphical interpretation of the derivative (slope of a tangent line) is specific to functions $f : \mathbb{R} \to \mathbb{R}$ plotted in the Cartesian plane. The transformational interpretation -- the derivative as a local linear scaling factor -- generalizes naturally to:
+
+- **Multivariable calculus**, where the derivative becomes the Jacobian matrix, describing how a mapping stretches, rotates, and shears small regions of $\mathbb{R}^n$.
+- **Complex analysis**, where analytic functions act as conformal mappings, and the derivative describes local rotation and scaling in the complex plane.
+- **Differential geometry**, where the derivative of a map between manifolds is a linear map between tangent spaces.
+
+In each of these settings, the core idea remains unchanged: the derivative describes the best local linear approximation to a function, encoding how it transforms an infinitesimal neighborhood of a point.
+
+## Summary
+
+::: {.key-formula}
+| Concept | Key Result |
+|---|---|
+| Transformational derivative | $f(x_0 + h) \approx f(x_0) + f'(x_0) \cdot h$; the derivative is the local stretching factor |
+| Stretching vs. squishing | $|f'(x_0)| > 1$: stretches; $|f'(x_0)| < 1$: contracts; $f'(x_0) < 0$: reverses |
+| Fixed point equation for $g(x) = 1 + 1/x$ | $(x^*)^2 - x^* - 1 = 0 \implies x^* = \phi$ or $x^* = \psi = -1/\phi$ |
+| Stability criterion | Fixed point $x^*$ is stable if $|g'(x^*)| < 1$, unstable if $|g'(x^*)| > 1$ |
+| Golden ratio as attractor | $|g'(\phi)| = 1/\phi^2 \approx 0.382 < 1$, so $\phi$ is the stable fixed point |
+:::

@@ -1,0 +1,290 @@
+---
+title: "极限、洛必达法则与 ε-δ 定义"
+subtitle: "第七章"
+date: 2023-04-07
+---
+
+本课对极限的概念进行形式化处理——极限是本系列迄今为止遇到的每个定义的基石。我们将导数的直觉性"微扰"解释与标准教科书定义联系起来，引入极限的严格 ε-δ 刻画，最后讨论洛必达法则——一种计算不定型极限的强大技术。
+
+::: {.callout-note collapse="true"}
+## 预备知识
+
+- 理解导数作为微小扰动下的比值 $df/dx$（第二至三章）
+- 熟悉基本求导法则：幂法则、链式法则（第三至四章）
+- 能够使用 $\lim_{x \to a} f(x)$ 记号
+:::
+
+## 本课内容
+
+- 导数作为极限的形式化定义
+- "趋近"的直觉含义与严格含义
+- 极限的 ε-δ 定义
+- 不定型与洛必达法则
+
+## 课程视频
+
+```{=html}
+<video controls width="100%" preload="metadata">
+  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/07_Limits%2C%20L%27H%C3%B4pital%27s%20rule%2C%20and%20epsilon%20delta%20definitions%20%EF%BD%9C%20Chapter%207%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
+</video>
+```
+
+## 课程关键帧
+
+![导数作为差商极限的形式化定义](../images/ch07/frame_01.jpg)
+
+![一个在极限点处有空洞的函数，说明极限描述的是附近的行为](../images/ch07/frame_02.jpg)
+
+![ε-δ 框架：缩小输入范围可以产生任意小的输出范围](../images/ch07/frame_03.jpg)
+
+![将洛必达法则应用于 $\sin(\pi x)/(x^2 - 1)$ 在 $x = 1$ 附近的情形](../images/ch07/frame_04.jpg)
+
+## 核心要点
+
+### 导数的形式化定义
+
+在前面的章节中，我们将函数 $f$ 在点 $x$ 处的导数解释为比值 $df/dx$，其中 $dx$ 是对输入的一个小而具体的扰动。形式化定义使这个取极限的过程变得明确。我们用一个普通变量 $h$ 替代无穷小符号 $dx$，写出
+
+$$
+f'(x) = \lim_{h \to 0} \frac{f(x + h) - f(x)}{h}.
+$$
+
+$h$ 是一个真正的、有限小的数——例如 $0.001$ 或 $0.0001$。然后我们考察当 $h$ 无限趋近于零时差商趋向什么值。这个定义中没有涉及"无穷小"量；极限的形式化完全绕开了这个概念。
+
+作为一个具体的例子，考虑 $f(x) = x^3$ 在 $x = 2$ 处。差商变为
+
+$$
+\frac{(2 + h)^3 - 2^3}{h} = \frac{(8 + 12h + 6h^2 + h^3) - 8}{h} = 12 + 6h + h^2.
+$$
+
+这是一个对所有 $h \neq 0$ 都有良好定义的函数，其图像是一条在 $h = 0$ 处有空洞的抛物线。当 $h \to 0$ 时，该表达式趋近于 $12$，证实 $f'(2) = 12$。
+
+### "趋近"的含义：直觉图景
+
+考虑任意函数 $g(h)$，它在 $h = 0$ 附近（但不一定在 $h = 0$ 处）有定义。如果通过将 $h$ 限制在 $0$ 附近一个足够小的区间内，相应的输出就可以被限制在 $L$ 附近一个任意小的区间内，那么我们就说当 $h \to 0$ 时 $g(h)$ **趋近于** $L$。
+
+当极限不存在时，这样的限制是不可能的。例如，如果一个函数在某点左侧趋向一个值而在右侧趋向另一个值，那么无论输入范围限制得多紧，输出范围都横跨一个永远无法消除的间隙。
+
+### 极限的 ε-δ 定义
+
+上述非形式化的描述可以被完全精确化。我们写
+
+$$
+\lim_{x \to a} f(x) = L
+$$
+
+其含义如下：对于每一个 $\varepsilon > 0$，都存在一个 $\delta > 0$，使得
+
+$$
+0 < |x - a| < \delta \implies |f(x) - L| < \varepsilon.
+$$
+
+量词的结构至关重要。对手首先选择 $\varepsilon$——对输出的一个任意严格的容差。我们然后必须给出一个 $\delta$——对输入的一个足够紧的限制——使得在 $a$ 的 $\delta$ 范围内（不包括 $a$ 本身）的每个 $x$ 都产生在 $L$ 的 $\varepsilon$ 范围内的输出。
+
+**示例.** 我们验证 $\lim_{h \to 0}(12 + 6h + h^2) = 12$。给定 $\varepsilon > 0$，我们需要 $|6h + h^2| < \varepsilon$。限制 $|h| < 1$ 时，有 $|6h + h^2| \le 6|h| + |h|^2 \le 6|h| + |h| = 7|h|$。取 $\delta = \min(1, \varepsilon / 7)$ 即可保证不等式成立。
+
+当极限**不存在**时，存在某个 $\varepsilon > 0$ 使得没有任何 $\delta$ 足以满足条件。考虑一个在给定点从右侧趋向 $2$ 而从左侧趋向 $1$ 的函数。取 $\varepsilon = 0.4$，无论 $\delta$ 选得多小，该点两侧的输入产生的输出相差接近 $1$，超过了 $2\varepsilon$。
+
+### 交互演示：探索差商（Desmos）
+
+```{=html}
+<div id="calc_ch07_1" class="desmos-container"></div>
+<script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+<script>
+  var calc_ch07_1 = Desmos.GraphingCalculator(document.getElementById('calc_ch07_1'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'h', yAxisLabel: 'Q(h)'
+  });
+  calc_ch07_1.setExpression({ id: 'quotient', latex: 'y = 12 + 6x + x^2', color: '#2d70b3' });
+  calc_ch07_1.setExpression({ id: 'hole', latex: '(0, 12)', color: '#c74440', pointStyle: 'OPEN', pointSize: 9 });
+  calc_ch07_1.setExpression({ id: 'limit_line', latex: 'y = 12', color: '#388c46', lineStyle: 'DASHED', lineWidth: 1.5 });
+  calc_ch07_1.setMathBounds({ left: -4, right: 4, bottom: -2, top: 30 });
+</script>
+```
+
+蓝色曲线是差商 $(2+h)^3 - 8)/h = 12 + 6h + h^2$。$h = 0$ 处的空心圆标记了该表达式未定义的点，但函数从两侧明显趋近于 $12$（绿色虚线）。
+
+### 交互演示：ε-δ 窗口（Desmos）
+
+```{=html}
+<div id="calc_ch07_2" class="desmos-container"></div>
+<script>
+  var calc_ch07_2 = Desmos.GraphingCalculator(document.getElementById('calc_ch07_2'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'h', yAxisLabel: 'Q(h)'
+  });
+  calc_ch07_2.setExpression({ id: 'func', latex: 'y = 12 + 6x + x^2', color: '#2d70b3' });
+  calc_ch07_2.setExpression({ id: 'eps', latex: '\\epsilon = 1', sliderBounds: { min: 0.05, max: 5, step: 0.05 } });
+  calc_ch07_2.setExpression({ id: 'del', latex: '\\delta = 0.14', sliderBounds: { min: 0.01, max: 2, step: 0.01 } });
+  calc_ch07_2.setExpression({ id: 'eps_upper', latex: 'y = 12 + \\epsilon', color: '#c74440', lineStyle: 'DASHED' });
+  calc_ch07_2.setExpression({ id: 'eps_lower', latex: 'y = 12 - \\epsilon', color: '#c74440', lineStyle: 'DASHED' });
+  calc_ch07_2.setExpression({ id: 'del_left', latex: 'x = -\\delta', color: '#388c46', lineStyle: 'DASHED' });
+  calc_ch07_2.setExpression({ id: 'del_right', latex: 'x = \\delta', color: '#388c46', lineStyle: 'DASHED' });
+  calc_ch07_2.setExpression({ id: 'shade', latex: '12 - \\epsilon \\le y \\le 12 + \\epsilon \\left\\{-\\delta \\le x \\le \\delta\\right\\}', color: '#ffd700', fillOpacity: 0.15 });
+  calc_ch07_2.setMathBounds({ left: -3, right: 3, bottom: 5, top: 20 });
+</script>
+```
+
+调整 $\varepsilon$ 滑块（红色虚线）设定围绕 $12$ 的输出容差，然后调整 $\delta$（绿色虚线）寻找能使蓝色曲线保持在黄色区域内的输入限制。对于每一个 $\varepsilon > 0$ 的选择，都存在合适的 $\delta$——这正是极限等于 $12$ 的表述。
+
+### 洛必达法则
+
+现在我们转向一种计算 $0/0$ 型极限的实用技术。考虑两个函数 $f$ 和 $g$，它们都在某点 $x = a$ 处为零，因此比值 $f(x)/g(x)$ 在该点未定义。在 $x = a$ 附近，每个函数可以用其线性近似很好地逼近：
+
+$$
+f(x) \approx f'(a) \cdot (x - a), \qquad g(x) \approx g'(a) \cdot (x - a).
+$$
+
+这两个近似的比值为
+
+$$
+\frac{f(x)}{g(x)} \approx \frac{f'(a)\cdot (x - a)}{g'(a)\cdot (x - a)} = \frac{f'(a)}{g'(a)},
+$$
+
+前提是 $g'(a) \neq 0$。由于近似在极限中变为精确，我们得到**洛必达法则**：
+
+$$
+\lim_{x \to a} \frac{f(x)}{g(x)} = \frac{f'(a)}{g'(a)},
+$$
+
+只要右端有定义且 $f(a) = g(a) = 0$。
+
+**示例.** 计算 $\displaystyle\lim_{x \to 1} \frac{\sin(\pi x)}{x^2 - 1}$。
+
+分子和分母在 $x = 1$ 处都为零。分别求导：
+
+$$
+\frac{d}{dx}\sin(\pi x)\Big|_{x=1} = \pi\cos(\pi \cdot 1) = \pi(-1) = -\pi,
+$$
+
+$$
+\frac{d}{dx}(x^2 - 1)\Big|_{x=1} = 2(1) = 2.
+$$
+
+因此，
+
+$$
+\lim_{x \to 1} \frac{\sin(\pi x)}{x^2 - 1} = \frac{-\pi}{2}.
+$$
+
+### 交互演示：洛必达法则的应用（Desmos）
+
+```{=html}
+<div id="calc_ch07_3" class="desmos-container"></div>
+<script>
+  var calc_ch07_3 = Desmos.GraphingCalculator(document.getElementById('calc_ch07_3'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: ''
+  });
+  calc_ch07_3.setExpression({ id: 'ratio', latex: 'y = \\frac{\\sin(\\pi x)}{x^2 - 1}', color: '#2d70b3' });
+  calc_ch07_3.setExpression({ id: 'limit_val', latex: 'y = -\\frac{\\pi}{2}', color: '#c74440', lineStyle: 'DASHED', lineWidth: 1.5 });
+  calc_ch07_3.setExpression({ id: 'limit_pt', latex: '(1, -\\frac{\\pi}{2})', color: '#c74440', pointStyle: 'OPEN', pointSize: 9 });
+  calc_ch07_3.setExpression({ id: 'num', latex: 'y = \\sin(\\pi x)', color: '#388c46', lineWidth: 1 });
+  calc_ch07_3.setExpression({ id: 'den', latex: 'y = x^2 - 1', color: '#fa7e19', lineWidth: 1 });
+  calc_ch07_3.setMathBounds({ left: -1, right: 3, bottom: -4, top: 4 });
+</script>
+```
+
+蓝色曲线是 $\sin(\pi x)/(x^2-1)$，在 $x = 1$ 处有空洞。绿色和橙色曲线分别表示分子和分母；两者在 $x = 1$ 处都过零。红色虚线 $y = -\pi/2$ 标记了洛必达法则所预测的极限值。
+
+### 关于循环论证的说明
+
+有人可能会问，洛必达法则是否可以用来发现新的导数公式，因为导数的定义本身就是一个 $0/0$ 型的极限。这将构成循环论证：应用该法则需要事先知道分子和分母的导数。洛必达法则是用于计算已知函数的极限的工具，而不是用于推导微分学基本公式的方法。
+
+### 交互演示：差商的数值探索（Python）
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch07_1">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Difference quotient for f(x) = x^3 at x = 2
+def diff_quotient(h):
+    return ((2 + h)**3 - 2**3) / h
+
+h_values = np.linspace(-3, 3, 601)
+h_values = h_values[h_values != 0]  # exclude h = 0
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
+
+# Left: the difference quotient as a function of h
+ax1.plot(h_values, diff_quotient(h_values), color='steelblue', linewidth=1.5)
+ax1.axhline(y=12, color='coral', linestyle='--', label='Limit = 12')
+ax1.plot(0, 12, 'o', mfc='white', mec='coral', markersize=8)
+ax1.set_xlabel('h')
+ax1.set_ylabel('Q(h)')
+ax1.set_title('Difference quotient for $x^3$ at $x=2$')
+ax1.legend()
+ax1.grid(True, alpha=0.3)
+
+# Right: convergence as h -> 0
+h_small = np.logspace(-1, -8, 50)
+errors = np.abs(diff_quotient(h_small) - 12)
+ax2.loglog(h_small, errors, 'o-', markersize=3, color='steelblue')
+ax2.set_xlabel('h')
+ax2.set_ylabel('$|Q(h) - 12|$')
+ax2.set_title('Error vs. h (log-log scale)')
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch07_1', 'output_ch07_1', 'plot_ch07_1')">Run ▶</button>
+  <div class="output" id="output_ch07_1"></div>
+  <div class="plot-output" id="plot_ch07_1"></div>
+</div>
+```
+
+### 交互演示：数值验证洛必达法则（Python）
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch07_2">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Evaluate sin(pi*x) / (x^2 - 1) near x = 1
+def f(x):
+    return np.sin(np.pi * x) / (x**2 - 1)
+
+# Approach x = 1 from both sides
+offsets = np.logspace(-1, -10, 50)
+from_right = [f(1 + d) for d in offsets]
+from_left  = [f(1 - d) for d in offsets]
+
+limit_exact = -np.pi / 2
+
+fig, ax = plt.subplots(figsize=(8, 4))
+ax.semilogx(offsets, from_right, 'o-', markersize=3, color='steelblue',
+            label='From right: $f(1 + \\delta)$')
+ax.semilogx(offsets, from_left, 's-', markersize=3, color='coral',
+            label='From left: $f(1 - \\delta)$')
+ax.axhline(y=limit_exact, color='black', linestyle='--',
+           label=f'$-\\pi/2 \\approx {limit_exact:.6f}$')
+ax.set_xlabel('Offset $\\delta$')
+ax.set_ylabel('$f(1 \\pm \\delta)$')
+ax.set_title("Numerical verification of L'H\\^opital's Rule")
+ax.legend()
+ax.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+print(f"Exact limit (L'Hopital): -pi/2 = {limit_exact:.10f}")
+print(f"Numerical at delta=1e-8:  from right = {f(1+1e-8):.10f}")
+print(f"                          from left  = {f(1-1e-8):.10f}")
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch07_2', 'output_ch07_2', 'plot_ch07_2')">Run ▶</button>
+  <div class="output" id="output_ch07_2"></div>
+  <div class="plot-output" id="plot_ch07_2"></div>
+</div>
+```
+
+## 速查表
+
+::: {.key-formula}
+| 概念 | 核心结论 |
+|---|---|
+| 导数的形式化定义 | $f'(x) = \lim_{h \to 0} \dfrac{f(x+h) - f(x)}{h}$ |
+| ε-δ 定义 | $\lim_{x \to a} f(x) = L$ 当且仅当 $\forall\, \varepsilon > 0,\; \exists\, \delta > 0$ 使得 $0 < |x-a| < \delta \Rightarrow |f(x)-L| < \varepsilon$ |
+| 洛必达法则 | 若 $f(a) = g(a) = 0$，则 $\lim_{x \to a} \dfrac{f(x)}{g(x)} = \dfrac{f'(a)}{g'(a)}$ |
+| 计算示例 | $\lim_{x \to 1} \dfrac{\sin(\pi x)}{x^2 - 1} = \dfrac{-\pi}{2}$ |
+:::

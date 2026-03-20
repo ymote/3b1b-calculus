@@ -1,0 +1,330 @@
+---
+title: "积分与微积分基本定理"
+subtitle: "第八章"
+date: 2023-04-01
+---
+
+本课从"由速度恢复路程"这一问题出发，发展积分作为曲线下面积的概念。然后我们建立微积分基本定理，揭示积分与微分互为逆运算的关系，并演示如何利用原函数来计算定积分。
+
+::: {.callout-note collapse="true"}
+## 预备知识
+
+- 理解导数和幂法则（第二至四章）
+- 熟悉极限的概念（第七章）
+- 能够使用求和记号以及有限和逼近的思想
+:::
+
+## 本课内容
+
+- 通过速度函数的曲线下面积恢复路程
+- 积分作为黎曼和的极限
+- 面积函数及其导数
+- 微积分基本定理
+- 利用原函数计算定积分
+- 有符号面积与被积函数为负值的情形
+
+## 课程视频
+
+```{=html}
+<video controls width="100%" preload="metadata">
+  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/08_Integration%20and%20the%20fundamental%20theorem%20of%20calculus%20%EF%BD%9C%20Chapter%208%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
+</video>
+```
+
+## 课程关键帧
+
+![用速度曲线下的细矩形近似行驶距离](../images/ch08/frame_01.jpg)
+
+![积分记号及其作为极限求和的解释](../images/ch08/frame_02.jpg)
+
+![面积函数与薄片论证其导数](../images/ch08/frame_03.jpg)
+
+![微积分基本定理：通过原函数计算积分](../images/ch08/frame_04.jpg)
+
+## 核心要点
+
+### 从速度到距离：驱动问题
+
+考虑一辆汽车，其速度由函数
+
+$$
+v(t) = t(8 - t)
+$$
+
+给出，其中 $0 \le t \le 8$ 秒。核心问题是：在这段时间内汽车行驶了多远？如果速度恒定，答案就是速度乘以时间。但由于 $v(t)$ 在不断变化，我们需要发展一种更精细的方法。
+
+### 黎曼和近似
+
+我们将时间区间 $[0, 8]$ 分成 $n$ 个子区间，每个宽度为 $dt = 8/n$。在每个小区间 $[t_i,\, t_i + dt]$ 上，我们将速度近似为常数，等于 $v(t_i)$。在该子区间上行驶的距离近似为
+
+$$
+\Delta s_i \approx v(t_i) \, dt.
+$$
+
+对所有子区间求和，总的近似距离为
+
+$$
+s \approx \sum_{i=0}^{n-1} v(t_i) \, dt.
+$$
+
+这个和中的每一项对应于一个高为 $v(t_i)$、宽为 $dt$ 的细矩形的面积。当 $dt \to 0$（即 $n \to \infty$）时，这个和收敛到精确的行驶距离，等于速度曲线下的面积：
+
+$$
+s = \int_0^8 v(t) \, dt = \int_0^8 t(8 - t) \, dt.
+$$
+
+### 交互演示：黎曼和近似（Desmos）
+
+```{=html}
+<div id="calc_ch08_1" class="desmos-container"></div>
+<script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+<script>
+  var calc_ch08_1 = Desmos.GraphingCalculator(document.getElementById('calc_ch08_1'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 't', yAxisLabel: 'v(t)'
+  });
+  calc_ch08_1.setExpression({ id: 'vel', latex: 'v(t) = t(8 - t)', color: '#2d70b3' });
+  calc_ch08_1.setExpression({ id: 'n', latex: 'n = 8', sliderBounds: { min: 1, max: 80, step: 1 } });
+  calc_ch08_1.setExpression({ id: 'dt', latex: 'd_t = \\frac{8}{n}' });
+  calc_ch08_1.setExpression({ id: 'rects', latex: '0 \\le y \\le \\operatorname{floor}\\left(\\frac{x}{d_t}\\right) d_t \\left(8 - \\operatorname{floor}\\left(\\frac{x}{d_t}\\right) d_t\\right) \\left\\{0 \\le x \\le 8\\right\\}', color: '#388c46', fillOpacity: 0.3 });
+  calc_ch08_1.setMathBounds({ left: -0.5, right: 9, bottom: -2, top: 20 });
+</script>
+```
+
+调整滑块 $n$ 以增加矩形的数量。随着 $n$ 增大，所有矩形的总面积收敛到抛物线下的真实面积。
+
+### 积分作为面积函数
+
+我们现在将这一构造推广。给定一个连续函数 $f$，我们定义**面积函数**
+
+$$
+A(T) = \int_a^T f(t) \, dt,
+$$
+
+它表示 $f$ 的图像从 $t = a$ 到 $t = T$ 之间的有符号面积。在速度的语境中，$A(T)$ 就是汽车到时刻 $T$ 所行驶的距离。
+
+### 面积函数的导数
+
+考虑对上限施加一个微小增量 $dT$。相应的面积变化是 $T$ 与 $T + dT$ 之间的薄片：
+
+$$
+dA \approx f(T) \, dT.
+$$
+
+这个薄片近似为一个高为 $f(T)$、宽为 $dT$ 的矩形。两边除以 $dT$ 并令 $dT \to 0$，我们得到
+
+$$
+\frac{dA}{dT} = f(T).
+$$
+
+换言之，面积函数在任意一点的导数等于图像在该点的高度。这是连接积分与微分的核心洞察。
+
+### 交互演示：面积函数及其导数（Desmos）
+
+```{=html}
+<div id="calc_ch08_2" class="desmos-container"></div>
+<script>
+  var calc_ch08_2 = Desmos.GraphingCalculator(document.getElementById('calc_ch08_2'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 't', yAxisLabel: ''
+  });
+  calc_ch08_2.setExpression({ id: 'v', latex: 'v(t) = t(8 - t)', color: '#2d70b3' });
+  calc_ch08_2.setExpression({ id: 'S', latex: 'S(t) = 4t^2 - \\frac{t^3}{3}', color: '#388c46' });
+  calc_ch08_2.setExpression({ id: 'T', latex: 'T = 5', sliderBounds: { min: 0, max: 8, step: 0.01 } });
+  calc_ch08_2.setExpression({ id: 'dT', latex: 'd = 0.3', sliderBounds: { min: 0.01, max: 1, step: 0.01 } });
+  calc_ch08_2.setExpression({ id: 'shade', latex: '0 \\le y \\le x(8 - x) \\left\\{0 \\le x \\le T\\right\\}', color: '#388c46', fillOpacity: 0.15 });
+  calc_ch08_2.setExpression({ id: 'sliver', latex: '0 \\le y \\le x(8 - x) \\left\\{T \\le x \\le T + d\\right\\}', color: '#c74440', fillOpacity: 0.5 });
+  calc_ch08_2.setMathBounds({ left: -0.5, right: 9, bottom: -10, top: 90 });
+</script>
+```
+
+移动滑块 $T$ 观察阴影面积的增长。$t = T$ 处的红色薄片面积近似为 $v(T) \cdot dT$，证实 $dS/dT = v(T)$。
+
+### 微积分基本定理
+
+前面的论证建立了**微积分基本定理**。若 $F$ 是 $f$ 的任意原函数（即 $F'(x) = f(x)$），则
+
+$$
+\int_a^b f(t) \, dt = F(b) - F(a).
+$$
+
+证明如下。我们已经证明面积函数 $A(x) = \int_a^x f(t)\, dt$ 满足 $A'(x) = f(x)$。因此 $A$ 是 $f$ 的一个原函数。由于 $f$ 的任意两个原函数之差为常数，我们可以写 $A(x) = F(x) + C$，其中 $C$ 为某常数。在 $x = a$ 处求值得 $0 = F(a) + C$，从而 $C = -F(a)$。因此
+
+$$
+\int_a^b f(t)\, dt = A(b) = F(b) - F(a).
+$$
+
+这个结果非常深刻：要计算积分——它被定义为涉及 $f$ 在 $[a, b]$ 上所有值的求和的极限——只需在两个点处计算原函数的值即可。
+
+### 应用微积分基本定理：速度的例子
+
+回到速度函数 $v(t) = t(8 - t) = 8t - t^2$。我们寻找满足 $S'(t) = 8t - t^2$ 的原函数 $S(t)$。
+
+逆用幂法则：
+
+- $4t^2$ 的导数是 $8t$。
+- $\tfrac{1}{3}t^3$ 的导数是 $t^2$。
+
+因此
+
+$$
+S(t) = 4t^2 - \frac{t^3}{3} + C.
+$$
+
+由微积分基本定理，在 $[0, 8]$ 上行驶的总距离为
+
+$$
+\int_0^8 (8t - t^2)\, dt = S(8) - S(0) = \left(4 \cdot 64 - \frac{512}{3}\right) - 0 = 256 - \frac{512}{3} = \frac{256}{3} \approx 85.33 \text{ 米}.
+$$
+
+更一般地，在 $t = 1$ 到 $t = 7$ 之间行驶的距离为
+
+$$
+\int_1^7 (8t - t^2)\, dt = S(7) - S(1) = \left(196 - \frac{343}{3}\right) - \left(4 - \frac{1}{3}\right) = \frac{245}{3} - \frac{11}{3} = 78 \text{ 米}.
+$$
+
+注意任意常数 $C$ 在差 $S(b) - S(a)$ 中抵消了，因此可以使用任何原函数。
+
+### 交互演示：计算定积分（Desmos）
+
+```{=html}
+<div id="calc_ch08_3" class="desmos-container"></div>
+<script>
+  var calc_ch08_3 = Desmos.GraphingCalculator(document.getElementById('calc_ch08_3'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 't', yAxisLabel: 'v(t)'
+  });
+  calc_ch08_3.setExpression({ id: 'vel', latex: 'v(t) = t(8 - t)', color: '#2d70b3' });
+  calc_ch08_3.setExpression({ id: 'a', latex: 'a = 1', sliderBounds: { min: 0, max: 7, step: 0.1 } });
+  calc_ch08_3.setExpression({ id: 'b', latex: 'b = 7', sliderBounds: { min: 1, max: 8, step: 0.1 } });
+  calc_ch08_3.setExpression({ id: 'region', latex: '0 \\le y \\le x(8 - x) \\left\\{a \\le x \\le b\\right\\}', color: '#6042a6', fillOpacity: 0.3 });
+  calc_ch08_3.setExpression({ id: 'Fb', latex: 'F_b = 4b^2 - \\frac{b^3}{3}' });
+  calc_ch08_3.setExpression({ id: 'Fa', latex: 'F_a = 4a^2 - \\frac{a^3}{3}' });
+  calc_ch08_3.setExpression({ id: 'integral', latex: 'I = F_b - F_a' });
+  calc_ch08_3.setMathBounds({ left: -0.5, right: 9, bottom: -2, top: 20 });
+</script>
+```
+
+调整滑块 $a$ 和 $b$ 以改变积分上下限。阴影区域表示 $\int_a^b t(8-t)\, dt = S(b) - S(a)$。
+
+### 有符号面积与负值被积函数
+
+当函数 $f$ 在 $[a, b]$ 的部分区间上取负值时，积分通过**有符号面积**来处理。图像位于水平轴下方的部分对积分贡献负值。在速度的语境中，负速度对应于汽车在倒退，积分计算的是区间上的净位移（而非总路程）。
+
+形式上，如果 $f(t) < 0$ 在某个子区间上成立，黎曼和中的矩形 $f(t_i)\, dt$ 带有负号，积分反映了这一点：
+
+$$
+\int_a^b f(t)\, dt = (\text{轴上方面积}) - (\text{轴下方面积}).
+$$
+
+### 交互演示：黎曼和的收敛（Python）
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch08_1">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Riemann sum approximation for integral of v(t) = t(8-t) over [0, 8]
+def v(t):
+    return t * (8 - t)
+
+exact = 256 / 3  # exact integral value
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
+
+# Left: visualize rectangles for a specific N
+N = 20
+dt = 8 / N
+t_vals = np.array([i * dt for i in range(N)])
+heights = v(t_vals)
+
+t_fine = np.linspace(0, 8, 300)
+ax1.plot(t_fine, v(t_fine), 'k-', linewidth=2, label='$v(t) = t(8-t)$')
+ax1.bar(t_vals, heights, width=dt, alpha=0.4, align='edge', color='steelblue',
+        edgecolor='steelblue')
+ax1.set_xlabel('t (seconds)')
+ax1.set_ylabel('v(t) (m/s)')
+ax1.set_title(f'Left Riemann Sum (N = {N})')
+ax1.legend()
+
+# Right: convergence as N increases
+Ns = np.arange(5, 201, 5)
+errors = []
+for n in Ns:
+    dt_n = 8 / n
+    approx = sum(v(i * dt_n) * dt_n for i in range(n))
+    errors.append(abs(approx - exact))
+
+ax2.semilogy(Ns, errors, 'o-', markersize=3, color='#c74440')
+ax2.set_xlabel('Number of rectangles N')
+ax2.set_ylabel('Absolute error')
+ax2.set_title('Convergence to exact integral')
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch08_1', 'output_ch08_1', 'plot_ch08_1')">Run ▶</button>
+  <div class="output" id="output_ch08_1"></div>
+  <div class="plot-output" id="plot_ch08_1"></div>
+</div>
+```
+
+### 交互演示：原函数与微积分基本定理（Python）
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch08_2">
+import numpy as np
+import matplotlib.pyplot as plt
+
+def v(t):
+    return t * (8 - t)
+
+def S(t):
+    return 4 * t**2 - t**3 / 3
+
+t = np.linspace(0, 8, 300)
+
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 6), sharex=True)
+
+# Top: velocity function
+ax1.plot(t, v(t), color='#2d70b3', linewidth=2)
+ax1.fill_between(t, v(t), alpha=0.15, color='#2d70b3')
+ax1.set_ylabel('$v(t) = t(8-t)$ (m/s)')
+ax1.set_title('Velocity and its antiderivative (distance)')
+ax1.axhline(0, color='gray', linewidth=0.5)
+
+# Bottom: antiderivative (distance function)
+ax2.plot(t, S(t), color='#388c46', linewidth=2)
+ax2.set_xlabel('t (seconds)')
+ax2.set_ylabel('$S(t) = 4t^2 - t^3/3$ (m)')
+ax2.axhline(0, color='gray', linewidth=0.5)
+
+# Mark the total distance at t=8
+ax2.plot(8, S(8), 'ro', markersize=8)
+ax2.annotate(f'S(8) = {S(8):.2f} m', xy=(8, S(8)),
+             xytext=(5.5, S(8) + 5), fontsize=10,
+             arrowprops=dict(arrowstyle='->', color='red'))
+
+plt.tight_layout()
+plt.show()
+
+print(f"Total distance over [0, 8]: S(8) - S(0) = {S(8) - S(0):.4f} meters")
+print(f"Distance over [1, 7]:       S(7) - S(1) = {S(7) - S(1):.4f} meters")
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch08_2', 'output_ch08_2', 'plot_ch08_2')">Run ▶</button>
+  <div class="output" id="output_ch08_2"></div>
+  <div class="plot-output" id="plot_ch08_2"></div>
+</div>
+```
+
+## 速查表
+
+::: {.key-formula}
+| 概念 | 核心结论 |
+|---|---|
+| 黎曼和近似 | $\displaystyle\sum_{i=0}^{n-1} f(t_i)\, dt \;\to\; \int_a^b f(t)\, dt$，当 $dt \to 0$ |
+| 面积函数的导数 | $\dfrac{d}{dT}\displaystyle\int_a^T f(t)\, dt = f(T)$ |
+| 微积分基本定理 | $\displaystyle\int_a^b f(t)\, dt = F(b) - F(a)$，其中 $F' = f$ |
+| 速度的例子 | $\displaystyle\int_0^8 t(8-t)\, dt = 4t^2 - \tfrac{t^3}{3}\Big\vert_0^8 = \tfrac{256}{3}$ |
+| 有符号面积 | 轴下方区域对积分贡献负值 |
+:::

@@ -1,0 +1,342 @@
+---
+title: "Limits, L'Hopital's Rule, and Epsilon-Delta Definitions"
+subtitle: "Chapter 7"
+date: 2023-04-07
+---
+
+This lesson formalizes the notion of a limit, which undergirds every definition
+encountered so far in the series. We connect the intuitive "nudge" interpretation
+of derivatives to the standard textbook definition, introduce the rigorous
+epsilon-delta characterization of limits, and conclude with L'Hopital's Rule — a
+powerful technique for evaluating indeterminate forms.
+
+::: {.callout-note collapse="true"}
+## Prerequisites
+
+- Understanding of the derivative as the ratio $df/dx$ in the limit of small nudges (Chapters 2--3)
+- Familiarity with basic derivative rules: power rule, chain rule (Chapters 3--4)
+- Comfort with the notation $\lim_{x \to a} f(x)$
+:::
+
+## Topics Covered
+
+- The formal definition of the derivative as a limit
+- Intuitive and rigorous meanings of "approach"
+- The epsilon-delta definition of limits
+- Indeterminate forms and L'Hopital's Rule
+
+## Lecture Video
+
+```{=html}
+<video controls width="100%" preload="metadata">
+  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/07_Limits%2C%20L%27H%C3%B4pital%27s%20rule%2C%20and%20epsilon%20delta%20definitions%20%EF%BD%9C%20Chapter%207%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
+</video>
+```
+
+## Key Video Frames
+
+![The formal definition of the derivative as a limit of the difference quotient](../images/ch07/frame_01.jpg)
+
+![A function with a hole at the limiting point, illustrating that the limit describes nearby behavior](../images/ch07/frame_02.jpg)
+
+![The epsilon-delta framework: shrinking input ranges produce arbitrarily small output ranges](../images/ch07/frame_03.jpg)
+
+![Applying L'Hopital's Rule to $\sin(\pi x)/(x^2 - 1)$ near $x = 1$](../images/ch07/frame_04.jpg)
+
+## Key Concepts
+
+### The Formal Definition of the Derivative
+
+Throughout the preceding chapters, we have interpreted the derivative of a
+function $f$ at a point $x$ as the ratio $df/dx$, where $dx$ is a small but
+concrete nudge to the input. The formal definition makes the limiting process
+explicit. We replace the infinitesimal symbol $dx$ with an ordinary variable $h$
+and write
+
+$$
+f'(x) = \lim_{h \to 0} \frac{f(x + h) - f(x)}{h}.
+$$
+
+The value $h$ is a genuine, finitely small number — for example, $0.001$ or
+$0.0001$. We then ask what the difference quotient approaches as $h$ is taken
+arbitrarily close to zero. Nothing in this definition invokes "infinitely small"
+quantities; the limit formalism circumvents that notion entirely.
+
+As a concrete illustration, consider $f(x) = x^3$ at $x = 2$. The difference
+quotient becomes
+
+$$
+\frac{(2 + h)^3 - 2^3}{h} = \frac{(8 + 12h + 6h^2 + h^3) - 8}{h} = 12 + 6h + h^2.
+$$
+
+This is a perfectly well-defined function of $h$ for all $h \neq 0$, and its
+graph is a parabola with a hole at $h = 0$. As $h \to 0$, the expression
+approaches $12$, confirming that $f'(2) = 12$.
+
+### What "Approach" Means: An Intuitive Picture
+
+Consider any function $g(h)$ that is defined for values of $h$ near (but not
+necessarily at) some point $h = 0$. We say that $g(h)$ **approaches** the value
+$L$ as $h \to 0$ if, by restricting $h$ to a sufficiently small interval around
+$0$, the corresponding outputs can be confined to an arbitrarily small interval
+around $L$.
+
+When a limit fails to exist, no such confinement is possible. For instance, if a
+function jumps from one value on the left of a point to a different value on the
+right, then no matter how tightly we restrict the input range, the output range
+straddles a gap that never closes.
+
+### The Epsilon-Delta Definition of Limits
+
+The informal description above can be made completely precise. We write
+
+$$
+\lim_{x \to a} f(x) = L
+$$
+
+and mean the following: for every $\varepsilon > 0$, there exists a
+$\delta > 0$ such that
+
+$$
+0 < |x - a| < \delta \implies |f(x) - L| < \varepsilon.
+$$
+
+The quantifier structure is crucial. The adversary chooses $\varepsilon$ first —
+an arbitrarily stringent tolerance on the output. We must then respond with a
+$\delta$ — a sufficiently tight restriction on the input — so that every $x$
+within $\delta$ of $a$ (excluding $a$ itself) produces an output within
+$\varepsilon$ of $L$.
+
+**Example.** We verify that $\lim_{h \to 0}(12 + 6h + h^2) = 12$. Given
+$\varepsilon > 0$, we need $|6h + h^2| < \varepsilon$. Restricting $|h| < 1$,
+we have $|6h + h^2| \le 6|h| + |h|^2 \le 6|h| + |h| = 7|h|$. Choosing
+$\delta = \min(1, \varepsilon / 7)$ ensures the inequality holds.
+
+When a limit does **not** exist, there is some $\varepsilon > 0$ for which no
+$\delta$ suffices. Consider a function that approaches $2$ from the right and
+$1$ from the left at a given point. Taking $\varepsilon = 0.4$, no matter how
+small $\delta$ is chosen, inputs on opposite sides of the point produce outputs
+that differ by nearly $1$, which exceeds $2\varepsilon$.
+
+### Interactive Desmos Graph: Exploring the Difference Quotient
+
+```{=html}
+<div id="calc_ch07_1" class="desmos-container"></div>
+<script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+<script>
+  var calc_ch07_1 = Desmos.GraphingCalculator(document.getElementById('calc_ch07_1'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'h', yAxisLabel: 'Q(h)'
+  });
+  calc_ch07_1.setExpression({ id: 'quotient', latex: 'y = 12 + 6x + x^2', color: '#2d70b3' });
+  calc_ch07_1.setExpression({ id: 'hole', latex: '(0, 12)', color: '#c74440', pointStyle: 'OPEN', pointSize: 9 });
+  calc_ch07_1.setExpression({ id: 'limit_line', latex: 'y = 12', color: '#388c46', lineStyle: 'DASHED', lineWidth: 1.5 });
+  calc_ch07_1.setMathBounds({ left: -4, right: 4, bottom: -2, top: 30 });
+</script>
+```
+
+The blue curve is the difference quotient $(2+h)^3 - 8)/h = 12 + 6h + h^2$. The
+open circle at $h = 0$ marks the point where the expression is undefined, yet
+the function clearly approaches $12$ (dashed green line) as $h \to 0$ from
+either side.
+
+### Interactive Desmos Graph: The Epsilon-Delta Window
+
+```{=html}
+<div id="calc_ch07_2" class="desmos-container"></div>
+<script>
+  var calc_ch07_2 = Desmos.GraphingCalculator(document.getElementById('calc_ch07_2'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'h', yAxisLabel: 'Q(h)'
+  });
+  calc_ch07_2.setExpression({ id: 'func', latex: 'y = 12 + 6x + x^2', color: '#2d70b3' });
+  calc_ch07_2.setExpression({ id: 'eps', latex: '\\epsilon = 1', sliderBounds: { min: 0.05, max: 5, step: 0.05 } });
+  calc_ch07_2.setExpression({ id: 'del', latex: '\\delta = 0.14', sliderBounds: { min: 0.01, max: 2, step: 0.01 } });
+  calc_ch07_2.setExpression({ id: 'eps_upper', latex: 'y = 12 + \\epsilon', color: '#c74440', lineStyle: 'DASHED' });
+  calc_ch07_2.setExpression({ id: 'eps_lower', latex: 'y = 12 - \\epsilon', color: '#c74440', lineStyle: 'DASHED' });
+  calc_ch07_2.setExpression({ id: 'del_left', latex: 'x = -\\delta', color: '#388c46', lineStyle: 'DASHED' });
+  calc_ch07_2.setExpression({ id: 'del_right', latex: 'x = \\delta', color: '#388c46', lineStyle: 'DASHED' });
+  calc_ch07_2.setExpression({ id: 'shade', latex: '12 - \\epsilon \\le y \\le 12 + \\epsilon \\left\\{-\\delta \\le x \\le \\delta\\right\\}', color: '#ffd700', fillOpacity: 0.15 });
+  calc_ch07_2.setMathBounds({ left: -3, right: 3, bottom: 5, top: 20 });
+</script>
+```
+
+Adjust the $\varepsilon$ slider (red dashed lines) to set an output tolerance
+around $12$, then adjust $\delta$ (green dashed lines) to find an input
+restriction that keeps the blue curve inside the yellow band. For every choice of
+$\varepsilon > 0$, a suitable $\delta$ exists — this is precisely the statement
+that the limit equals $12$.
+
+### L'Hopital's Rule
+
+We now turn to a practical technique for evaluating limits of the form $0/0$.
+Consider two functions $f$ and $g$ that both vanish at some point $x = a$, so
+that the ratio $f(x)/g(x)$ is undefined there. Near $x = a$, each function is
+well approximated by its linearization:
+
+$$
+f(x) \approx f'(a) \cdot (x - a), \qquad g(x) \approx g'(a) \cdot (x - a).
+$$
+
+The ratio of these approximations is
+
+$$
+\frac{f(x)}{g(x)} \approx \frac{f'(a)\cdot (x - a)}{g'(a)\cdot (x - a)} = \frac{f'(a)}{g'(a)},
+$$
+
+provided $g'(a) \neq 0$. Since the approximations become exact in the limit, we
+obtain **L'Hopital's Rule**:
+
+$$
+\lim_{x \to a} \frac{f(x)}{g(x)} = \frac{f'(a)}{g'(a)},
+$$
+
+whenever the right-hand side is well defined and both $f(a) = g(a) = 0$.
+
+**Example.** Evaluate $\displaystyle\lim_{x \to 1} \frac{\sin(\pi x)}{x^2 - 1}$.
+
+Both numerator and denominator vanish at $x = 1$. Differentiating:
+
+$$
+\frac{d}{dx}\sin(\pi x)\Big|_{x=1} = \pi\cos(\pi \cdot 1) = \pi(-1) = -\pi,
+$$
+
+$$
+\frac{d}{dx}(x^2 - 1)\Big|_{x=1} = 2(1) = 2.
+$$
+
+Therefore,
+
+$$
+\lim_{x \to 1} \frac{\sin(\pi x)}{x^2 - 1} = \frac{-\pi}{2}.
+$$
+
+### Interactive Desmos Graph: L'Hopital's Rule in Action
+
+```{=html}
+<div id="calc_ch07_3" class="desmos-container"></div>
+<script>
+  var calc_ch07_3 = Desmos.GraphingCalculator(document.getElementById('calc_ch07_3'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: ''
+  });
+  calc_ch07_3.setExpression({ id: 'ratio', latex: 'y = \\frac{\\sin(\\pi x)}{x^2 - 1}', color: '#2d70b3' });
+  calc_ch07_3.setExpression({ id: 'limit_val', latex: 'y = -\\frac{\\pi}{2}', color: '#c74440', lineStyle: 'DASHED', lineWidth: 1.5 });
+  calc_ch07_3.setExpression({ id: 'limit_pt', latex: '(1, -\\frac{\\pi}{2})', color: '#c74440', pointStyle: 'OPEN', pointSize: 9 });
+  calc_ch07_3.setExpression({ id: 'num', latex: 'y = \\sin(\\pi x)', color: '#388c46', lineWidth: 1 });
+  calc_ch07_3.setExpression({ id: 'den', latex: 'y = x^2 - 1', color: '#fa7e19', lineWidth: 1 });
+  calc_ch07_3.setMathBounds({ left: -1, right: 3, bottom: -4, top: 4 });
+</script>
+```
+
+The blue curve is $\sin(\pi x)/(x^2-1)$, which has a hole at $x = 1$. The green
+and orange curves show the numerator and denominator individually; both cross
+zero at $x = 1$. The dashed red line at $y = -\pi/2$ marks the limiting value
+predicted by L'Hopital's Rule.
+
+### A Note on Circular Reasoning
+
+One might wonder whether L'Hopital's Rule could be used to discover new
+derivative formulas, since the definition of the derivative is itself a limit of
+the form $0/0$. This would be circular: applying the rule requires knowing the
+derivatives of the numerator and denominator in advance. The rule is a tool for
+evaluating limits of known functions, not for deriving the foundational formulas
+of differentiation.
+
+### Interactive Python: Numerical Exploration of the Difference Quotient
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch07_1">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Difference quotient for f(x) = x^3 at x = 2
+def diff_quotient(h):
+    return ((2 + h)**3 - 2**3) / h
+
+h_values = np.linspace(-3, 3, 601)
+h_values = h_values[h_values != 0]  # exclude h = 0
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
+
+# Left: the difference quotient as a function of h
+ax1.plot(h_values, diff_quotient(h_values), color='steelblue', linewidth=1.5)
+ax1.axhline(y=12, color='coral', linestyle='--', label='Limit = 12')
+ax1.plot(0, 12, 'o', mfc='white', mec='coral', markersize=8)
+ax1.set_xlabel('h')
+ax1.set_ylabel('Q(h)')
+ax1.set_title('Difference quotient for $x^3$ at $x=2$')
+ax1.legend()
+ax1.grid(True, alpha=0.3)
+
+# Right: convergence as h -> 0
+h_small = np.logspace(-1, -8, 50)
+errors = np.abs(diff_quotient(h_small) - 12)
+ax2.loglog(h_small, errors, 'o-', markersize=3, color='steelblue')
+ax2.set_xlabel('h')
+ax2.set_ylabel('$|Q(h) - 12|$')
+ax2.set_title('Error vs. h (log-log scale)')
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch07_1', 'output_ch07_1', 'plot_ch07_1')">Run ▶</button>
+  <div class="output" id="output_ch07_1"></div>
+  <div class="plot-output" id="plot_ch07_1"></div>
+</div>
+```
+
+### Interactive Python: Verifying L'Hopital's Rule Numerically
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch07_2">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Evaluate sin(pi*x) / (x^2 - 1) near x = 1
+def f(x):
+    return np.sin(np.pi * x) / (x**2 - 1)
+
+# Approach x = 1 from both sides
+offsets = np.logspace(-1, -10, 50)
+from_right = [f(1 + d) for d in offsets]
+from_left  = [f(1 - d) for d in offsets]
+
+limit_exact = -np.pi / 2
+
+fig, ax = plt.subplots(figsize=(8, 4))
+ax.semilogx(offsets, from_right, 'o-', markersize=3, color='steelblue',
+            label='From right: $f(1 + \\delta)$')
+ax.semilogx(offsets, from_left, 's-', markersize=3, color='coral',
+            label='From left: $f(1 - \\delta)$')
+ax.axhline(y=limit_exact, color='black', linestyle='--',
+           label=f'$-\\pi/2 \\approx {limit_exact:.6f}$')
+ax.set_xlabel('Offset $\\delta$')
+ax.set_ylabel('$f(1 \\pm \\delta)$')
+ax.set_title("Numerical verification of L'H\\^opital's Rule")
+ax.legend()
+ax.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+print(f"Exact limit (L'Hopital): -pi/2 = {limit_exact:.10f}")
+print(f"Numerical at delta=1e-8:  from right = {f(1+1e-8):.10f}")
+print(f"                          from left  = {f(1-1e-8):.10f}")
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch07_2', 'output_ch07_2', 'plot_ch07_2')">Run ▶</button>
+  <div class="output" id="output_ch07_2"></div>
+  <div class="plot-output" id="plot_ch07_2"></div>
+</div>
+```
+
+## Summary
+
+::: {.key-formula}
+| Concept | Key Result |
+|---|---|
+| Formal derivative | $f'(x) = \lim_{h \to 0} \dfrac{f(x+h) - f(x)}{h}$ |
+| Epsilon-delta definition | $\lim_{x \to a} f(x) = L$ iff $\forall\, \varepsilon > 0,\; \exists\, \delta > 0$ such that $0 < |x-a| < \delta \Rightarrow |f(x)-L| < \varepsilon$ |
+| L'Hopital's Rule | If $f(a) = g(a) = 0$, then $\lim_{x \to a} \dfrac{f(x)}{g(x)} = \dfrac{f'(a)}{g'(a)}$ |
+| Worked example | $\lim_{x \to 1} \dfrac{\sin(\pi x)}{x^2 - 1} = \dfrac{-\pi}{2}$ |
+:::

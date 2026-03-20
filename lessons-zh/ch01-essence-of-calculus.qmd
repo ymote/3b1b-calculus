@@ -1,0 +1,253 @@
+---
+title: "微积分的本质"
+subtitle: "第一章"
+date: 2023-04-01
+---
+
+本课通过一个几何问题——为什么圆的面积是 $\pi r^2$——来建立微积分背后的基础直觉。借助这一视角，我们引入微积分的三大核心思想：积分、导数，以及连接二者的基本定理。
+
+::: {.callout-note collapse="true"}
+## 预备知识
+
+- 熟悉基本几何图形（矩形、三角形）的面积公式
+- 理解函数 $f(x)$ 的概念
+- 能够使用求和符号 $\sum$ 表示有限和
+:::
+
+## 本课内容
+
+- 利用同心环分解逼近圆的面积
+- 积分作为黎曼和的极限
+- 导数作为瞬时变化率
+- 微积分基本定理：积分与微分互为逆运算
+
+## 课程视频
+
+```{=html}
+<video controls width="100%" preload="metadata">
+  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/01_The%20essence%20of%20calculus.mp4" type="video/mp4">
+</video>
+```
+
+## 课程关键帧
+
+![将圆分解为同心环](../images/ch01/frame_01.jpg)
+
+![将环展开为 $2\pi r$ 图形下的矩形](../images/ch01/frame_02.jpg)
+
+![总面积趋近于曲线下方的面积](../images/ch01/frame_03.jpg)
+
+![导数表示为比值 $dA/dx$](../images/ch01/frame_04.jpg)
+
+## 核心要点
+
+### 逼近圆的面积
+
+我们从一个半径为 $R$ 的圆出发，试图确定其面积。策略是将圆分解为许多同心环，每个环的内半径为 $r$，无穷小厚度为 $dr$。当我们将每个环"展开"时，它会形成一个宽度为 $2\pi r$（即周长）、高度为 $dr$ 的细矩形。
+
+因此，每个环的面积近似为
+
+$$
+dA = 2\pi r \, dr.
+$$
+
+将从 $r = 0$ 到 $r = R$ 的所有环求和，我们得到总面积为
+
+$$
+A = \sum_{r} 2\pi r \, dr.
+$$
+
+当 $dr \to 0$ 时，这个离散求和变为黎曼积分：
+
+$$
+A = \int_0^R 2\pi r \, dr.
+$$
+
+### 用几何方法计算积分
+
+函数 $f(r) = 2\pi r$ 是一条过原点、斜率为 $2\pi$ 的直线。从 $r = 0$ 到 $r = R$，该直线下方的区域是一个底为 $R$、高为 $2\pi R$ 的三角形。其面积为
+
+$$
+A = \frac{1}{2} \cdot R \cdot 2\pi R = \pi R^2,
+$$
+
+这正是圆的面积经典公式。
+
+### 交互演示：同心环分解（Desmos）
+
+```{=html}
+<div id="calc1" class="desmos-container"></div>
+<script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+<script>
+  var calc1 = Desmos.GraphingCalculator(document.getElementById('calc1'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'r', yAxisLabel: 'f(r)'
+  });
+  calc1.setExpression({ id: 'line', latex: 'y = 2\\pi x', color: '#2d70b3' });
+  calc1.setExpression({ id: 'R', latex: 'R = 3', sliderBounds: { min: 0.5, max: 5, step: 0.1 } });
+  calc1.setExpression({ id: 'n', latex: 'n = 10', sliderBounds: { min: 1, max: 50, step: 1 } });
+  calc1.setExpression({ id: 'dr', latex: 'd_r = \\frac{R}{n}' });
+  calc1.setExpression({ id: 'rects', latex: '0 \\le y \\le 2\\pi \\operatorname{floor}\\left(\\frac{x}{d_r}\\right) d_r \\left\\{0 \\le x \\le R\\right\\}', color: '#388c46', fillOpacity: 0.3 });
+  calc1.setExpression({ id: 'area_label', latex: 'A = \\pi R^2', color: '#c74440' });
+  calc1.setMathBounds({ left: -0.5, right: 6, bottom: -2, top: 35 });
+</script>
+```
+
+调节滑块 $n$ 以增加环的数量。随着 $n$ 增大，矩形面积之和收敛于三角形面积 $\pi R^2$。
+
+### 积分作为面积函数
+
+更一般地，给定任意连续函数 $f(x)$，我们定义其从 $a$ 到 $x$ 的**积分**为
+
+$$
+A(x) = \int_a^x f(t) \, dt,
+$$
+
+它表示曲线 $f$ 从 $a$ 到 $x$ 下方的（有符号）面积。
+
+### 导数作为变化率
+
+考虑将 $x$ 增加一个微小量 $dx$。面积函数的相应变化为
+
+$$
+dA \approx f(x) \, dx.
+$$
+
+两边同除以 $dx$，得到
+
+$$
+\frac{dA}{dx} \approx f(x).
+$$
+
+当 $dx \to 0$ 时，这变成精确等式：
+
+$$
+\frac{dA}{dx} = f(x).
+$$
+
+这个比值——**导数**——衡量的是 $A$ 的输出对其输入的微小扰动有多敏感。
+
+### 交互演示：面积函数的导数（Desmos）
+
+```{=html}
+<div id="calc2" class="desmos-container"></div>
+<script>
+  var calc2 = Desmos.GraphingCalculator(document.getElementById('calc2'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: ''
+  });
+  calc2.setExpression({ id: 'f', latex: 'f(x) = x^2', color: '#2d70b3' });
+  calc2.setExpression({ id: 'A', latex: 'A(x) = \\frac{x^3}{3}', color: '#388c46' });
+  calc2.setExpression({ id: 'a', latex: 'a = 2', sliderBounds: { min: 0, max: 4, step: 0.01 } });
+  calc2.setExpression({ id: 'dx', latex: 'd = 0.3', sliderBounds: { min: 0.01, max: 1, step: 0.01 } });
+  calc2.setExpression({ id: 'sliver', latex: '0 \\le y \\le x^2 \\left\\{a \\le x \\le a + d\\right\\}', color: '#c74440', fillOpacity: 0.5 });
+  calc2.setExpression({ id: 'shade', latex: '0 \\le y \\le x^2 \\left\\{0 \\le x \\le a\\right\\}', color: '#388c46', fillOpacity: 0.2 });
+  calc2.setMathBounds({ left: -0.5, right: 5, bottom: -1, top: 20 });
+</script>
+```
+
+移动滑块 $a$，观察在 $x = a$ 处的面积薄片 $dA$（红色）如何近似等于 $f(a) \cdot dx = a^2 \cdot dx$，从而验证面积函数的导数等于原函数。
+
+### 微积分基本定理
+
+上述观察构成了**微积分基本定理**：若 $A(x) = \int_a^x f(t)\, dt$，则
+
+$$
+\frac{d}{dx} A(x) = f(x).
+$$
+
+换言之，微分与积分互为逆运算。面积函数的导数恢复了原始被积函数。
+
+这一结论有着深远的实际意义：要计算积分 $\int_a^b f(t)\, dt$，只需找到任意一个**反导数** $F$ 满足 $F'(x) = f(x)$，然后计算 $F(b) - F(a)$ 即可。
+
+### 交互演示：同心环逼近（Python）
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code1">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Approximate area of circle using concentric rings
+N = 50
+R = 3
+dr = R / N
+total_area = 0
+rings_r = []
+rings_area = []
+
+for i in range(N):
+    r = i * dr
+    ring_area = 2 * np.pi * r * dr
+    total_area += ring_area
+    rings_r.append(r)
+    rings_area.append(ring_area)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
+
+# Left: individual ring areas form the graph of 2*pi*r
+ax1.bar(rings_r, rings_area, width=dr*0.9, alpha=0.7, color='steelblue')
+ax1.set_xlabel('Radius r')
+ax1.set_ylabel('Ring area  $2\\pi r \\cdot dr$')
+ax1.set_title(f'Ring decomposition (N = {N})')
+
+# Right: cumulative sum approaches pi*R^2
+ax2.bar(rings_r, np.cumsum(rings_area), width=dr*0.9, alpha=0.7, color='coral')
+ax2.axhline(y=np.pi*R**2, color='black', linestyle='--',
+            label=f'$\\pi R^2 = {np.pi*R**2:.4f}$')
+ax2.set_xlabel('Radius r')
+ax2.set_ylabel('Cumulative area')
+ax2.set_title(f'Cumulative sum (approx = {total_area:.4f})')
+ax2.legend()
+
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code1', 'output1', 'plot1')">Run ▶</button>
+  <div class="output" id="output1"></div>
+  <div class="plot-output" id="plot1"></div>
+</div>
+```
+
+### 交互演示：逼近的收敛性（Python）
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code2">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Show how the approximation improves as N increases
+R = 3
+exact = np.pi * R**2
+Ns = np.arange(5, 201, 5)
+errors = []
+
+for N in Ns:
+    dr = R / N
+    approx = sum(2 * np.pi * (i * dr) * dr for i in range(N))
+    errors.append(abs(approx - exact))
+
+fig, ax = plt.subplots(figsize=(8, 4))
+ax.semilogy(Ns, errors, 'o-', markersize=3, color='#2d70b3')
+ax.set_xlabel('Number of rings N')
+ax.set_ylabel('Absolute error $|A_N - \\pi R^2|$')
+ax.set_title('Convergence of ring approximation')
+ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code2', 'output2', 'plot2')">Run ▶</button>
+  <div class="output" id="output2"></div>
+  <div class="plot-output" id="plot2"></div>
+</div>
+```
+
+## 速查表
+
+::: {.key-formula}
+| 概念 | 核心结论 |
+|---|---|
+| 圆的面积 | $A = \int_0^R 2\pi r\, dr = \pi R^2$ |
+| 面积的导数 | $\frac{dA}{dR} = 2\pi R$（即周长） |
+| 一般积分 | $A(x) = \int_a^x f(t)\, dt$ |
+| 基本定理 | $\frac{d}{dx}\int_a^x f(t)\,dt = f(x)$ |
+:::

@@ -1,0 +1,369 @@
+---
+title: "泰勒级数"
+subtitle: "第十一章"
+date: 2023-04-01
+---
+
+本课发展泰勒级数理论——用多项式系统地逼近函数。我们从构造 $\cos(x)$ 在 $x = 0$ 附近的二次逼近开始，然后推广到高阶泰勒多项式，最后讨论所得无穷级数的收敛性质。
+
+::: {.callout-note collapse="true"}
+## 预备知识
+
+- 熟悉直到高阶的导数（第二至四章、第十章）
+- 理解 $e^x$、$\sin(x)$、$\cos(x)$ 和 $\ln(x)$（第五章）
+- 微积分基本定理（第一、八章）
+- 熟练使用阶乘记号：$n! = 1 \cdot 2 \cdot 3 \cdots n$
+:::
+
+## 本课内容
+
+- 通过在某一点匹配导数来构造多项式逼近
+- 阶乘在泰勒系数中的作用
+- $\cos(x)$、$e^x$ 和 $\ln(x)$ 的泰勒多项式
+- 通过微积分基本定理对二阶项的几何解释
+- 泰勒级数的收敛、发散与收敛半径
+
+## 课程视频
+
+```{=html}
+<video controls width="100%" preload="metadata">
+  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/11_Taylor%20series%20%EF%BD%9C%20Chapter%2011%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
+</video>
+```
+
+## 课程关键帧
+
+![$\cos(x)$ 在 $x = 0$ 附近的二次逼近](../images/ch11/frame_01.jpg)
+
+![$\cos(x)$ 的高阶泰勒多项式](../images/ch11/frame_02.jpg)
+
+![$e^x$ 的泰勒多项式在每个输入值处收敛](../images/ch11/frame_03.jpg)
+
+![$\ln(x)$ 泰勒级数的收敛半径](../images/ch11/frame_04.jpg)
+
+## 核心要点
+
+### 动机：为什么用多项式逼近
+
+数学和物理中出现的许多函数——$\cos(\theta)$、$e^x$、$\ln(x)$——在精确形式下难以计算、微分或积分。相比之下，多项式的处理非常简单：只需要加法和乘法，其导数和积分遵循初等法则。本章的核心思想是，我们可以系统地构造多项式来逼近给定函数在选定点附近的行为，随着包含更多项，精度不断提高。
+
+物理学中的一个经典例子是摆。摆的势能涉及 $1 - \cos(\theta)$，这会导致复杂的方程。如果我们用逼近 $1 - \theta^2/2$ 来替换 $\cos(\theta)$，问题就简化为熟悉的简谐振子，物理图像变得清晰透明。
+
+### 构造 $\cos(x)$ 的二次逼近
+
+我们寻求一个多项式 $P(x) = c_0 + c_1 x + c_2 x^2$，使其在 $x = 0$ 附近最好地近似 $\cos(x)$。我们通过施加三个条件来确定三个系数：多项式与 $\cos(x)$ 在 $x = 0$ 处的函数值、一阶导数和二阶导数必须一致。
+
+**匹配函数值。** 在 $x = 0$ 处，$\cos(0) = 1$。将多项式在 $x = 0$ 处求值得 $P(0) = c_0$。因此，
+
+$$
+c_0 = 1.
+$$
+
+**匹配一阶导数。** $\cos(x)$ 的导数是 $-\sin(x)$，在 $x = 0$ 处等于 $0$。$P(x)$ 的导数是 $c_1 + 2c_2 x$，在 $x = 0$ 处等于 $c_1$。因此，
+
+$$
+c_1 = 0.
+$$
+
+**匹配二阶导数。** $\cos(x)$ 的二阶导数是 $-\cos(x)$，在 $x = 0$ 处等于 $-1$。$P(x)$ 的二阶导数是 $2c_2$。令它们相等：
+
+$$
+2c_2 = -1 \quad \Longrightarrow \quad c_2 = -\frac{1}{2}.
+$$
+
+因此二次逼近为
+
+$$
+\cos(x) \approx 1 - \frac{x^2}{2}.
+$$
+
+作为具体验证：$P(0.1) = 1 - 0.005 = 0.995$，与真值 $\cos(0.1) = 0.99500\ldots$ 精确到五位小数。
+
+### 高阶项与阶乘的作用
+
+我们可以通过添加高阶项来改善逼近。假设扩展为一般的 $n$ 次多项式：
+
+$$
+P(x) = c_0 + c_1 x + c_2 x^2 + c_3 x^3 + c_4 x^4 + \cdots
+$$
+
+一个关键的结构性观察是：当我们对 $x^n$ 取 $n$ 次导数时，幂法则层层递推产生系数 $n!$。例如，$x^4$ 的四阶导数是 $4 \cdot 3 \cdot 2 \cdot 1 = 4! = 24$。这意味着 $P(x)$ 的 $n$ 阶导数在 $x = 0$ 处的值为 $n! \cdot c_n$。
+
+为匹配 $f$ 在 $x = 0$ 处的 $n$ 阶导数，我们因此需要
+
+$$
+n! \cdot c_n = f^{(n)}(0) \quad \Longrightarrow \quad c_n = \frac{f^{(n)}(0)}{n!}.
+$$
+
+另一个重要性质是，添加高阶项不会破坏已经确定的系数。当我们在 $x = 0$ 处计算第 $k$ 阶导数时，所有次数大于 $k$ 的项都消失了（因为每个这样的项在 $k$ 次微分后仍保留一个 $x$ 的因子）。因此每个系数恰好由一个且仅一个导数控制。
+
+### $\cos(x)$ 的泰勒多项式
+
+$\cos(x)$ 的逐阶导数遵循一个循环模式：
+
+| $n$ | $f^{(n)}(x)$ | $f^{(n)}(0)$ |
+|-----|---------------|---------------|
+| 0   | $\cos(x)$     | $1$           |
+| 1   | $-\sin(x)$    | $0$           |
+| 2   | $-\cos(x)$    | $-1$          |
+| 3   | $\sin(x)$     | $0$           |
+| 4   | $\cos(x)$     | $1$           |
+
+模式 $1, 0, -1, 0$ 以周期四重复。将这些值代入通项公式，$\cos(x)$ 的 $2N$ 次泰勒多项式为
+
+$$
+\cos(x) \approx \sum_{k=0}^{N} \frac{(-1)^k}{(2k)!} x^{2k} = 1 - \frac{x^2}{2!} + \frac{x^4}{4!} - \frac{x^6}{6!} + \cdots
+$$
+
+每增加一项都进一步约束多项式，使其模拟 $\cos(x)$ 在原点附近的曲率、曲率变化率以及更高阶的行为。
+
+### 交互演示：$\cos(x)$ 的泰勒多项式（Desmos）
+
+```{=html}
+<div id="calc_ch11_1" class="desmos-container"></div>
+<script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+<script>
+  var calc_ch11_1 = Desmos.GraphingCalculator(document.getElementById('calc_ch11_1'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'y'
+  });
+  calc_ch11_1.setExpression({ id: 'cos', latex: 'y = \\cos(x)', color: '#2d70b3', lineWidth: 3 });
+  calc_ch11_1.setExpression({ id: 'n', latex: 'N = 2', sliderBounds: { min: 0, max: 10, step: 1 } });
+  calc_ch11_1.setExpression({ id: 'T2', latex: 'y = 1 - \\frac{x^2}{2} \\left\\{N \\ge 1\\right\\}', color: '#c74440', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_1.setExpression({ id: 'T4', latex: 'y = 1 - \\frac{x^2}{2} + \\frac{x^4}{24} \\left\\{N \\ge 2\\right\\}', color: '#388c46', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_1.setExpression({ id: 'T6', latex: 'y = 1 - \\frac{x^2}{2} + \\frac{x^4}{24} - \\frac{x^6}{720} \\left\\{N \\ge 3\\right\\}', color: '#6042a6', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_1.setExpression({ id: 'T8', latex: 'y = 1 - \\frac{x^2}{2} + \\frac{x^4}{24} - \\frac{x^6}{720} + \\frac{x^8}{40320} \\left\\{N \\ge 4\\right\\}', color: '#e07020', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_1.setExpression({ id: 'T10', latex: 'y = 1 - \\frac{x^2}{2} + \\frac{x^4}{24} - \\frac{x^6}{720} + \\frac{x^8}{40320} - \\frac{x^{10}}{3628800} \\left\\{N \\ge 5\\right\\}', color: '#c7a540', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_1.setMathBounds({ left: -7, right: 7, bottom: -2, top: 2 });
+</script>
+```
+
+调节滑块 $N$ 以逐步显示 $\cos(x)$ 的泰勒多项式逼近。随着多项式阶数的增加，逼近在原点周围更大的区间内保持准确。
+
+### 一般泰勒多项式
+
+对于一个充分可微的一般函数 $f$，以 $x = 0$ 为中心的 $n$ 次泰勒多项式（又称麦克劳林多项式）为
+
+$$
+P_n(x) = \sum_{k=0}^{n} \frac{f^{(k)}(0)}{k!} \, x^k = f(0) + f'(0)\,x + \frac{f''(0)}{2!}\,x^2 + \frac{f'''(0)}{3!}\,x^3 + \cdots
+$$
+
+每一项都有精确的含义：
+
+- 常数项 $f(0)$ 匹配 $f$ 在原点的值。
+- 线性项 $f'(0) \, x$ 匹配斜率（一阶导数）。
+- 二次项 $\frac{f''(0)}{2!} x^2$ 匹配凹凸性（二阶导数）。
+- 后续每一项匹配下一阶的导数。
+
+### 以任意点为中心的泰勒多项式
+
+如果我们希望在某点 $x = a$ 而非 $x = 0$ 附近逼近 $f$，则将多项式写成 $(x - a)$ 的幂次形式：
+
+$$
+P_n(x) = \sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!} (x - a)^k.
+$$
+
+这确保了 $P_n$ 的所有导数在 $x = a$ 处与 $f$ 的导数一致。从几何角度看，改变 $a$ 就是平移逼近最精确的区域。
+
+### $e^x$ 的泰勒多项式
+
+函数 $e^x$ 提供了一个特别优雅的例子。由于 $e^x$ 的导数就是自身，在 $x = 0$ 处计算的每阶导数都等于 $1$。因此泰勒多项式为
+
+$$
+e^x \approx \sum_{k=0}^{n} \frac{x^k}{k!} = 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + \frac{x^4}{4!} + \cdots
+$$
+
+### 交互演示：$e^x$ 的泰勒多项式（Desmos）
+
+```{=html}
+<div id="calc_ch11_2" class="desmos-container"></div>
+<script>
+  var calc_ch11_2 = Desmos.GraphingCalculator(document.getElementById('calc_ch11_2'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'y'
+  });
+  calc_ch11_2.setExpression({ id: 'exp', latex: 'y = e^x', color: '#2d70b3', lineWidth: 3 });
+  calc_ch11_2.setExpression({ id: 'n', latex: 'n = 1', sliderBounds: { min: 1, max: 10, step: 1 } });
+  calc_ch11_2.setExpression({ id: 'T1', latex: 'y = 1 + x \\left\\{n \\ge 1\\right\\}', color: '#c74440', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_2.setExpression({ id: 'T2', latex: 'y = 1 + x + \\frac{x^2}{2} \\left\\{n \\ge 2\\right\\}', color: '#388c46', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_2.setExpression({ id: 'T3', latex: 'y = 1 + x + \\frac{x^2}{2} + \\frac{x^3}{6} \\left\\{n \\ge 3\\right\\}', color: '#6042a6', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_2.setExpression({ id: 'T4', latex: 'y = 1 + x + \\frac{x^2}{2} + \\frac{x^3}{6} + \\frac{x^4}{24} \\left\\{n \\ge 4\\right\\}', color: '#e07020', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_2.setExpression({ id: 'T5', latex: 'y = 1 + x + \\frac{x^2}{2} + \\frac{x^3}{6} + \\frac{x^4}{24} + \\frac{x^5}{120} \\left\\{n \\ge 5\\right\\}', color: '#c7a540', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_2.setMathBounds({ left: -5, right: 5, bottom: -5, top: 30 });
+</script>
+```
+
+增大滑块 $n$ 以添加更多项。$e^x$ 的泰勒多项式在每个输入值处都收敛到真实函数，无论距原点有多远。
+
+### 通过微积分基本定理的几何解释
+
+对于二阶泰勒项，存在一个富有启发性的几何视角。考虑函数 $F(x) = \int_a^x g(t)\, dt$，其中 $g$ 是 $F$ 的导数。由微积分基本定理，$F'(x) = g(x)$。
+
+对于从 $a$ 到 $x$ 的有限步长，$F$ 的变化量可以如下分解。一阶逼近给出一个面积为 $g(a) \cdot (x - a)$ 的矩形。二阶修正则考虑到 $g$ 本身在变化：额外的面积大致构成一个底为 $(x - a)$、高为 $g'(a)(x - a)$ 的三角形。这个三角形的面积为
+
+$$
+\frac{1}{2} g'(a)(x - a)^2 = \frac{1}{2} F''(a)(x - a)^2.
+$$
+
+这恰好就是 $F$ 以 $a$ 为中心的泰勒多项式中的二阶项。泰勒展开中的每一项都在曲线下面积增量方面有直接的几何对应。
+
+### 从泰勒多项式到泰勒级数
+
+有限项的泰勒多项式称为**泰勒多项式**。当我们允许无穷多项时，所得表达式就是**泰勒级数**：
+
+$$
+\sum_{k=0}^{\infty} \frac{f^{(k)}(a)}{k!} (x - a)^k.
+$$
+
+这个无穷和是否等于 $f(x)$，取决于部分和是否收敛。如果部分和序列 $P_1(x), P_2(x), P_3(x), \ldots$ 趋向于一个确定的值，我们就说级数在点 $x$ 处**收敛**。
+
+### 收敛性与收敛半径
+
+不同的函数表现出不同的收敛行为：
+
+- **$e^x$：** 泰勒级数对每个实数 $x$ 都收敛到 $e^x$。收敛半径为无穷大。
+
+- **$\sin(x)$ 和 $\cos(x)$：** 这些级数也对所有 $x$ 收敛，反映了三角函数是"整函数"（处处解析）这一事实。
+
+- **以 $x = 1$ 为中心的 $\ln(x)$：** 泰勒级数为
+  $$
+  \ln(x) = (x-1) - \frac{(x-1)^2}{2} + \frac{(x-1)^3}{3} - \cdots
+  $$
+  该级数仅在 $0 < x \le 2$ 时收敛。在此区间之外，部分和剧烈振荡，无法趋近 $\ln(x)$，尽管函数本身是良好定义的。**收敛半径**为 $1$。
+
+收敛半径定义了从中心 $a$ 出发、级数能忠实地表示 $f$ 的距离范围。超出此半径，单点 $a$ 处的导数信息不足以确定函数的行为。
+
+### 交互演示：$\ln(x)$ 级数的收敛性（Desmos）
+
+```{=html}
+<div id="calc_ch11_3" class="desmos-container"></div>
+<script>
+  var calc_ch11_3 = Desmos.GraphingCalculator(document.getElementById('calc_ch11_3'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'y'
+  });
+  calc_ch11_3.setExpression({ id: 'ln', latex: 'y = \\ln(x)', color: '#2d70b3', lineWidth: 3 });
+  calc_ch11_3.setExpression({ id: 'n', latex: 'n = 1', sliderBounds: { min: 1, max: 12, step: 1 } });
+  calc_ch11_3.setExpression({ id: 'T1', latex: 'y = (x-1) \\left\\{n \\ge 1\\right\\}', color: '#c74440', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_3.setExpression({ id: 'T2', latex: 'y = (x-1) - \\frac{(x-1)^2}{2} \\left\\{n \\ge 2\\right\\}', color: '#388c46', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_3.setExpression({ id: 'T3', latex: 'y = (x-1) - \\frac{(x-1)^2}{2} + \\frac{(x-1)^3}{3} \\left\\{n \\ge 3\\right\\}', color: '#6042a6', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_3.setExpression({ id: 'T4', latex: 'y = (x-1) - \\frac{(x-1)^2}{2} + \\frac{(x-1)^3}{3} - \\frac{(x-1)^4}{4} \\left\\{n \\ge 4\\right\\}', color: '#e07020', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_3.setExpression({ id: 'T5', latex: 'y = (x-1) - \\frac{(x-1)^2}{2} + \\frac{(x-1)^3}{3} - \\frac{(x-1)^4}{4} + \\frac{(x-1)^5}{5} \\left\\{n \\ge 5\\right\\}', color: '#c7a540', lineStyle: Desmos.Styles.DASHED });
+  calc_ch11_3.setExpression({ id: 'bound1', latex: 'x = 0', color: '#aaaaaa', lineStyle: Desmos.Styles.DOTTED });
+  calc_ch11_3.setExpression({ id: 'bound2', latex: 'x = 2', color: '#aaaaaa', lineStyle: Desmos.Styles.DOTTED });
+  calc_ch11_3.setMathBounds({ left: -1, right: 4, bottom: -4, top: 4 });
+</script>
+```
+
+增大滑块 $n$ 以向 $\ln(x)$ 的泰勒级数（以 $x = 1$ 为中心）中添加更多项。在区间 $(0, 2]$ 内，逼近收敛到真实函数。在此区间之外，部分和发散，展示了有限收敛半径的现象。
+
+### 核心洞见
+
+泰勒级数的整个构造建立在一条基本原理之上：**函数在单一点处的各阶导数编码了函数在该点附近的行为信息。** 泰勒多项式将这些导数信息转化为一个显式的多项式逼近。每增加一项就纳入了更高一阶的导数，从而在中心点的更大邻域内产生更忠实的逼近。
+
+### 交互演示：泰勒多项式逼近误差（Python）
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch11_1">
+import numpy as np
+import matplotlib.pyplot as plt
+from math import factorial
+
+# Compute Taylor polynomials for cos(x) of various degrees
+x = np.linspace(-2 * np.pi, 2 * np.pi, 500)
+true_cos = np.cos(x)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+
+# Left panel: cos(x) and its Taylor approximations
+ax1.plot(x, true_cos, 'k-', linewidth=2, label='$\\cos(x)$')
+colors = ['#c74440', '#388c46', '#6042a6', '#e07020']
+for i, deg in enumerate([2, 4, 6, 8]):
+    T = np.zeros_like(x)
+    for k in range(deg // 2 + 1):
+        T += ((-1)**k / factorial(2*k)) * x**(2*k)
+    ax1.plot(x, T, '--', color=colors[i], label=f'Degree {deg}')
+
+ax1.set_ylim(-2, 2)
+ax1.set_xlabel('x')
+ax1.set_ylabel('y')
+ax1.set_title('Taylor polynomials for cos(x)')
+ax1.legend(fontsize=9)
+ax1.grid(True, alpha=0.3)
+
+# Right panel: absolute error at x = 1 vs. polynomial degree
+x_val = 1.0
+degrees = list(range(0, 21, 2))
+errors = []
+for deg in degrees:
+    T = sum(((-1)**k / factorial(2*k)) * x_val**(2*k) for k in range(deg // 2 + 1))
+    errors.append(abs(T - np.cos(x_val)))
+
+ax2.semilogy(degrees, [e if e > 0 else 1e-17 for e in errors], 'o-', color='#2d70b3')
+ax2.set_xlabel('Polynomial degree')
+ax2.set_ylabel('$|P_n(1) - \\cos(1)|$')
+ax2.set_title('Approximation error at $x = 1$')
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch11_1', 'output_ch11_1', 'plot_ch11_1')">Run ▶</button>
+  <div class="output" id="output_ch11_1"></div>
+  <div class="plot-output" id="plot_ch11_1"></div>
+</div>
+```
+
+### 交互演示：$e^x$ 级数的收敛性（Python）
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch11_2">
+import numpy as np
+import matplotlib.pyplot as plt
+from math import factorial
+
+# Demonstrate convergence of the Taylor series for e^x
+x_values = [1.0, 2.0, -3.0]
+max_terms = 20
+
+fig, axes = plt.subplots(1, 3, figsize=(14, 4))
+
+for idx, x_val in enumerate(x_values):
+    partial_sums = []
+    s = 0
+    for k in range(max_terms):
+        s += x_val**k / factorial(k)
+        partial_sums.append(s)
+
+    ax = axes[idx]
+    ax.plot(range(max_terms), partial_sums, 'o-', markersize=4, color='#2d70b3',
+            label='Partial sums')
+    ax.axhline(y=np.exp(x_val), color='#c74440', linestyle='--',
+               label=f'$e^{{{x_val:.0f}}} = {np.exp(x_val):.4f}$')
+    ax.set_xlabel('Number of terms')
+    ax.set_ylabel('Partial sum')
+    ax.set_title(f'$x = {x_val}$')
+    ax.legend(fontsize=8)
+    ax.grid(True, alpha=0.3)
+
+plt.suptitle('Convergence of the Taylor series for $e^x$', fontsize=13)
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch11_2', 'output_ch11_2', 'plot_ch11_2')">Run ▶</button>
+  <div class="output" id="output_ch11_2"></div>
+  <div class="plot-output" id="plot_ch11_2"></div>
+</div>
+```
+
+## 速查表
+
+::: {.key-formula}
+| 概念 | 核心结论 |
+|---|---|
+| 泰勒多项式（以 $x = 0$ 为中心） | $P_n(x) = \displaystyle\sum_{k=0}^{n} \frac{f^{(k)}(0)}{k!}\, x^k$ |
+| 泰勒多项式（以 $x = a$ 为中心） | $P_n(x) = \displaystyle\sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!}\, (x-a)^k$ |
+| 余弦级数 | $\cos(x) = 1 - \frac{x^2}{2!} + \frac{x^4}{4!} - \frac{x^6}{6!} + \cdots$ |
+| 指数级数 | $e^x = 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + \cdots$ |
+| 系数公式 | $c_n = \frac{f^{(n)}(a)}{n!}$ |
+| 收敛半径 | 级数收敛的距中心 $a$ 的最大距离 |
+:::

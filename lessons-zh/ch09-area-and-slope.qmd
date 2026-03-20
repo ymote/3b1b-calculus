@@ -1,0 +1,297 @@
+---
+title: "面积与斜率有什么关系"
+subtitle: "第九章"
+date: 2023-04-01
+---
+
+本课探讨积分与微分互为逆运算的更深层视角。通过研究连续函数平均值的计算问题——具体来说是 $\sin(x)$ 在 $[0, \pi]$ 上的平均值——我们发现函数的平均值等于其原函数在区间端点之间的斜率。这一重新表述将"曲线下面积"的概念与"另一条曲线的斜率"联系起来。
+
+::: {.callout-note collapse="true"}
+## 预备知识
+
+- 理解定积分作为黎曼和的极限（第一、二章）
+- 熟悉导数与原函数（第三、七章）
+- 微积分基本定理（第八章）
+- 了解基本三角函数及其导数
+:::
+
+## 本课内容
+
+- 连续函数的平均值与积分的关系
+- 通过原函数 $-\cos(x)$ 计算 $\int_0^\pi \sin(x)\, dx$
+- 将平均值重新解释为原函数图像的斜率
+- 切线斜率的平均值为何等于端点之间的整体斜率
+- 积分与微分互逆关系的第二种直觉
+
+## 课程视频
+
+```{=html}
+<video controls width="100%" preload="metadata">
+  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/09_What%20does%20area%20have%20to%20do%20with%20slope%EF%BC%9F%20%EF%BD%9C%20Chapter%209%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
+</video>
+```
+
+## 课程关键帧
+
+![$\sin(x)$ 在 $[0, \pi]$ 上的图像及其平均高度问题](../images/ch09/frame_01.jpg)
+
+![用有限个采样高度近似平均值](../images/ch09/frame_02.jpg)
+
+![原函数 $-\cos(x)$ 及其端点之间的斜率](../images/ch09/frame_03.jpg)
+
+![$f$ 的平均值即为原函数图像在 $a$ 与 $b$ 之间的斜率](../images/ch09/frame_04.jpg)
+
+## 核心要点
+
+### 连续变量的平均值
+
+我们从一个看似简单的问题开始：$\sin(x)$ 在区间 $[0, \pi]$ 上的平均高度是多少？对于有限个数的集合，平均值的计算方式是将所有数求和再除以个数。然而，连续函数取无穷多个值，我们不能简单地"把它们全部相加再除以无穷大"。
+
+解决方法是用近似。我们在 $[0, \pi]$ 上均匀取 $n$ 个点，间距为 $dx = \pi / n$。这些采样高度的平均值为
+
+$$
+\text{Average} \approx \frac{1}{n} \sum_{i=1}^{n} \sin(x_i).
+$$
+
+由于 $n = \pi / dx$，可以将其改写为
+
+$$
+\text{Average} \approx \frac{\displaystyle \sum_{i=1}^{n} \sin(x_i) \, dx}{\pi}.
+$$
+
+分子恰好是一个黎曼和。当 $dx \to 0$ 时，它收敛到定积分，从而得到连续函数平均值的基本公式：
+
+$$
+\text{Average value of } f \text{ on } [a, b] = \frac{1}{b - a} \int_a^b f(x)\, dx.
+$$
+
+用语言表述：平均值等于图像下的面积除以区间宽度。
+
+### 正弦函数积分的计算
+
+为计算 $\int_0^\pi \sin(x)\, dx$，我们需要 $\sin(x)$ 的一个原函数。由于 $\frac{d}{dx}[-\cos(x)] = \sin(x)$，原函数为 $F(x) = -\cos(x)$。应用微积分基本定理：
+
+$$
+\int_0^\pi \sin(x)\, dx = F(\pi) - F(0) = [-\cos(\pi)] - [-\cos(0)] = 1 - (-1) = 2.
+$$
+
+因此正弦曲线一个拱形下的面积恰好为 $2$。平均高度为
+
+$$
+\text{Average} = \frac{2}{\pi} \approx 0.6366.
+$$
+
+### 交互演示：正弦函数的平均值（Desmos）
+
+```{=html}
+<div id="calc_ch09_1" class="desmos-container"></div>
+<script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+<script>
+  var calc_ch09_1 = Desmos.GraphingCalculator(document.getElementById('calc_ch09_1'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'y'
+  });
+  calc_ch09_1.setExpression({ id: 'sinx', latex: 'y = \\sin(x) \\left\\{0 \\le x \\le \\pi\\right\\}', color: '#2d70b3' });
+  calc_ch09_1.setExpression({ id: 'n', latex: 'n = 10', sliderBounds: { min: 2, max: 80, step: 1 } });
+  calc_ch09_1.setExpression({ id: 'dx', latex: 'd = \\frac{\\pi}{n}' });
+  calc_ch09_1.setExpression({ id: 'rects', latex: '0 \\le y \\le \\sin\\left(\\operatorname{floor}\\left(\\frac{x}{d}\\right) \\cdot d + \\frac{d}{2}\\right) \\left\\{0 \\le x \\le \\pi\\right\\}', color: '#388c46', fillOpacity: 0.3 });
+  calc_ch09_1.setExpression({ id: 'avg_line', latex: 'y = \\frac{2}{\\pi} \\left\\{0 \\le x \\le \\pi\\right\\}', color: '#c74440', lineStyle: Desmos.Styles.DASHED });
+  calc_ch09_1.setExpression({ id: 'avg_label', latex: '\\frac{2}{\\pi}', color: '#c74440' });
+  calc_ch09_1.setMathBounds({ left: -0.5, right: 4, bottom: -0.3, top: 1.5 });
+</script>
+```
+
+调节滑块 $n$ 以增加采样点的数量。绿色矩形展示了黎曼和近似。高度 $2/\pi \approx 0.6366$ 处的红色虚线标记了精确的平均值。随着 $n$ 增大，矩形面积之和除以 $\pi$ 逐渐收敛到这个值。
+
+### 平均值即原函数的斜率
+
+这是本章的核心洞见。我们计算得到的平均值
+
+$$
+\frac{1}{\pi - 0}\int_0^\pi \sin(x)\, dx = \frac{F(\pi) - F(0)}{\pi - 0},
+$$
+
+恰好就是原函数 $F(x) = -\cos(x)$ 在点 $(0, F(0))$ 和 $(\pi, F(\pi))$ 之间的**割线斜率**。
+
+更一般地，对于 $[a, b]$ 上的任意连续函数 $f$，设其原函数为 $F$，平均值公式变为
+
+$$
+\frac{1}{b - a}\int_a^b f(x)\, dx = \frac{F(b) - F(a)}{b - a}.
+$$
+
+左边是 $f$ 的平均值，右边是原函数图像在端点之间的斜率。两者是同一个量。
+
+### 平均斜率为何等于整体斜率
+
+由于 $f(x) = F'(x)$，$f$ 在每一点 $x$ 的值就是原函数图像在该点切线的斜率。因此，$f$ 在 $[a, b]$ 上的平均值就是 $F$ 在该区间上**所有切线斜率的平均值**。
+
+从几何角度看，一条曲线在某区间上所有瞬时斜率的平均值应该等于端点之间的整体斜率，这是非常自然的。如果曲线的总上升量为 $\Delta F = F(b) - F(a)$，水平跨度为 $\Delta x = b - a$，那么无论曲线中间如何起伏，平均上升速率必定为 $\Delta F / \Delta x$。
+
+这为积分与微分互逆的关系提供了第二种互补的直觉：$f$ 的积分（曲线下面积）除以区间长度等于原函数的斜率（一个类导数的量），这恰恰是因为 $f$ 本身就是原函数的导数。
+
+### 交互演示：原函数的斜率（Desmos）
+
+```{=html}
+<div id="calc_ch09_2" class="desmos-container"></div>
+<script>
+  var calc_ch09_2 = Desmos.GraphingCalculator(document.getElementById('calc_ch09_2'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'y'
+  });
+  calc_ch09_2.setExpression({ id: 'F', latex: 'F(x) = -\\cos(x)', color: '#388c46' });
+  calc_ch09_2.setExpression({ id: 'a', latex: 'a = 0', sliderBounds: { min: 0, max: 3, step: 0.01 } });
+  calc_ch09_2.setExpression({ id: 'b', latex: 'b = \\pi', sliderBounds: { min: 0.5, max: 6.28, step: 0.01 } });
+  calc_ch09_2.setExpression({ id: 'ptA', latex: '(a, -\\cos(a))', color: '#c74440', pointStyle: Desmos.Styles.POINT, pointSize: 9 });
+  calc_ch09_2.setExpression({ id: 'ptB', latex: '(b, -\\cos(b))', color: '#c74440', pointStyle: Desmos.Styles.POINT, pointSize: 9 });
+  calc_ch09_2.setExpression({ id: 'secant', latex: 'y = -\\cos(a) + \\frac{-\\cos(b) + \\cos(a)}{b - a}(x - a)', color: '#c74440', lineStyle: Desmos.Styles.DASHED });
+  calc_ch09_2.setMathBounds({ left: -0.5, right: 7, bottom: -1.5, top: 1.5 });
+</script>
+```
+
+绿色曲线是原函数 $F(x) = -\cos(x)$。红色虚线是连接 $(a, F(a))$ 和 $(b, F(b))$ 的割线。调节滑块 $a$ 和 $b$，观察割线的斜率如何始终等于 $\sin(x)$ 在 $[a, b]$ 上的平均值。
+
+### 交互演示：推广到任意函数（Desmos）
+
+```{=html}
+<div id="calc_ch09_3" class="desmos-container"></div>
+<script>
+  var calc_ch09_3 = Desmos.GraphingCalculator(document.getElementById('calc_ch09_3'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'y'
+  });
+  calc_ch09_3.setExpression({ id: 'f', latex: 'f(x) = x^2', color: '#2d70b3' });
+  calc_ch09_3.setExpression({ id: 'F', latex: 'F(x) = \\frac{x^3}{3}', color: '#388c46' });
+  calc_ch09_3.setExpression({ id: 'a', latex: 'a = 0', sliderBounds: { min: -2, max: 3, step: 0.1 } });
+  calc_ch09_3.setExpression({ id: 'b', latex: 'b = 3', sliderBounds: { min: 0.5, max: 5, step: 0.1 } });
+  calc_ch09_3.setExpression({ id: 'shade', latex: '0 \\le y \\le x^2 \\left\\{a \\le x \\le b\\right\\}', color: '#2d70b3', fillOpacity: 0.2 });
+  calc_ch09_3.setExpression({ id: 'avg_line', latex: 'y = \\frac{F(b) - F(a)}{b - a} \\left\\{a \\le x \\le b\\right\\}', color: '#c74440', lineStyle: Desmos.Styles.DASHED });
+  calc_ch09_3.setMathBounds({ left: -1, right: 6, bottom: -1, top: 12 });
+</script>
+```
+
+这里 $f(x) = x^2$（蓝色）及其原函数 $F(x) = x^3/3$（绿色）。阴影区域显示 $f$ 在 $[a, b]$ 上的曲线下面积。红色虚线表示平均值 $\frac{F(b) - F(a)}{b - a}$。调节 $a$ 和 $b$，验证面积除以区间宽度总是等于原函数的割线斜率。
+
+### 从有限平均到连续平均的推广
+
+重新审视从有限到连续的过渡是有启发意义的。给定 $n$ 个采样点 $x_1, x_2, \ldots, x_n$，间距为 $dx = (b - a)/n$，有限平均为
+
+$$
+\bar{f}_n = \frac{1}{n} \sum_{i=1}^{n} f(x_i) = \frac{1}{b - a} \sum_{i=1}^{n} f(x_i)\, dx.
+$$
+
+第二个等号来自代入 $n = (b - a)/dx$。当 $n \to \infty$（等价于 $dx \to 0$）时，分子中的黎曼和收敛到 $\int_a^b f(x)\, dx$，从而得到
+
+$$
+\bar{f} = \frac{1}{b - a}\int_a^b f(x)\, dx.
+$$
+
+这一推导凸显了微积分中反复出现的主题：当我们希望将一个离散运算（此处为有限个值的平均）推广到连续情形时，自然的工具就是积分。
+
+### 交互演示：平均值近似（Python）
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch09_1">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Approximate the average value of sin(x) on [0, pi]
+a, b = 0, np.pi
+N_values = [5, 10, 25, 50, 100, 500]
+exact_avg = 2 / np.pi
+
+fig, axes = plt.subplots(2, 3, figsize=(12, 7))
+axes = axes.flatten()
+
+for idx, N in enumerate(N_values):
+    dx = (b - a) / N
+    x_samples = np.linspace(a + dx/2, b - dx/2, N)
+    heights = np.sin(x_samples)
+    approx_avg = np.mean(heights)
+
+    x_fine = np.linspace(a, b, 500)
+    axes[idx].plot(x_fine, np.sin(x_fine), 'b-', linewidth=1.5)
+    axes[idx].bar(x_samples, heights, width=dx*0.9, alpha=0.4,
+                  color='green', edgecolor='green')
+    axes[idx].axhline(y=exact_avg, color='red', linestyle='--',
+                      linewidth=1, label=f'Exact = {exact_avg:.4f}')
+    axes[idx].axhline(y=approx_avg, color='orange', linestyle=':',
+                      linewidth=1, label=f'Approx = {approx_avg:.4f}')
+    axes[idx].set_title(f'N = {N}')
+    axes[idx].set_xlim(-0.2, 3.5)
+    axes[idx].set_ylim(-0.1, 1.2)
+    axes[idx].legend(fontsize=7)
+
+plt.suptitle('Average value of sin(x) on [0, pi]', fontsize=13)
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch09_1', 'output_ch09_1', 'plot_ch09_1')">Run ▶</button>
+  <div class="output" id="output_ch09_1"></div>
+  <div class="plot-output" id="plot_ch09_1"></div>
+</div>
+```
+
+### 交互演示：原函数斜率等于平均值（Python）
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch09_2">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Demonstrate: slope of antiderivative = average value of function
+x = np.linspace(0, 2*np.pi, 500)
+
+# f(x) = sin(x), F(x) = -cos(x)
+f = np.sin(x)
+F = -np.cos(x)
+
+a, b = 0.5, 4.0  # interval endpoints
+avg_value = (-np.cos(b) - (-np.cos(a))) / (b - a)
+secant_slope = ((-np.cos(b)) - (-np.cos(a))) / (b - a)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+
+# Left panel: f(x) = sin(x) with shaded area
+ax1.plot(x, f, 'b-', linewidth=1.5, label='$f(x) = \\sin(x)$')
+mask = (x >= a) & (x <= b)
+ax1.fill_between(x[mask], f[mask], alpha=0.3, color='blue')
+ax1.axhline(y=avg_value, color='red', linestyle='--',
+            label=f'Avg value = {avg_value:.4f}')
+ax1.axhline(y=0, color='gray', linewidth=0.5)
+ax1.set_xlabel('x')
+ax1.set_title('$f(x) = \\sin(x)$ and its average on $[a, b]$')
+ax1.legend()
+
+# Right panel: F(x) = -cos(x) with secant line
+ax2.plot(x, F, 'g-', linewidth=1.5, label='$F(x) = -\\cos(x)$')
+ax2.plot([a, b], [-np.cos(a), -np.cos(b)], 'ro-', markersize=8)
+secant_line = -np.cos(a) + secant_slope * (x - a)
+ax2.plot(x, secant_line, 'r--', linewidth=1,
+         label=f'Secant slope = {secant_slope:.4f}')
+ax2.axhline(y=0, color='gray', linewidth=0.5)
+ax2.set_xlabel('x')
+ax2.set_title('$F(x) = -\\cos(x)$ and its secant on $[a, b]$')
+ax2.legend()
+
+plt.suptitle(
+    f'Average value = {avg_value:.4f},  '
+    f'Secant slope = {secant_slope:.4f}  (they match)',
+    fontsize=12, fontweight='bold')
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch09_2', 'output_ch09_2', 'plot_ch09_2')">Run ▶</button>
+  <div class="output" id="output_ch09_2"></div>
+  <div class="plot-output" id="plot_ch09_2"></div>
+</div>
+```
+
+## 速查表
+
+::: {.key-formula}
+| 概念 | 核心结论 |
+|---|---|
+| $f$ 在 $[a, b]$ 上的平均值 | $\displaystyle \bar{f} = \frac{1}{b-a}\int_a^b f(x)\,dx$ |
+| $\sin(x)$ 在 $[0, \pi]$ 上的平均值 | $\displaystyle \frac{1}{\pi}\int_0^\pi \sin(x)\,dx = \frac{2}{\pi} \approx 0.6366$ |
+| 平均值即原函数斜率 | $\displaystyle \frac{1}{b-a}\int_a^b f(x)\,dx = \frac{F(b) - F(a)}{b - a}$ |
+| 面积与斜率的关联 | $f(x) = F'(x)$，因此 $f$ 的平均值（面积$\div$宽度）等于 $F$ 的平均斜率（上升量$\div$跨度） |
+:::

@@ -1,0 +1,344 @@
+---
+title: "What Does Area Have to Do with Slope?"
+subtitle: "Chapter 9"
+date: 2023-04-01
+---
+
+This lesson explores a deeper perspective on why integration and differentiation
+are inverse operations. By examining the problem of computing the average value
+of a continuous function — specifically $\sin(x)$ on $[0, \pi]$ — we discover
+that the average value of a function equals the slope of its antiderivative
+between the endpoints of the interval. This reframing connects the notion of
+area under a curve to the notion of slope of another curve.
+
+::: {.callout-note collapse="true"}
+## Prerequisites
+
+- Understanding of the definite integral as a limit of Riemann sums (Chapters 1 and 2)
+- Familiarity with derivatives and antiderivatives (Chapters 3 and 7)
+- The Fundamental Theorem of Calculus (Chapter 8)
+- Knowledge of basic trigonometric functions and their derivatives
+:::
+
+## Topics Covered
+
+- The average value of a continuous function as an integral
+- Computing $\int_0^\pi \sin(x)\, dx$ via the antiderivative $-\cos(x)$
+- Reinterpreting the average value as the slope of the antiderivative graph
+- Why the average slope of tangent lines equals the overall slope between endpoints
+- A second intuition for the inverse relationship between integrals and derivatives
+
+## Lecture Video
+
+```{=html}
+<video controls width="100%" preload="metadata">
+  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/09_What%20does%20area%20have%20to%20do%20with%20slope%EF%BC%9F%20%EF%BD%9C%20Chapter%209%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
+</video>
+```
+
+## Key Video Frames
+
+![The graph of $\sin(x)$ on $[0, \pi]$ and the question of its average height](../images/ch09/frame_01.jpg)
+
+![Approximating the average with a finite sample of heights](../images/ch09/frame_02.jpg)
+
+![The antiderivative $-\cos(x)$ and its slope between endpoints](../images/ch09/frame_03.jpg)
+
+![The average value of $f$ as the slope of the antiderivative graph between $a$ and $b$](../images/ch09/frame_04.jpg)
+
+## Key Concepts
+
+### The Average of a Continuous Variable
+
+We begin with a deceptively simple question: what is the average height of
+$\sin(x)$ on the interval $[0, \pi]$? For a finite collection of numbers, the
+average is computed by summing the values and dividing by their count. However,
+a continuous function assumes infinitely many values, and we cannot simply "add
+them all up and divide by infinity."
+
+The resolution is to approximate. We sample $n$ points evenly spaced by
+$dx = \pi / n$ across $[0, \pi]$. The average of these sampled heights is
+
+$$
+\text{Average} \approx \frac{1}{n} \sum_{i=1}^{n} \sin(x_i).
+$$
+
+Since $n = \pi / dx$, we may rewrite this as
+
+$$
+\text{Average} \approx \frac{\displaystyle \sum_{i=1}^{n} \sin(x_i) \, dx}{\pi}.
+$$
+
+The numerator is precisely a Riemann sum. As $dx \to 0$, it converges to the
+definite integral, giving us the fundamental formula for the average value of a
+continuous function:
+
+$$
+\text{Average value of } f \text{ on } [a, b] = \frac{1}{b - a} \int_a^b f(x)\, dx.
+$$
+
+In words, the average value is the area under the graph divided by the width
+of the interval.
+
+### Evaluating the Integral of Sine
+
+To compute $\int_0^\pi \sin(x)\, dx$, we require an antiderivative of $\sin(x)$.
+Since $\frac{d}{dx}[-\cos(x)] = \sin(x)$, the antiderivative is $F(x) = -\cos(x)$.
+Applying the Fundamental Theorem of Calculus:
+
+$$
+\int_0^\pi \sin(x)\, dx = F(\pi) - F(0) = [-\cos(\pi)] - [-\cos(0)] = 1 - (-1) = 2.
+$$
+
+Thus the area under one arch of the sine curve is exactly $2$. The average
+height is therefore
+
+$$
+\text{Average} = \frac{2}{\pi} \approx 0.6366.
+$$
+
+### Interactive Desmos Graph: Average Value of Sine
+
+```{=html}
+<div id="calc_ch09_1" class="desmos-container"></div>
+<script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+<script>
+  var calc_ch09_1 = Desmos.GraphingCalculator(document.getElementById('calc_ch09_1'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'y'
+  });
+  calc_ch09_1.setExpression({ id: 'sinx', latex: 'y = \\sin(x) \\left\\{0 \\le x \\le \\pi\\right\\}', color: '#2d70b3' });
+  calc_ch09_1.setExpression({ id: 'n', latex: 'n = 10', sliderBounds: { min: 2, max: 80, step: 1 } });
+  calc_ch09_1.setExpression({ id: 'dx', latex: 'd = \\frac{\\pi}{n}' });
+  calc_ch09_1.setExpression({ id: 'rects', latex: '0 \\le y \\le \\sin\\left(\\operatorname{floor}\\left(\\frac{x}{d}\\right) \\cdot d + \\frac{d}{2}\\right) \\left\\{0 \\le x \\le \\pi\\right\\}', color: '#388c46', fillOpacity: 0.3 });
+  calc_ch09_1.setExpression({ id: 'avg_line', latex: 'y = \\frac{2}{\\pi} \\left\\{0 \\le x \\le \\pi\\right\\}', color: '#c74440', lineStyle: Desmos.Styles.DASHED });
+  calc_ch09_1.setExpression({ id: 'avg_label', latex: '\\frac{2}{\\pi}', color: '#c74440' });
+  calc_ch09_1.setMathBounds({ left: -0.5, right: 4, bottom: -0.3, top: 1.5 });
+</script>
+```
+
+Adjust the slider $n$ to increase the number of sample points. The green
+rectangles illustrate the Riemann sum approximation. The dashed red line at
+height $2/\pi \approx 0.6366$ marks the exact average value. As $n$ grows, the
+sum of rectangle areas divided by $\pi$ converges to this value.
+
+### The Average Value as the Slope of the Antiderivative
+
+Here lies the central insight of this chapter. The average value we computed,
+
+$$
+\frac{1}{\pi - 0}\int_0^\pi \sin(x)\, dx = \frac{F(\pi) - F(0)}{\pi - 0},
+$$
+
+is nothing other than the **slope of the secant line** of the antiderivative
+$F(x) = -\cos(x)$ between the points $(0, F(0))$ and $(\pi, F(\pi))$.
+
+More generally, for any continuous function $f$ on $[a, b]$ with antiderivative
+$F$, the average value formula becomes
+
+$$
+\frac{1}{b - a}\int_a^b f(x)\, dx = \frac{F(b) - F(a)}{b - a}.
+$$
+
+The left-hand side is the average value of $f$. The right-hand side is the
+slope of the antiderivative graph between the endpoints. These are the same
+quantity.
+
+### Why Average Slope Equals Overall Slope
+
+Since $f(x) = F'(x)$, the value of $f$ at each point $x$ is the slope of the
+tangent line to the antiderivative graph at that point. Therefore, the average
+value of $f$ over $[a, b]$ is the **average of all the tangent-line slopes**
+of $F$ on that interval.
+
+It is geometrically natural that the average of all instantaneous slopes of a
+curve over an interval should equal the overall slope between the two endpoints.
+If the curve rises by a total amount $\Delta F = F(b) - F(a)$ over a horizontal
+span of $\Delta x = b - a$, then no matter how the curve oscillates in between,
+the average rate of ascent must be $\Delta F / \Delta x$.
+
+This provides a second, complementary intuition for why integration and
+differentiation are inverses: the integral of $f$ (area under the curve)
+divided by the interval length equals the slope of the antiderivative
+(a derivative-like quantity), precisely because $f$ itself is the derivative
+of that antiderivative.
+
+### Interactive Desmos Graph: Antiderivative Slope
+
+```{=html}
+<div id="calc_ch09_2" class="desmos-container"></div>
+<script>
+  var calc_ch09_2 = Desmos.GraphingCalculator(document.getElementById('calc_ch09_2'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'y'
+  });
+  calc_ch09_2.setExpression({ id: 'F', latex: 'F(x) = -\\cos(x)', color: '#388c46' });
+  calc_ch09_2.setExpression({ id: 'a', latex: 'a = 0', sliderBounds: { min: 0, max: 3, step: 0.01 } });
+  calc_ch09_2.setExpression({ id: 'b', latex: 'b = \\pi', sliderBounds: { min: 0.5, max: 6.28, step: 0.01 } });
+  calc_ch09_2.setExpression({ id: 'ptA', latex: '(a, -\\cos(a))', color: '#c74440', pointStyle: Desmos.Styles.POINT, pointSize: 9 });
+  calc_ch09_2.setExpression({ id: 'ptB', latex: '(b, -\\cos(b))', color: '#c74440', pointStyle: Desmos.Styles.POINT, pointSize: 9 });
+  calc_ch09_2.setExpression({ id: 'secant', latex: 'y = -\\cos(a) + \\frac{-\\cos(b) + \\cos(a)}{b - a}(x - a)', color: '#c74440', lineStyle: Desmos.Styles.DASHED });
+  calc_ch09_2.setMathBounds({ left: -0.5, right: 7, bottom: -1.5, top: 1.5 });
+</script>
+```
+
+The green curve is the antiderivative $F(x) = -\cos(x)$. The dashed red line
+is the secant connecting $(a, F(a))$ and $(b, F(b))$. Adjust the sliders $a$
+and $b$ to observe how the slope of this secant always equals the average value
+of $\sin(x)$ on $[a, b]$.
+
+### Interactive Desmos Graph: Generalising to Any Function
+
+```{=html}
+<div id="calc_ch09_3" class="desmos-container"></div>
+<script>
+  var calc_ch09_3 = Desmos.GraphingCalculator(document.getElementById('calc_ch09_3'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'y'
+  });
+  calc_ch09_3.setExpression({ id: 'f', latex: 'f(x) = x^2', color: '#2d70b3' });
+  calc_ch09_3.setExpression({ id: 'F', latex: 'F(x) = \\frac{x^3}{3}', color: '#388c46' });
+  calc_ch09_3.setExpression({ id: 'a', latex: 'a = 0', sliderBounds: { min: -2, max: 3, step: 0.1 } });
+  calc_ch09_3.setExpression({ id: 'b', latex: 'b = 3', sliderBounds: { min: 0.5, max: 5, step: 0.1 } });
+  calc_ch09_3.setExpression({ id: 'shade', latex: '0 \\le y \\le x^2 \\left\\{a \\le x \\le b\\right\\}', color: '#2d70b3', fillOpacity: 0.2 });
+  calc_ch09_3.setExpression({ id: 'avg_line', latex: 'y = \\frac{F(b) - F(a)}{b - a} \\left\\{a \\le x \\le b\\right\\}', color: '#c74440', lineStyle: Desmos.Styles.DASHED });
+  calc_ch09_3.setMathBounds({ left: -1, right: 6, bottom: -1, top: 12 });
+</script>
+```
+
+Here $f(x) = x^2$ (blue) with its antiderivative $F(x) = x^3/3$ (green). The
+shaded region shows the area under $f$ on $[a, b]$. The dashed red line
+indicates the average value $\frac{F(b) - F(a)}{b - a}$. Adjust $a$ and $b$
+to verify that the area divided by the interval width always agrees with the
+secant slope of the antiderivative.
+
+### Generalising the Finite Average
+
+It is instructive to revisit the passage from finite to continuous more
+carefully. Given $n$ sample points $x_1, x_2, \ldots, x_n$ spaced by
+$dx = (b - a)/n$, the finite average is
+
+$$
+\bar{f}_n = \frac{1}{n} \sum_{i=1}^{n} f(x_i) = \frac{1}{b - a} \sum_{i=1}^{n} f(x_i)\, dx.
+$$
+
+The second equality follows from substituting $n = (b - a)/dx$. As $n \to \infty$
+(equivalently $dx \to 0$), the Riemann sum in the numerator converges to
+$\int_a^b f(x)\, dx$, yielding
+
+$$
+\bar{f} = \frac{1}{b - a}\int_a^b f(x)\, dx.
+$$
+
+This derivation highlights a recurring theme in calculus: whenever one wishes
+to generalise a discrete operation (here, averaging finitely many values) to a
+continuous setting, the natural tool is the integral.
+
+### Interactive Python: Average Value Approximation
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch09_1">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Approximate the average value of sin(x) on [0, pi]
+a, b = 0, np.pi
+N_values = [5, 10, 25, 50, 100, 500]
+exact_avg = 2 / np.pi
+
+fig, axes = plt.subplots(2, 3, figsize=(12, 7))
+axes = axes.flatten()
+
+for idx, N in enumerate(N_values):
+    dx = (b - a) / N
+    x_samples = np.linspace(a + dx/2, b - dx/2, N)
+    heights = np.sin(x_samples)
+    approx_avg = np.mean(heights)
+
+    x_fine = np.linspace(a, b, 500)
+    axes[idx].plot(x_fine, np.sin(x_fine), 'b-', linewidth=1.5)
+    axes[idx].bar(x_samples, heights, width=dx*0.9, alpha=0.4,
+                  color='green', edgecolor='green')
+    axes[idx].axhline(y=exact_avg, color='red', linestyle='--',
+                      linewidth=1, label=f'Exact = {exact_avg:.4f}')
+    axes[idx].axhline(y=approx_avg, color='orange', linestyle=':',
+                      linewidth=1, label=f'Approx = {approx_avg:.4f}')
+    axes[idx].set_title(f'N = {N}')
+    axes[idx].set_xlim(-0.2, 3.5)
+    axes[idx].set_ylim(-0.1, 1.2)
+    axes[idx].legend(fontsize=7)
+
+plt.suptitle('Average value of sin(x) on [0, pi]', fontsize=13)
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch09_1', 'output_ch09_1', 'plot_ch09_1')">Run ▶</button>
+  <div class="output" id="output_ch09_1"></div>
+  <div class="plot-output" id="plot_ch09_1"></div>
+</div>
+```
+
+### Interactive Python: Antiderivative Slope Equals Average Value
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch09_2">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Demonstrate: slope of antiderivative = average value of function
+x = np.linspace(0, 2*np.pi, 500)
+
+# f(x) = sin(x), F(x) = -cos(x)
+f = np.sin(x)
+F = -np.cos(x)
+
+a, b = 0.5, 4.0  # interval endpoints
+avg_value = (-np.cos(b) - (-np.cos(a))) / (b - a)
+secant_slope = ((-np.cos(b)) - (-np.cos(a))) / (b - a)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+
+# Left panel: f(x) = sin(x) with shaded area
+ax1.plot(x, f, 'b-', linewidth=1.5, label='$f(x) = \\sin(x)$')
+mask = (x >= a) & (x <= b)
+ax1.fill_between(x[mask], f[mask], alpha=0.3, color='blue')
+ax1.axhline(y=avg_value, color='red', linestyle='--',
+            label=f'Avg value = {avg_value:.4f}')
+ax1.axhline(y=0, color='gray', linewidth=0.5)
+ax1.set_xlabel('x')
+ax1.set_title('$f(x) = \\sin(x)$ and its average on $[a, b]$')
+ax1.legend()
+
+# Right panel: F(x) = -cos(x) with secant line
+ax2.plot(x, F, 'g-', linewidth=1.5, label='$F(x) = -\\cos(x)$')
+ax2.plot([a, b], [-np.cos(a), -np.cos(b)], 'ro-', markersize=8)
+secant_line = -np.cos(a) + secant_slope * (x - a)
+ax2.plot(x, secant_line, 'r--', linewidth=1,
+         label=f'Secant slope = {secant_slope:.4f}')
+ax2.axhline(y=0, color='gray', linewidth=0.5)
+ax2.set_xlabel('x')
+ax2.set_title('$F(x) = -\\cos(x)$ and its secant on $[a, b]$')
+ax2.legend()
+
+plt.suptitle(
+    f'Average value = {avg_value:.4f},  '
+    f'Secant slope = {secant_slope:.4f}  (they match)',
+    fontsize=12, fontweight='bold')
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch09_2', 'output_ch09_2', 'plot_ch09_2')">Run ▶</button>
+  <div class="output" id="output_ch09_2"></div>
+  <div class="plot-output" id="plot_ch09_2"></div>
+</div>
+```
+
+## Summary
+
+::: {.key-formula}
+| Concept | Key Result |
+|---|---|
+| Average value of $f$ on $[a, b]$ | $\displaystyle \bar{f} = \frac{1}{b-a}\int_a^b f(x)\,dx$ |
+| Average of $\sin(x)$ on $[0, \pi]$ | $\displaystyle \frac{1}{\pi}\int_0^\pi \sin(x)\,dx = \frac{2}{\pi} \approx 0.6366$ |
+| Average as antiderivative slope | $\displaystyle \frac{1}{b-a}\int_a^b f(x)\,dx = \frac{F(b) - F(a)}{b - a}$ |
+| Why area relates to slope | $f(x) = F'(x)$, so the average of $f$ (area$\div$width) equals the average slope of $F$ (rise$\div$run) |
+:::

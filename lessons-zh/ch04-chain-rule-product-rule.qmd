@@ -1,0 +1,356 @@
+---
+title: "链式法则与乘积法则的可视化"
+subtitle: "第四章"
+date: 2023-04-04
+---
+
+本课为两个最重要的求导法则——乘积法则和链式法则——建立几何和可视化直觉。我们不将它们视为需要记忆的公式，而是从第一性原理出发，通过考察微小扰动如何在复合函数和乘积函数中传播来推导每条法则。
+
+::: {.callout-note collapse="true"}
+## 预备知识
+
+- 理解导数作为比值 $df/dx$（第一至二章）
+- 熟悉基本函数的导数：$\frac{d}{dx}\sin(x) = \cos(x)$，$\frac{d}{dx}x^2 = 2x$（第三章）
+- 能够使用 $f(x)$、$g(x)$、$h(x)$ 表示命名函数
+:::
+
+## 本课内容
+
+- 加法法则作为热身：和的导数等于导数的和
+- 通过矩形面积模型推导乘积法则
+- 通过三条数轴模型推导链式法则
+- 中间微分量的"消去"反映了底层几何结构
+
+## 课程视频
+
+```{=html}
+<video controls width="100%" preload="metadata">
+  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/04_Visualizing%20the%20chain%20rule%20and%20product%20rule%20%EF%BD%9C%20Chapter%204%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
+</video>
+```
+
+## 课程关键帧
+
+![两个函数的乘积可视化为一个边长可调的矩形面积](../images/ch04/frame_01.jpg)
+
+![微小增量 $dx$ 产生的三块新面积](../images/ch04/frame_02.jpg)
+
+![链式法则中表示 $x$、$h(x)$ 和 $g(h(x))$ 的三条数轴](../images/ch04/frame_03.jpg)
+
+![增量 $dx$ 经由中间变量 $dh$ 传播到最终输出 $dg$](../images/ch04/frame_04.jpg)
+
+## 核心要点
+
+### 加法法则：热身
+
+考虑一个由两个分量函数之和定义的函数，
+
+$$
+f(x) = g(x) + h(x).
+$$
+
+当输入从 $x$ 变为 $x + dx$ 时，$f$ 的变化为
+
+$$
+df = dg + dh.
+$$
+
+两边除以 $dx$ 得
+
+$$
+\frac{df}{dx} = \frac{dg}{dx} + \frac{dh}{dx}.
+$$
+
+和的导数等于导数的和。这个结论很直观，但它可作为一个有用的模板：我们考察微小增量 $dx$ 如何通过函数结构传播，然后从所得表达式中读出导数。
+
+### 通过面积模型推导乘积法则
+
+设我们要对乘积
+
+$$
+f(x) = g(x) \cdot h(x)
+$$
+
+求导。我们将这个乘积表示为一个矩形的面积，其宽度为 $g(x)$，高度为 $h(x)$。当输入增加 $dx$ 时，宽度变化 $dg$，高度变化 $dh$。面积的变化由三部分组成：
+
+1. 底部的一条薄矩形，宽度为 $g$，高度为 $dh$，面积为 $g \cdot dh$。
+2. 右侧的一条薄矩形，宽度为 $dg$，高度为 $h$，面积为 $h \cdot dg$。
+3. 一个角落的微小矩形，面积为 $dg \cdot dh$，正比于 $(dx)^2$，因此可以忽略。
+
+因此，
+
+$$
+df \approx g(x)\, dh + h(x)\, dg.
+$$
+
+将 $dg = g'(x)\, dx$ 和 $dh = h'(x)\, dx$ 代入，然后除以 $dx$，我们得到**乘积法则**：
+
+$$
+\frac{d}{dx}\bigl[g(x) \cdot h(x)\bigr] = g(x)\, h'(x) + h(x)\, g'(x).
+$$
+
+一个有用的助记方法是"左乘右导加右乘左导"：第一个因子乘以第二个的导数，加上第二个因子乘以第一个的导数。
+
+#### 常数倍数作为特殊情形
+
+当其中一个因子为常数 $c$ 时，乘积法则简化为：由于 $\frac{d}{dx}[c] = 0$，我们有
+
+$$
+\frac{d}{dx}\bigl[c \cdot h(x)\bigr] = c \cdot h'(x).
+$$
+
+常数可以直接"穿过"导数运算符。
+
+### 交互演示：乘积法则面积模型（Desmos）
+
+```{=html}
+<div id="calc_ch04_1" class="desmos-container"></div>
+<script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+<script>
+  var calc_ch04_1 = Desmos.GraphingCalculator(document.getElementById('calc_ch04_1'), {
+    expressions: true, settingsMenu: false, xAxisLabel: '', yAxisLabel: ''
+  });
+  // g(x) = sin(x), h(x) = x^2; show the rectangle and the two thin strips
+  calc_ch04_1.setExpression({ id: 'a', latex: 'a = 1', sliderBounds: { min: 0.3, max: 3, step: 0.01 } });
+  calc_ch04_1.setExpression({ id: 'dx', latex: 'd = 0.3', sliderBounds: { min: 0.01, max: 0.5, step: 0.01 } });
+  calc_ch04_1.setExpression({ id: 'g_val', latex: 'g = \\sin(a)' });
+  calc_ch04_1.setExpression({ id: 'h_val', latex: 'h = a^2' });
+  calc_ch04_1.setExpression({ id: 'dg_val', latex: 'g_1 = \\sin(a+d) - \\sin(a)' });
+  calc_ch04_1.setExpression({ id: 'dh_val', latex: 'h_1 = (a+d)^2 - a^2' });
+  // Main rectangle (original area)
+  calc_ch04_1.setExpression({ id: 'rect_main', latex: '0 \\le y \\le h \\left\\{0 \\le x \\le g\\right\\}', color: '#2d70b3', fillOpacity: 0.2 });
+  // Bottom strip: g * dh
+  calc_ch04_1.setExpression({ id: 'strip_bottom', latex: 'h \\le y \\le h + h_1 \\left\\{0 \\le x \\le g\\right\\}', color: '#388c46', fillOpacity: 0.5 });
+  // Right strip: h * dg
+  calc_ch04_1.setExpression({ id: 'strip_right', latex: '0 \\le y \\le h \\left\\{g \\le x \\le g + g_1\\right\\}', color: '#c74440', fillOpacity: 0.5 });
+  // Corner (negligible)
+  calc_ch04_1.setExpression({ id: 'corner', latex: 'h \\le y \\le h + h_1 \\left\\{g \\le x \\le g + g_1\\right\\}', color: '#6042a6', fillOpacity: 0.3 });
+  calc_ch04_1.setMathBounds({ left: -0.3, right: 2.5, bottom: -0.5, top: 10 });
+</script>
+```
+
+调节滑块 $a$ 选择 $x$ 的值，调节滑块 $d$ 控制增量 $dx$ 的大小。绿色条带表示 $g(x)\, dh$，红色条带表示 $h(x)\, dg$，紫色小角落为 $dg \cdot dh$，当 $d \to 0$ 时它变得可以忽略。
+
+### 通过三条数轴推导链式法则
+
+现在考虑两个函数的复合，
+
+$$
+f(x) = g\bigl(h(x)\bigr).
+$$
+
+我们使用三条纵向排列的数轴来可视化：
+
+- **第一条**承载输入 $x$。
+- **第二条**承载中间值 $h(x)$。
+- **第三条**承载最终输出 $g(h(x))$。
+
+第一条数轴上的微小增量 $dx$ 在第二条数轴上引起大小为
+
+$$
+dh = h'(x)\, dx
+$$
+
+的增量。这个中间增量 $dh$ 进而在第三条数轴上引起大小为
+
+$$
+dg = g'(h)\, dh
+$$
+
+的增量。将 $dh$ 的表达式代入，得
+
+$$
+dg = g'(h(x)) \cdot h'(x)\, dx.
+$$
+
+两边除以 $dx$ 得到**链式法则**：
+
+$$
+\frac{d}{dx}\bigl[g(h(x))\bigr] = g'(h(x)) \cdot h'(x).
+$$
+
+用莱布尼茨记号表示，这具有特别优雅的形式
+
+$$
+\frac{dg}{dx} = \frac{dg}{dh} \cdot \frac{dh}{dx}.
+$$
+
+$dh$ 的表观"消去"并非仅仅是记号上的巧合；它反映了扰动通过中间变量传播的真实过程。
+
+#### 示例：$\sin(x^2)$
+
+令 $g(u) = \sin(u)$，$h(x) = x^2$。则 $g'(u) = \cos(u)$，$h'(x) = 2x$。应用链式法则：
+
+$$
+\frac{d}{dx}\sin(x^2) = \cos(x^2) \cdot 2x.
+$$
+
+在特定输入如 $x = 1.5$ 处，导数的值为 $2(1.5)\cos(1.5^2) = 3\cos(2.25)$。
+
+### 交互演示：链式法则与三个函数（Desmos）
+
+```{=html}
+<div id="calc_ch04_2" class="desmos-container"></div>
+<script>
+  var calc_ch04_2 = Desmos.GraphingCalculator(document.getElementById('calc_ch04_2'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: ''
+  });
+  calc_ch04_2.setExpression({ id: 'f_inner', latex: 'h(x) = x^2', color: '#2d70b3' });
+  calc_ch04_2.setExpression({ id: 'f_outer', latex: 'g(x) = \\sin(x)', color: '#388c46' });
+  calc_ch04_2.setExpression({ id: 'f_comp', latex: 'f(x) = \\sin(x^2)', color: '#c74440', lineWidth: 3 });
+  calc_ch04_2.setExpression({ id: 'a', latex: 'a = 1.5', sliderBounds: { min: -3, max: 3, step: 0.01 } });
+  calc_ch04_2.setExpression({ id: 'tangent', latex: 'y = \\sin(a^2) + \\cos(a^2) \\cdot 2a \\cdot (x - a)', color: '#6042a6', lineStyle: Desmos.Styles.DASHED });
+  calc_ch04_2.setExpression({ id: 'pt', latex: '(a, \\sin(a^2))', color: '#c74440', pointSize: 8 });
+  calc_ch04_2.setMathBounds({ left: -3.5, right: 3.5, bottom: -2, top: 2 });
+</script>
+```
+
+红色曲线为复合函数 $f(x) = \sin(x^2)$。移动滑块 $a$，可以看到切线（紫色虚线），其斜率即链式法则给出的导数 $\cos(a^2) \cdot 2a$。
+
+### 交互演示：乘积法则函数及其导数（Desmos）
+
+```{=html}
+<div id="calc_ch04_3" class="desmos-container"></div>
+<script>
+  var calc_ch04_3 = Desmos.GraphingCalculator(document.getElementById('calc_ch04_3'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: ''
+  });
+  calc_ch04_3.setExpression({ id: 'g_func', latex: 'g(x) = \\sin(x)', color: '#2d70b3', lineStyle: Desmos.Styles.DASHED });
+  calc_ch04_3.setExpression({ id: 'h_func', latex: 'h(x) = x^2', color: '#388c46', lineStyle: Desmos.Styles.DASHED });
+  calc_ch04_3.setExpression({ id: 'product', latex: 'p(x) = \\sin(x) \\cdot x^2', color: '#c74440', lineWidth: 3 });
+  calc_ch04_3.setExpression({ id: 'deriv', latex: 'd(x) = \\cos(x) \\cdot x^2 + \\sin(x) \\cdot 2x', color: '#6042a6' });
+  calc_ch04_3.setExpression({ id: 'a', latex: 'a = 1', sliderBounds: { min: -3, max: 3, step: 0.01 } });
+  calc_ch04_3.setExpression({ id: 'tan_line', latex: 'y = p(a) + d(a)(x - a)', color: '#000000', lineStyle: Desmos.Styles.DASHED });
+  calc_ch04_3.setExpression({ id: 'pt', latex: '(a, p(a))', color: '#c74440', pointSize: 8 });
+  calc_ch04_3.setMathBounds({ left: -4, right: 4, bottom: -8, top: 8 });
+</script>
+```
+
+红色曲线为 $p(x) = \sin(x) \cdot x^2$，紫色曲线为其导数 $p'(x) = \cos(x) \cdot x^2 + \sin(x) \cdot 2x$。移动滑块 $a$ 验证切线（黑色虚线）的斜率与乘积法则给出的值一致。
+
+### 综合运用法则
+
+实际建模中遇到的大多数函数都涉及和、积和复合的嵌套组合。关键思路是始终可以逐步进行，一层一层剥离。例如，要对
+
+$$
+f(x) = \sin(x^2) \cdot e^x
+$$
+
+求导，我们首先识别它是 $g(x) = \sin(x^2)$ 与 $h(x) = e^x$ 的乘积。应用乘积法则：
+
+$$
+f'(x) = g'(x) \cdot e^x + \sin(x^2) \cdot e^x.
+$$
+
+然后应用链式法则求 $g'(x) = \cos(x^2) \cdot 2x$，得到
+
+$$
+f'(x) = 2x\cos(x^2)\, e^x + \sin(x^2)\, e^x.
+$$
+
+### 交互演示：数值验证乘积法则（Python）
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch04_1">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Product rule: d/dx [sin(x) * x^2] = cos(x)*x^2 + sin(x)*2x
+x = np.linspace(0.1, 4, 300)
+
+# The product function and its analytic derivative
+f = np.sin(x) * x**2
+f_prime_analytic = np.cos(x) * x**2 + np.sin(x) * 2 * x
+
+# Numerical derivative via central differences
+dx = 1e-7
+f_prime_numerical = (np.sin(x + dx) * (x + dx)**2
+                     - np.sin(x - dx) * (x - dx)**2) / (2 * dx)
+
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(9, 6), sharex=True)
+
+ax1.plot(x, f, color='#c74440', linewidth=2, label=r'$f(x) = \sin(x)\, x^2$')
+ax1.plot(x, f_prime_analytic, color='#6042a6', linewidth=2,
+         label=r"$f'(x)$ (product rule)")
+ax1.set_ylabel('Value')
+ax1.set_title('Product rule: analytic derivative')
+ax1.legend()
+ax1.grid(True, alpha=0.3)
+
+ax2.semilogy(x, np.abs(f_prime_analytic - f_prime_numerical),
+             color='#2d70b3', linewidth=1.5)
+ax2.set_xlabel('x')
+ax2.set_ylabel('Absolute error')
+ax2.set_title('Difference between analytic and numerical derivatives')
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch04_1', 'output_ch04_1', 'plot_ch04_1')">Run ▶</button>
+  <div class="output" id="output_ch04_1"></div>
+  <div class="plot-output" id="plot_ch04_1"></div>
+</div>
+```
+
+### 交互演示：可视化链式法则的传播过程（Python）
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch04_2">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Chain rule: d/dx [sin(x^2)] = cos(x^2) * 2x
+# Visualize how a nudge dx propagates: dx -> dh = 2x*dx -> dg = cos(h)*dh
+
+x0 = 1.5
+dx_values = np.logspace(-1, -6, 50)
+
+actual_dg = np.sin((x0 + dx_values)**2) - np.sin(x0**2)
+chain_approx = np.cos(x0**2) * 2 * x0 * dx_values
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
+
+# Left: compare actual vs chain-rule approximation
+ax1.plot(dx_values, actual_dg, 'o-', markersize=3, color='#c74440',
+         label=r'Actual $\Delta g$')
+ax1.plot(dx_values, chain_approx, '--', color='#2d70b3', linewidth=2,
+         label=r"Chain rule: $\cos(x_0^2)\cdot 2x_0\cdot dx$")
+ax1.set_xscale('log')
+ax1.set_xlabel(r'$dx$')
+ax1.set_ylabel(r'Change in $g = \sin(x^2)$')
+ax1.set_title(f'Nudge propagation at $x_0 = {x0}$')
+ax1.legend(fontsize=9)
+ax1.grid(True, alpha=0.3)
+
+# Right: relative error shrinks as dx -> 0
+rel_error = np.abs(actual_dg - chain_approx) / np.abs(actual_dg + 1e-30)
+ax2.loglog(dx_values, rel_error, 'o-', markersize=3, color='#388c46')
+ax2.set_xlabel(r'$dx$')
+ax2.set_ylabel('Relative error')
+ax2.set_title('Chain rule approximation error')
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch04_2', 'output_ch04_2', 'plot_ch04_2')">Run ▶</button>
+  <div class="output" id="output_ch04_2"></div>
+  <div class="plot-output" id="plot_ch04_2"></div>
+</div>
+```
+
+## 速查表
+
+::: {.key-formula}
+| 概念 | 核心结论 |
+|---|---|
+| 加法法则 | $\frac{d}{dx}\bigl[g(x) + h(x)\bigr] = g'(x) + h'(x)$ |
+| 乘积法则 | $\frac{d}{dx}\bigl[g(x)\, h(x)\bigr] = g(x)\, h'(x) + h(x)\, g'(x)$ |
+| 乘积法则（几何形式） | $df = g\, dh + h\, dg$（矩形面积的两个薄条带） |
+| 链式法则 | $\frac{d}{dx}\bigl[g(h(x))\bigr] = g'(h(x)) \cdot h'(x)$ |
+| 链式法则（莱布尼茨形式） | $\frac{dg}{dx} = \frac{dg}{dh} \cdot \frac{dh}{dx}$ |
+| 常数倍数 | $\frac{d}{dx}\bigl[c \cdot f(x)\bigr] = c \cdot f'(x)$ |
+:::

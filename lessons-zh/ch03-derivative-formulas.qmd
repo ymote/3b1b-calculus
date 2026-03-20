@@ -1,0 +1,295 @@
+---
+title: "通过几何推导导数公式"
+subtitle: "第三章"
+date: 2023-04-01
+---
+
+本课推导标准的导数公式——幂法则、$1/x$ 的导数以及 $\sin(\theta)$ 的导数——不仅通过代数运算，更通过几何推理来实现。通过将每个函数可视化为一个具体的几何量（面积、体积、单位圆上的高度），我们得以理解这些公式为何必然具有它们的形式。
+
+::: {.callout-note collapse="true"}
+## 预备知识
+
+- 理解导数作为微小增量 $dx$ 下的比值 $df/dx$（第二章）
+- 熟悉多项式表达式和基本指数法则
+- 了解 $\sin\theta$ 和 $\cos\theta$ 的单位圆定义
+:::
+
+## 本课内容
+
+- 通过正方形面积几何推导 $\frac{d}{dx}x^2 = 2x$
+- 通过立方体体积几何推导 $\frac{d}{dx}x^3 = 3x^2$
+- 一般幂法则：$\frac{d}{dx}x^n = nx^{n-1}$
+- 通过常面积矩形几何推导 $\frac{d}{dx}(1/x) = -1/x^2$
+- 通过单位圆几何推导 $\frac{d}{dx}\sin\theta = \cos\theta$
+
+## 课程视频
+
+```{=html}
+<video controls width="100%" preload="metadata">
+  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/03_Derivative%20formulas%20through%20geometry%20%EF%BD%9C%20Chapter%203%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
+</video>
+```
+
+## 课程关键帧
+
+![将 $x^2$ 视为正方形的面积，以及增量 $dx$ 产生的三块新面积](../images/ch03/frame_01.jpg)
+
+![将 $x^3$ 视为立方体的体积；三个薄正方形面贡献 $3x^2\,dx$](../images/ch03/frame_02.jpg)
+
+![$1/x$ 的常面积矩形解释及其导数](../images/ch03/frame_03.jpg)
+
+![单位圆论证：沿弧线的增量 $d\theta$ 产生高度变化 $d(\sin\theta) = \cos\theta\,d\theta$](../images/ch03/frame_04.jpg)
+
+## 核心要点
+
+### $x^2$ 的导数：正方形的面积
+
+我们将 $f(x) = x^2$ 直接理解为边长为 $x$ 的正方形的面积。当我们将 $x$ 增加一个微小量 $dx$ 时，新面积为 $(x + dx)^2$。面积的变化由三部分组成：
+
+- 两个细矩形，每个面积为 $x \cdot dx$，
+- 一个微小正方形，面积为 $(dx)^2$。
+
+由于 $(dx)^2$ 在 $dx \to 0$ 时与 $dx$ 相比可以忽略，面积变化为
+
+$$
+df = 2x\,dx + (dx)^2 \approx 2x\,dx.
+$$
+
+两边除以 $dx$，
+
+$$
+\frac{df}{dx} = 2x.
+$$
+
+### $x^3$ 的导数：立方体的体积
+
+我们将 $g(x) = x^3$ 理解为边长为 $x$ 的立方体的体积。将 $x$ 增加 $dx$ 后，新增的体积主要来自三个薄正方形板，每块的体积为 $x^2 \cdot dx$。沿棱边的剩余薄片（正比于 $dx^2$）和微小角落立方体（正比于 $dx^3$）都可以忽略。因此，
+
+$$
+dg = 3x^2\,dx + \mathcal{O}(dx^2),
+$$
+
+进而
+
+$$
+\frac{dg}{dx} = 3x^2.
+$$
+
+### 一般幂法则
+
+上述模式推广到任意正整数 $n$。当我们展开 $(x + dx)^n$ 时，首项为 $x^n$（原始值）。下一组项来自在 $n$ 个因子中恰好选择一个 $dx$、其余 $n - 1$ 个选择 $x$。共有 $n$ 种这样的选择，给出
+
+$$
+(x + dx)^n = x^n + n\,x^{n-1}\,dx + \mathcal{O}(dx^2).
+$$
+
+所有高阶项涉及 $dx^2$ 或更高次幂，因此在极限中消失。我们得到：
+
+$$
+\boxed{\frac{d}{dx}\,x^n = n\,x^{n-1}.}
+$$
+
+这就是**幂法则**。虽然它常被机械地应用——"将指数提前并减一"——但几何图景提醒我们，$n$ 项 $x^{n-1}\,dx$ 中的每一项都对应高维立方体的一个"面"获得了厚度为 $dx$ 的薄层。
+
+### 交互演示：幂法则（Desmos）
+
+```{=html}
+<div id="calc_ch03_1" class="desmos-container"></div>
+<script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+<script>
+  var calc_ch03_1 = Desmos.GraphingCalculator(document.getElementById('calc_ch03_1'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'y'
+  });
+  calc_ch03_1.setExpression({ id: 'n', latex: 'n = 2', sliderBounds: { min: 1, max: 6, step: 1 } });
+  calc_ch03_1.setExpression({ id: 'f', latex: 'f(x) = x^{n}', color: '#2d70b3' });
+  calc_ch03_1.setExpression({ id: 'df', latex: 'g(x) = n \\cdot x^{n-1}', color: '#c74440' });
+  calc_ch03_1.setExpression({ id: 'a', latex: 'a = 1.5', sliderBounds: { min: -3, max: 3, step: 0.01 } });
+  calc_ch03_1.setExpression({ id: 'tangent', latex: 'y - a^{n} = n a^{n-1}(x - a)', color: '#388c46', lineStyle: Desmos.Styles.DASHED });
+  calc_ch03_1.setExpression({ id: 'pt', latex: '(a, a^{n})', color: '#388c46', pointSize: 8 });
+  calc_ch03_1.setMathBounds({ left: -3, right: 4, bottom: -5, top: 20 });
+</script>
+```
+
+使用滑块 $n$ 选择不同的幂次。蓝色曲线为 $x^n$，红色曲线为其导数 $nx^{n-1}$，绿色虚线为 $x^n$ 在 $x = a$ 点的切线。调节 $a$ 可以验证切线斜率等于该点的导数值。
+
+### $1/x$ 的导数：常面积矩形
+
+我们考虑 $f(x) = 1/x$ 并从几何角度理解它。想象一个面积恒为 $1$ 的矩形，其宽度为 $x$；则高度必为 $1/x$。若宽度增加 $dx$，矩形右侧增加一个面积为 $(1/x)\,dx$ 的薄竖条。为保持总面积等于 $1$，高度必须减少一定量 $d(1/x)$，从顶部移除一个面积约为 $x \cdot |d(1/x)|$ 的薄横条。令增加的面积等于减少的面积：
+
+$$
+\frac{1}{x}\,dx \approx -\,x\,d\!\left(\frac{1}{x}\right).
+$$
+
+（负号说明高度在减小。）求解导数，
+
+$$
+\frac{d}{dx}\!\left(\frac{1}{x}\right) = -\frac{1}{x^2}.
+$$
+
+这与将幂法则应用于 $x^{-1}$ 一致：将指数 $-1$ 提前并减一，得到 $-1 \cdot x^{-2} = -1/x^2$。
+
+### 交互演示：$1/x$ 的常面积矩形（Desmos）
+
+```{=html}
+<div id="calc_ch03_2" class="desmos-container"></div>
+<script>
+  var calc_ch03_2 = Desmos.GraphingCalculator(document.getElementById('calc_ch03_2'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'x', yAxisLabel: 'y'
+  });
+  calc_ch03_2.setExpression({ id: 'curve', latex: 'y = \\frac{1}{x} \\left\\{x > 0\\right\\}', color: '#2d70b3' });
+  calc_ch03_2.setExpression({ id: 'x0', latex: 'x_0 = 2', sliderBounds: { min: 0.5, max: 5, step: 0.01 } });
+  calc_ch03_2.setExpression({ id: 'rect', latex: '0 \\le y \\le \\frac{1}{x_0} \\left\\{0 \\le x \\le x_0\\right\\}', color: '#388c46', fillOpacity: 0.25 });
+  calc_ch03_2.setExpression({ id: 'deriv', latex: 'y = -\\frac{1}{x^2} \\left\\{x > 0\\right\\}', color: '#c74440' });
+  calc_ch03_2.setExpression({ id: 'pt', latex: '(x_0, \\frac{1}{x_0})', color: '#388c46', pointSize: 8 });
+  calc_ch03_2.setMathBounds({ left: -0.5, right: 6, bottom: -2, top: 3 });
+</script>
+```
+
+绿色阴影区域的面积始终为 $1$。移动滑块 $x_0$，观察矩形如何重新调整形状：宽度增大时，高度 $1/x_0$ 减小。红色曲线显示导数 $-1/x^2$，它始终为负，证实 $1/x$ 在 $x > 0$ 时是递减函数。
+
+### $\sin\theta$ 的导数：单位圆
+
+回顾 $\sin\theta$ 的定义：它是从最右端出发、沿单位圆走过弧长 $\theta$ 后所在点的 $y$ 坐标（高度）。为求导数，我们考虑 $\theta$ 增加一个微小量 $d\theta$ 时会发生什么。
+
+沿圆周的长度为 $d\theta$ 的小弧段，在近距离观察时本质上是一个微小直角三角形的斜边。这个三角形的竖直边——即高度的变化——就是 $d(\sin\theta)$。通过与大三角形（由半径构成）的相似三角形论证，这个小三角形与竖直方向的夹角本身就是 $\theta$。
+
+由这个小直角三角形的几何关系，
+
+$$
+\frac{d(\sin\theta)}{d\theta} = \frac{\text{邻边}}{\text{斜边}} = \cos\theta.
+$$
+
+因此，
+
+$$
+\boxed{\frac{d}{d\theta}\sin\theta = \cos\theta.}
+$$
+
+在单位圆上进行类似论证（考察 $x$ 坐标的变化），可以得到伴随结论：
+
+$$
+\frac{d}{d\theta}\cos\theta = -\sin\theta.
+$$
+
+### 交互演示：单位圆上正弦的导数（Desmos）
+
+```{=html}
+<div id="calc_ch03_3" class="desmos-container"></div>
+<script>
+  var calc_ch03_3 = Desmos.GraphingCalculator(document.getElementById('calc_ch03_3'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'θ', yAxisLabel: 'y'
+  });
+  calc_ch03_3.setExpression({ id: 'sin', latex: 'y = \\sin(x)', color: '#2d70b3' });
+  calc_ch03_3.setExpression({ id: 'cos', latex: 'y = \\cos(x)', color: '#c74440' });
+  calc_ch03_3.setExpression({ id: 't', latex: 't = 1', sliderBounds: { min: 0, max: 6.28, step: 0.01 } });
+  calc_ch03_3.setExpression({ id: 'tangent', latex: 'y - \\sin(t) = \\cos(t)(x - t)', color: '#388c46', lineStyle: Desmos.Styles.DASHED });
+  calc_ch03_3.setExpression({ id: 'pt', latex: '(t, \\sin(t))', color: '#388c46', pointSize: 8 });
+  calc_ch03_3.setMathBounds({ left: -0.5, right: 7, bottom: -2, top: 2 });
+</script>
+```
+
+蓝色曲线为 $\sin\theta$，红色曲线为 $\cos\theta$。绿色虚线为正弦曲线在 $\theta = t$ 处的切线。可以观察到，该切线的斜率始终等于该点处余弦的值。
+
+### 交互演示：数值验证幂法则（Python）
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch03_1">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Numerically verify the power rule for several values of n
+dx = 1e-8
+x = np.linspace(0.5, 3, 200)
+
+fig, axes = plt.subplots(2, 2, figsize=(10, 8))
+
+for idx, n in enumerate([2, 3, 4, 5]):
+    ax = axes[idx // 2][idx % 2]
+    # Numerical derivative via symmetric difference quotient
+    numerical = (((x + dx)**n) - ((x - dx)**n)) / (2 * dx)
+    # Analytical derivative from the power rule
+    analytical = n * x**(n - 1)
+
+    ax.plot(x, analytical, label=f'Power rule: ${n}x^{{{n-1}}}$', linewidth=2)
+    ax.plot(x, numerical, '--', label='Numerical derivative', linewidth=2)
+    ax.set_title(f'$f(x) = x^{{{n}}}$')
+    ax.set_xlabel('x')
+    ax.set_ylabel("f'(x)")
+    ax.legend(fontsize=9)
+    ax.grid(True, alpha=0.3)
+
+plt.suptitle('Numerical verification of the power rule', fontsize=14)
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch03_1', 'output_ch03_1', 'plot_ch03_1')">Run ▶</button>
+  <div class="output" id="output_ch03_1"></div>
+  <div class="plot-output" id="plot_ch03_1"></div>
+</div>
+```
+
+### 交互演示：$x^2$ 的几何面积论证（Python）
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch03_2">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Visualise the "nudged square" argument for d/dx(x^2) = 2x
+x = 2.0
+dx_vals = [0.5, 0.3, 0.1]
+
+fig, axes = plt.subplots(1, 3, figsize=(12, 4))
+
+for ax, dx in zip(axes, dx_vals):
+    # Original square
+    sq = plt.Rectangle((0, 0), x, x, facecolor='#2d70b3', alpha=0.4,
+                        edgecolor='black', linewidth=1.5)
+    ax.add_patch(sq)
+    # Right thin rectangle
+    r1 = plt.Rectangle((x, 0), dx, x, facecolor='#c74440', alpha=0.5,
+                        edgecolor='black', linewidth=1)
+    ax.add_patch(r1)
+    # Top thin rectangle
+    r2 = plt.Rectangle((0, x), x, dx, facecolor='#c74440', alpha=0.5,
+                        edgecolor='black', linewidth=1)
+    ax.add_patch(r2)
+    # Corner square
+    c = plt.Rectangle((x, x), dx, dx, facecolor='#388c46', alpha=0.6,
+                       edgecolor='black', linewidth=1)
+    ax.add_patch(c)
+
+    total_new = 2 * x * dx + dx**2
+    approx_new = 2 * x * dx
+    ax.set_xlim(-0.2, x + dx + 0.3)
+    ax.set_ylim(-0.2, x + dx + 0.3)
+    ax.set_aspect('equal')
+    ax.set_title(f'dx = {dx}\nnew area = {total_new:.4f}\n2x dx = {approx_new:.4f}')
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+
+fig.suptitle(f'Nudged square for x = {x}: red = 2x dx, green = (dx)²',
+             fontsize=12)
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch03_2', 'output_ch03_2', 'plot_ch03_2')">Run ▶</button>
+  <div class="output" id="output_ch03_2"></div>
+  <div class="plot-output" id="plot_ch03_2"></div>
+</div>
+```
+
+## 速查表
+
+::: {.key-formula}
+| 概念 | 核心结论 |
+|---|---|
+| $x^2$ 的导数（正方形面积） | $\frac{d}{dx}x^2 = 2x$ |
+| $x^3$ 的导数（立方体体积） | $\frac{d}{dx}x^3 = 3x^2$ |
+| 幂法则 | $\frac{d}{dx}x^n = nx^{n-1}$ |
+| $1/x$ 的导数（常面积矩形） | $\frac{d}{dx}\frac{1}{x} = -\frac{1}{x^2}$ |
+| $\sin\theta$ 的导数（单位圆） | $\frac{d}{d\theta}\sin\theta = \cos\theta$ |
+| $\cos\theta$ 的导数（单位圆） | $\frac{d}{d\theta}\cos\theta = -\sin\theta$ |
+:::

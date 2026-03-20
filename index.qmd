@@ -1,0 +1,34 @@
+---
+title: "Essence of Calculus — 3Blue1Brown"
+---
+
+This site presents an interactive companion to Grant Sanderson's
+[Essence of Calculus](https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr)
+video series. Each lesson includes the original lecture video, a formal mathematical
+exposition derived from the transcript, interactive Desmos graphs, and executable
+Python code via Pyodide.
+
+## Chapters
+
+| Chapter | Topic |
+|---------|-------|
+| 1 | [The Essence of Calculus](lessons/ch01-essence-of-calculus.qmd) |
+| 2 | [The Paradox of the Derivative](lessons/ch02-paradox-of-derivative.qmd) |
+| 3 | [Derivative Formulas Through Geometry](lessons/ch03-derivative-formulas.qmd) |
+| 4 | [Visualizing the Chain Rule and Product Rule](lessons/ch04-chain-rule-product-rule.qmd) |
+| 5 | [What's So Special About Euler's Number e?](lessons/ch05-eulers-number.qmd) |
+| 6 | [Implicit Differentiation](lessons/ch06-implicit-differentiation.qmd) |
+| 7 | [Limits, L'Hôpital's Rule, and Epsilon-Delta Definitions](lessons/ch07-limits.qmd) |
+| 8 | [Integration and the Fundamental Theorem of Calculus](lessons/ch08-integration-ftc.qmd) |
+| 9 | [What Does Area Have to Do with Slope?](lessons/ch09-area-and-slope.qmd) |
+| 10 | [Higher Order Derivatives](lessons/ch10-higher-order-derivatives.qmd) |
+| 11 | [Taylor Series](lessons/ch11-taylor-series.qmd) |
+| 12 | [The Other Way to Visualize Derivatives](lessons/ch12-alternative-derivative-view.qmd) |
+
+## About
+
+These materials are intended for self-study at the introductory undergraduate level.
+The exposition follows a formal, mathematical style while preserving the geometric
+intuition that characterizes the original 3Blue1Brown presentation.
+
+All interactive elements run entirely in the browser — no installation is required.

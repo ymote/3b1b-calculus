@@ -1,0 +1,160 @@
+Music
+In the last videos I talked about the derivatives of simple functions,
+and the goal was to have a clear picture or intuition to hold in your mind
+that actually explains where these formulas come from.
+But of course most of the functions you deal with in modeling the world involve mixing,
+or combining, or tweaking these simple functions in some other way.
+So our natural next step is to understand how you take derivatives of more complicated combinations.
+And again, I don't want these to be something to memorize.
+I want you to have a clear picture in mind for where each one comes from.
+Now, this really boils down into three basic ways to combine functions.
+You can add them together, you can multiply them, and you can throw one inside the other, known as composing them.
+Sure, you could say subtracting them, but really that's just multiplying the second by negative one and adding them together.
+And likewise, dividing functions doesn't really add anything,
+because that's the same as plugging one inside the function, one over x, and then multiplying the two together.
+So really, most functions you come across just involve layering together these three different types of combinations,
+though there's not really a bound on how monstrous things can become.
+But as long as you know how derivatives play with just those three combination types,
+you'll always be able to just take it step by step and peel through the layers for any kind of monstrous expression.
+So the question is, if you know the derivative of two functions, what is the derivative of their sum,
+of their product, and of the function composition between them?
+The sum rule is easiest, if somewhat tongue-twisting to say out loud.
+The derivative of a sum of two functions is the sum of their derivatives.
+But it's worth warming up with this example by really thinking through what it means to take a derivative of a sum of two functions,
+since the derivative patterns for products and for function composition won't be so straightforward,
+and they're going to require this kind of deeper thinking.
+For example, let's think about this function f equals sin plus x squared.
+It's a function where, for every input, you add together the values of sin and x squared at that point.
+For example, let's say at x equals 0.5, the height of the sin graph is given by this vertical bar,
+and the height of the x squared parabola is given by this slightly smaller vertical bar.
+And their sum is the length you get by just stacking them together.
+Now, for the derivative, you want to ask what happens as you nudge that input slightly,
+maybe increasing it up to 0.5 plus dx.
+The difference in the value of f between those two places is what we call df.
+And when you picture it like this, I think you'll agree that the total change in the height
+is whatever the change to the sin graph is, what we might call d sin ,
+plus whatever the change to x squared is, dx squared.
+Now, we know that the derivative of sin is cos, and remember what that means.
+It means that this little change, d sin , is about cos times dx.
+It's proportional to the size of our initial nudge, dx, and the proportionality constant equals cos of whatever input we happen to start at.
+Likewise, because the derivative of x squared is 2x, the change in the height of the x squared graph is going to be about 2 times x times whatever dx was.
+So, rearranging, df divided by dx, the ratio of the tiny change to this sum function, to the tiny change in x that caused it, is indeed cos plus 2x, the sum of the derivatives of its parts.
+But, like I said, things are a bit different for products, and let's think through why, and let's think through why in terms of tiny nudges again.
+In this case, I don't think graphs are our best bet for visualizing things.
+Pretty commonly in math, at a lot of levels of math really, if you're dealing with a product of two things, it helps to understand it as some kind of area.
+In this case, maybe you try to configure some mental setup of a box where the side lengths are sin and x squared.
+But what would that mean?
+Well, since these are functions, you might think of those sides as adjustable, dependent on the value of x, which maybe you think of as this number that you can just freely adjust up and down.
+So, getting a feel for what this means, focus on that top side there, who changes as the function sin .
+As you change this value of x up from 0, it increases up to a length of 1 as sin moves up towards its peak.
+And after that, it starts to decrease as sin comes down from 1.
+And in the same way, that height there is always changing as x squared.
+So, f defined as the product of these two functions, is going to be the area of this box.
+And for the derivative, let's think about how a tiny change to x by dx influences that area.
+What is that resulting change in area df?
+Well, the nudge dx caused that width to change by some small d sin , and it caused that height to change by some d x squared.
+And this gives us three little snippets of new area.
+A thin rectangle on the bottom, whose area is its width, sin , times its thin height, dx squared.
+And there's this thin rectangle on the right, whose area is its height, x squared, times its thin little width, d sin .
+And there's also this little bit in the corner, but we can ignore that.
+Its area is ultimately going to be proportional to dx squared, and as we've seen before, that becomes negligible as dx goes to 0.
+I mean, this whole setup is very similar to what I showed last video, with the x squared diagram.
+And just like then, keep in mind that I'm using somewhat beefy changes here to draw things, just so that we can actually see them.
+But in principle, dx is something very very small, and that means that dx squared and d sin are also very very small.
+So, applying what we know about the derivative of sin and of x squared, that tiny change, dx squared, is going to be about 2x times dx.
+And that tiny change, d sin , well that's going to be about cos .
+As usual, we divide out by that dx, to see that the ratio we want, df divided by dx, is sin times the derivative of x squared, plus x squared times the derivative of sin.
+And nothing we've done here is specific to sin or to x squared.
+This same line of reasoning would work for any two functions, g and h.
+And sometimes people like to remember this pattern with a certain mnemonic that you kind of sing in your head.
+Left d right, right d left.
+In this example, where we have sin times x squared, left d right means you take that left function, sin times the derivative of the right, in this case 2x.
+Then you add on right d left, that right function, x squared, times the derivative of the left one, cos .
+Now, out of context, presented as a rule to remember, I think this would feel pretty strange, don't you?
+But when you actually think of this adjustable box, you can see what each of those terms represents.
+Left d right is the area of that little bottom rectangle.
+And right d left is the area of that rectangle on the side.
+By the way, I should mention that if you multiply by a constant, say 2 times sin , things end up a lot simpler.
+The derivative is just the same as the constant multiplied by the derivative of the function, in this case 2 times cos .
+I'll leave it to you to pause and ponder and just kind of verify that that makes sense.
+Aside from addition and multiplication, the other common way to combine functions, and believe me, this one comes up all the time,
+is to shove one inside the other, function composition.
+For example, maybe we take the function x squared, and we just shove it on inside sin , to get this new function, sin .
+What do you think the derivative of that new function is?
+To think this one through, I'm going to choose yet another way to visualize things, just to emphasize that in creative math, we've got lots of options.
+I'll put up three different number lines.
+The top one is going to hold the value of x, the second one is going to hold the value of x squared,
+and that third line is going to hold the value of sin .
+That is, the function x squared gets you from line 1 to line 2, and the function sin gets you from line 2 to line 3.
+As I shift around this value of x, maybe moving it up to the value of 3,
+that second value stays pegged to whatever x squared is, in this case moving up to 9.
+And that bottom value, being sin , is going to go to whatever sin .
+So, for the derivative, let's again start by just nudging that x value by some little dx.
+And I always think that it's helpful to think of x as starting at some actual concrete number, maybe 1.5 in this case.
+The resulting nudge to that second value, the change in x squared caused by such a dx, is dx squared.
+And we could expand this like we have before, as 2x times dx, which for our specific input would be 2 times 1.5 times dx,
+but it actually helps to keep things written as dx squared, at least for now.
+And in fact, I'm going to go one step further.
+I'm going to give a new name to this x squared, maybe h, so that instead of writing dx squared for this nudge, we write dh.
+And this makes it easier to think about that third value, which is now pegged at sin .
+Its change is d sin , the tiny change caused by the nudge dh.
+And by the way, the fact that it's moving to the left while the dh bump is going to the right,
+that just means that this change, d sin , is going to be some kind of negative number.
+And once again, we can use our knowledge of the derivative of the sin.
+This d sin is going to be about cos times dh.
+That's what it means for the derivative of sin to be cos.
+And unfolding things, we can just replace that h with x squared again,
+so we know that that bottom nudge is going to have a size of cos times dx squared.
+And in fact, let's unfold things even further.
+That intermediate nudge, dx squared, is going to be about 2x times dx.
+And it's always a good habit to remind yourself of what an expression like this actually means.
+In this case, where we started at x equals 1.5 up top, this whole expression is telling us that the size of the nudge on that third line
+is going to be about cos times 2 times 1.5 times whatever the size of dx was.
+It's proportional to the size of dx, and this derivative is giving us that proportionality constant.
+Notice what we came out with here.
+We have the derivative of the outside function, and it's still taking in the unaltered inside function,
+and then multiplying it by the derivative of the inside function.
+Again, there is nothing special about sin or x squared.
+If you have any two functions, g and h , the derivative of their composition, g is going to be the derivative of g evaluated on h, multiplied by the derivative of h.
+This pattern right here is what we usually call the chain rule.
+Notice, for the derivative of g, I'm writing it as dg dh instead of dg dx.
+On the symbolic level, this is a reminder that the thing you plug into that derivative is still going to be that intermediary function h.
+But more than that, it's an important reflection of what this derivative of the outer function actually represents.
+Remember, in our three line setup, when we took the derivative of the sine on that bottom,
+we expanded the size of that nudge, dsine, as cos h times dh.
+This was because we didn't immediately know how the size of that bottom nudge depended on x.
+That's kind of the whole thing we were trying to figure out.
+But we could take the derivative with respect to that intermediate variable, h.
+That is, figure out how to express the size of that nudge on the third line as some multiple of dh, the size of the nudge on the second line.
+And it was only after that that we unfolded further by figuring out what dh was.
+So, in this chain rule expression, we're saying, look at the ratio between a tiny change in g, the final output,
+to a tiny change in h that caused it, h being the value that we plug into g.
+Then multiply that by the tiny change in h divided by the tiny change in x that caused it.
+So notice, those dh's cancel out, and they give us a ratio between the change in that final output,
+and the change to the input that, through a certain chain of events, brought it about.
+And that cancellation of dh is not just a notational trick.
+That is a genuine reflection of what's going on with the tiny nudges that underpin everything we do with derivatives.
+So, those are the three basic tools to have in your belt to handle derivatives of functions that combine a lot of smaller things.
+You've got the sum rule, the product rule, and the chain rule.
+And I'll be honest with you, there is a big difference between knowing what the chain rule is and what the product rule is,
+and actually being fluent with applying them in even the most hairy of situations.
+Watching videos, any videos, about the mechanics of calculus is never going to substitute for practicing those mechanics yourself,
+and building up the muscles to do these computations yourself.
+I really wish that I could offer to do that for you, but I'm afraid the ball is in your court, my friend, to seek out the practice.
+What I can offer, and what I hope I have offered, is to show you where these rules actually come from.
+To show that they're not just something to be memorized and hammered away, but they're natural patterns.
+Things that you too could have discovered just by patiently thinking through what a derivative actually means.
+Things that you can offer, and you can offer to make a difference.
+Things that you can offer, and you can offer them to make a difference.
+Things that you can offer, and you can offer them to make a difference.
+Things that you can offer, and you can offer them to make a difference.
+Things that you can offer, and you can offer them to make a difference.
+Things that you can offer, and you can offer them to make a difference.
+Things that you can offer, and you can offer them to make a difference.
+Things that you can offer, and you can offer them to make a difference.
+Things that you can offer them to make a difference.
+Things that you can offer them to make a difference.
+Things that you can offer them to make a difference.
+Things that you can offer them to make a difference.
+Things that you can offer them to make a difference.
+Things that you can offer them to make a difference.

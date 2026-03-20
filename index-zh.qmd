@@ -1,0 +1,32 @@
+---
+title: "微积分的本质 — 3Blue1Brown"
+---
+
+本站是 Grant Sanderson 的
+[微积分的本质](https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr)
+系列视频的交互式配套教材。每一课均包含原始讲座视频、基于字幕的正式数学论述、交互式
+Desmos 图形，以及可在浏览器中运行的 Pyodide Python 代码。
+
+## 章节目录
+
+| 章 | 主题 |
+|----|------|
+| 1 | [微积分的本质](lessons-zh/ch01-essence-of-calculus.qmd) |
+| 2 | [导数的悖论](lessons-zh/ch02-paradox-of-derivative.qmd) |
+| 3 | [通过几何推导求导公式](lessons-zh/ch03-derivative-formulas.qmd) |
+| 4 | [链式法则与乘积法则的可视化](lessons-zh/ch04-chain-rule-product-rule.qmd) |
+| 5 | [欧拉数 e 的特殊之处](lessons-zh/ch05-eulers-number.qmd) |
+| 6 | [隐函数求导](lessons-zh/ch06-implicit-differentiation.qmd) |
+| 7 | [极限、洛必达法则与 ε-δ 定义](lessons-zh/ch07-limits.qmd) |
+| 8 | [积分与微积分基本定理](lessons-zh/ch08-integration-ftc.qmd) |
+| 9 | [面积与斜率有何关系](lessons-zh/ch09-area-and-slope.qmd) |
+| 10 | [高阶导数](lessons-zh/ch10-higher-order-derivatives.qmd) |
+| 11 | [泰勒级数](lessons-zh/ch11-taylor-series.qmd) |
+| 12 | [可视化导数的另一种方式](lessons-zh/ch12-alternative-derivative-view.qmd) |
+
+## 关于
+
+本教材面向本科入门阶段的自学读者。论述采用正式的数学风格，同时保留了 3Blue1Brown
+系列视频所特有的几何直觉。
+
+所有交互元素均在浏览器中运行，无需安装任何软件。

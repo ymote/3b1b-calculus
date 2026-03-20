@@ -1,0 +1,342 @@
+---
+title: "What's So Special About Euler's Number e?"
+subtitle: "Chapter 5"
+date: 2023-04-05
+---
+
+This lesson explores why the number $e \approx 2.71828$ occupies a privileged
+position among exponential bases. We derive the fact that
+$\frac{d}{dt} a^t = a^t \ln a$ for any base $a > 0$, and show that $e$ is the
+unique base for which the proportionality constant equals $1$ — that is,
+$\frac{d}{dt} e^t = e^t$. We then discuss how the chain rule and the natural
+logarithm unify the treatment of all exponential functions.
+
+::: {.callout-note collapse="true"}
+## Prerequisites
+
+- Familiarity with exponential functions $a^t$ and their basic algebraic properties
+- The concept of a derivative as an instantaneous rate of change (Chapters 1–2)
+- The chain rule for composition of functions (Chapter 3)
+:::
+
+## Topics Covered
+
+- The derivative of $2^t$ and the emergence of a mystery proportionality constant
+- Factoring $a^{t+dt}$ to isolate a base-dependent constant
+- The defining property of $e$: the unique base whose exponential is its own derivative
+- Rewriting any exponential as $e^{kt}$ via the natural logarithm
+- Applications to population growth, cooling, and compound interest
+
+## Lecture Video
+
+```{=html}
+<video controls width="100%" preload="metadata">
+  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/05_What%27s%20so%20special%20about%20Euler%27s%20number%20e%EF%BC%9F%20%EF%BD%9C%20Chapter%205%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
+</video>
+```
+
+## Key Video Frames
+
+![The population-mass model: $2^t$ as a continuously growing quantity](../images/ch05/frame_01.jpg)
+
+![Factoring $2^{t+dt}$ into $2^t \cdot 2^{dt}$ to isolate the proportionality constant](../images/ch05/frame_02.jpg)
+
+![The graph of $e^t$: the slope at every point equals the height](../images/ch05/frame_03.jpg)
+
+![Rewriting $2^t$ as $e^{(\ln 2)\,t}$ — the mystery constant revealed](../images/ch05/frame_04.jpg)
+
+## Key Concepts
+
+### The Derivative of $2^t$: A First Attempt
+
+We begin by modelling a quantity that doubles every day. Let $M(t) = 2^t$
+represent the total mass at time $t$ (measured in days). Over a full day, the
+change in mass from day $t$ to day $t+1$ is
+
+$$
+M(t+1) - M(t) = 2^{t+1} - 2^t = 2^t(2 - 1) = 2^t.
+$$
+
+This observation — that the daily change equals the current value — might
+suggest that $\frac{d}{dt}2^t = 2^t$. However, the derivative requires us to
+examine what happens over intervals much smaller than a full day.
+
+### Isolating the Proportionality Constant
+
+For an infinitesimal time step $dt$, we write
+
+$$
+\frac{2^{t+dt} - 2^t}{dt} = 2^t \cdot \frac{2^{dt} - 1}{dt}.
+$$
+
+The key algebraic step is the factorisation $2^{t+dt} = 2^t \cdot 2^{dt}$,
+which follows from the fundamental property of exponents. After factoring out
+$2^t$, the remaining expression
+
+$$
+\frac{2^{dt} - 1}{dt}
+$$
+
+depends only on $dt$, not on $t$. As $dt \to 0$, this ratio approaches a
+specific constant. Numerical evaluation confirms
+
+$$
+\lim_{dt \to 0} \frac{2^{dt} - 1}{dt} \approx 0.6931.
+$$
+
+Therefore, the derivative of $2^t$ is not equal to itself, but rather
+**proportional** to itself:
+
+$$
+\frac{d}{dt} 2^t = 0.6931 \cdot 2^t.
+$$
+
+### The General Pattern for Any Base
+
+The same argument applies to any exponential $a^t$ with $a > 0$. We obtain
+
+$$
+\frac{d}{dt} a^t = a^t \cdot \lim_{dt \to 0} \frac{a^{dt} - 1}{dt}.
+$$
+
+The limit on the right is a constant that depends on the base $a$. For
+several illustrative bases:
+
+| Base $a$ | Proportionality constant |
+|:--------:|:-----------------------:|
+| 2        | 0.6931                  |
+| 3        | 1.0986                  |
+| 8        | 2.0794                  |
+
+One may observe that $2.0794 \approx 3 \times 0.6931$, hinting at a deeper
+logarithmic structure.
+
+### Interactive Desmos Graph: The Proportionality Constant
+
+```{=html}
+<div id="calc_ch05_1" class="desmos-container"></div>
+<script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+<script>
+  var calc_ch05_1 = Desmos.GraphingCalculator(document.getElementById('calc_ch05_1'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 'dt', yAxisLabel: ''
+  });
+  calc_ch05_1.setExpression({ id: 'base', latex: 'a = 2', sliderBounds: { min: 1.1, max: 10, step: 0.1 } });
+  calc_ch05_1.setExpression({ id: 'ratio', latex: 'y = \\frac{a^{x} - 1}{x}', color: '#2d70b3' });
+  calc_ch05_1.setExpression({ id: 'limit', latex: 'y = \\ln(a)', color: '#c74440', lineStyle: Desmos.Styles.DASHED });
+  calc_ch05_1.setMathBounds({ left: -0.5, right: 2, bottom: -0.5, top: 4 });
+</script>
+```
+
+Adjust the slider $a$ to change the exponential base. The blue curve shows
+$\frac{a^{dt} - 1}{dt}$ as a function of $dt$; observe that as $dt \to 0$ the
+curve approaches the dashed red line at $\ln a$.
+
+### The Defining Property of $e$
+
+A natural question arises: is there a base for which the proportionality
+constant equals exactly $1$? That is, we seek $a$ such that
+
+$$
+\lim_{dt \to 0} \frac{a^{dt} - 1}{dt} = 1.
+$$
+
+The answer is **yes**, and this base is denoted $e \approx 2.71828$. The
+number $e$ is, in a sense, *defined* by this property — much as $\pi$ is
+defined as the ratio of a circle's circumference to its diameter.
+
+For the base $e$, the derivative formula becomes
+
+$$
+\frac{d}{dt} e^t = e^t.
+$$
+
+Geometrically, this means that at every point on the graph of $e^t$, the
+slope of the tangent line equals the height of the curve above the
+horizontal axis.
+
+### Interactive Desmos Graph: $e^t$ Is Its Own Derivative
+
+```{=html}
+<div id="calc_ch05_2" class="desmos-container"></div>
+<script>
+  var calc_ch05_2 = Desmos.GraphingCalculator(document.getElementById('calc_ch05_2'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 't', yAxisLabel: ''
+  });
+  calc_ch05_2.setExpression({ id: 'exp', latex: 'y = e^{x}', color: '#2d70b3' });
+  calc_ch05_2.setExpression({ id: 'a', latex: 'a = 1', sliderBounds: { min: -2, max: 3, step: 0.01 } });
+  calc_ch05_2.setExpression({ id: 'pt', latex: '(a, e^{a})', color: '#c74440', pointSize: 9 });
+  calc_ch05_2.setExpression({ id: 'tangent', latex: 'y = e^{a}(x - a) + e^{a}', color: '#388c46' });
+  calc_ch05_2.setExpression({ id: 'height', latex: 'x = a \\left\\{0 \\le y \\le e^{a}\\right\\}', color: '#c74440', lineStyle: Desmos.Styles.DASHED });
+  calc_ch05_2.setMathBounds({ left: -3, right: 4, bottom: -2, top: 20 });
+</script>
+```
+
+Move the slider $a$ to slide the point along the curve $e^t$. The green
+tangent line has slope $e^a$, which equals the dashed red vertical
+segment — the height of the point. This confirms that $\frac{d}{dt}e^t = e^t$.
+
+### Connecting Back via the Chain Rule and Natural Logarithm
+
+The existence of $e$ resolves the mystery constants. Any base $a > 0$ can be
+rewritten as
+
+$$
+a = e^{\ln a},
+$$
+
+where $\ln a$ denotes the natural logarithm (i.e., $\log_e a$). Consequently,
+
+$$
+a^t = \bigl(e^{\ln a}\bigr)^t = e^{(\ln a)\,t}.
+$$
+
+Applying the chain rule to $e^{(\ln a)\,t}$, where the outer function is
+$e^u$ (with derivative $e^u$) and the inner function is $u = (\ln a)\,t$
+(with derivative $\ln a$), we obtain
+
+$$
+\frac{d}{dt} a^t = \frac{d}{dt} e^{(\ln a)\,t} = (\ln a)\, e^{(\ln a)\,t} = (\ln a)\, a^t.
+$$
+
+The mystery constant for any base $a$ is therefore $\ln a$:
+
+$$
+\frac{d}{dt} a^t = (\ln a)\, a^t.
+$$
+
+For $a = 2$, we recover $\ln 2 \approx 0.6931$; for $a = 8$,
+$\ln 8 = 3\ln 2 \approx 2.0794$.
+
+### Interactive Desmos Graph: Comparing Exponentials and Their Derivatives
+
+```{=html}
+<div id="calc_ch05_3" class="desmos-container"></div>
+<script>
+  var calc_ch05_3 = Desmos.GraphingCalculator(document.getElementById('calc_ch05_3'), {
+    expressions: true, settingsMenu: false, xAxisLabel: 't', yAxisLabel: ''
+  });
+  calc_ch05_3.setExpression({ id: 'base', latex: 'a = 2', sliderBounds: { min: 1.1, max: 5, step: 0.1 } });
+  calc_ch05_3.setExpression({ id: 'func', latex: 'y = a^{x}', color: '#2d70b3', label: 'a^t', showLabel: true });
+  calc_ch05_3.setExpression({ id: 'deriv', latex: 'y = \\ln(a) \\cdot a^{x}', color: '#c74440', label: 'ln(a) * a^t', showLabel: true });
+  calc_ch05_3.setExpression({ id: 'e_line', latex: 'a = e', color: '#388c46', lineStyle: Desmos.Styles.DASHED, label: 'a = e', showLabel: true });
+  calc_ch05_3.setMathBounds({ left: -2, right: 4, bottom: -2, top: 30 });
+</script>
+```
+
+Slide $a$ to observe how the exponential $a^t$ (blue) and its derivative
+$(\ln a)\, a^t$ (red) relate. When $a = e \approx 2.718$, the two curves
+coincide — the function equals its own derivative.
+
+### Why We Write $e^{kt}$ in Applications
+
+Many natural phenomena satisfy a differential equation of the form
+
+$$
+\frac{dM}{dt} = k \, M,
+$$
+
+where $k$ is a constant of proportionality. Examples include:
+
+- **Population growth**: the rate of growth is proportional to the current population size.
+- **Newton's law of cooling**: the rate of temperature change is proportional to the temperature difference.
+- **Compound interest**: the rate of monetary growth is proportional to the current balance.
+
+The solution to this equation is $M(t) = M(0)\, e^{kt}$. Writing the
+exponential in base $e$ makes the proportionality constant $k$ appear
+directly in the exponent, giving it an immediate physical interpretation.
+Any other base $a$ could be used — since $a^t = e^{(\ln a)\,t}$ — but $e$
+renders the relationship between the exponent and the rate of change
+transparent.
+
+### Interactive Python: Numerical Exploration of the Proportionality Constant
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch05_1">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Numerically compute lim (a^dt - 1)/dt as dt -> 0 for several bases
+bases = [2, 3, np.e, 5, 8, 10]
+dt_values = np.logspace(-1, -8, 50)
+
+fig, ax = plt.subplots(figsize=(9, 5))
+
+for a in bases:
+    ratios = (a**dt_values - 1) / dt_values
+    label = f'a = e' if np.isclose(a, np.e) else f'a = {a:.0f}'
+    ax.semilogx(dt_values, ratios, label=f'{label}  (ln a = {np.log(a):.4f})')
+
+ax.set_xlabel('dt')
+ax.set_ylabel('$(a^{dt} - 1) \\,/\\, dt$')
+ax.set_title('Proportionality constant converges to ln(a)')
+ax.legend()
+ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch05_1', 'output_ch05_1', 'plot_ch05_1')">Run ▶</button>
+  <div class="output" id="output_ch05_1"></div>
+  <div class="plot-output" id="plot_ch05_1"></div>
+</div>
+```
+
+### Interactive Python: Exponential Growth Model $M(t) = M_0 \, e^{kt}$
+
+```{=html}
+<div class="pyodide-container">
+  <textarea class="code-input" id="code_ch05_2">
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Compare exponential growth for different values of k
+t = np.linspace(0, 3, 200)
+M0 = 1.0
+k_values = [0.5, np.log(2), 1.0, np.log(3)]
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 5))
+
+for k in k_values:
+    M = M0 * np.exp(k * t)
+    ax1.plot(t, M, label=f'k = {k:.4f}')
+
+ax1.set_xlabel('Time t')
+ax1.set_ylabel('$M(t) = e^{kt}$')
+ax1.set_title('Exponential growth for various k')
+ax1.legend()
+ax1.grid(True, alpha=0.3)
+
+# Verify derivative numerically: d/dt e^(kt) should equal k * e^(kt)
+k = np.log(2)
+dt = 1e-6
+deriv_numerical = (np.exp(k * (t + dt)) - np.exp(k * t)) / dt
+deriv_exact = k * np.exp(k * t)
+
+ax2.plot(t, deriv_exact, label='Exact: $\\ln(2) \\cdot 2^t$', linewidth=2)
+ax2.plot(t, deriv_numerical, '--', label='Numerical derivative', linewidth=2)
+ax2.set_xlabel('Time t')
+ax2.set_ylabel('$dM/dt$')
+ax2.set_title('Derivative of $2^t = e^{(\\ln 2)\\,t}$')
+ax2.legend()
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+  </textarea>
+  <button class="run-btn" onclick="runPyodide('code_ch05_2', 'output_ch05_2', 'plot_ch05_2')">Run ▶</button>
+  <div class="output" id="output_ch05_2"></div>
+  <div class="plot-output" id="plot_ch05_2"></div>
+</div>
+```
+
+## Summary
+
+::: {.key-formula}
+| Concept | Key Result |
+|---|---|
+| Derivative of $a^t$ | $\frac{d}{dt} a^t = (\ln a)\, a^t$ |
+| Defining property of $e$ | $\frac{d}{dt} e^t = e^t$ |
+| Chain rule form | $\frac{d}{dt} e^{kt} = k\, e^{kt}$ |
+| Base conversion | $a^t = e^{(\ln a)\, t}$ |
+| Exponential ODE | $\frac{dM}{dt} = kM \implies M(t) = M_0\, e^{kt}$ |
+:::
