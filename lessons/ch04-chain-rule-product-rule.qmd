@@ -28,9 +28,7 @@ functions.
 ## Lecture Video
 
 ```{=html}
-<video controls width="100%" preload="metadata">
-  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/04_Visualizing%20the%20chain%20rule%20and%20product%20rule%20%EF%BD%9C%20Chapter%204%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
-</video>
+<div class="video-container"><iframe src="https://www.youtube.com/embed/YG15m2VwSjA" title="Visualizing the chain rule and product rule" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
 ```
 
 ## Key Video Frames
@@ -277,99 +275,347 @@ $$
 f'(x) = 2x\cos(x^2)\, e^x + \sin(x^2)\, e^x.
 $$
 
-### Interactive Python: Numerical Verification of the Product Rule
+### Animated: Product Rule as Area of a Rectangle
 
 ```{=html}
-<div class="pyodide-container">
-  <textarea class="code-input" id="code_ch04_1">
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Product rule: d/dx [sin(x) * x^2] = cos(x)*x^2 + sin(x)*2x
-x = np.linspace(0.1, 4, 300)
-
-# The product function and its analytic derivative
-f = np.sin(x) * x**2
-f_prime_analytic = np.cos(x) * x**2 + np.sin(x) * 2 * x
-
-# Numerical derivative via central differences
-dx = 1e-7
-f_prime_numerical = (np.sin(x + dx) * (x + dx)**2
-                     - np.sin(x - dx) * (x - dx)**2) / (2 * dx)
-
-fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(9, 6), sharex=True)
-
-ax1.plot(x, f, color='#c74440', linewidth=2, label=r'$f(x) = \sin(x)\, x^2$')
-ax1.plot(x, f_prime_analytic, color='#6042a6', linewidth=2,
-         label=r"$f'(x)$ (product rule)")
-ax1.set_ylabel('Value')
-ax1.set_title('Product rule: analytic derivative')
-ax1.legend()
-ax1.grid(True, alpha=0.3)
-
-ax2.semilogy(x, np.abs(f_prime_analytic - f_prime_numerical),
-             color='#2d70b3', linewidth=1.5)
-ax2.set_xlabel('x')
-ax2.set_ylabel('Absolute error')
-ax2.set_title('Difference between analytic and numerical derivatives')
-ax2.grid(True, alpha=0.3)
-
-plt.tight_layout()
-plt.show()
-  </textarea>
-  <button class="run-btn" onclick="runPyodide('code_ch04_1', 'output_ch04_1', 'plot_ch04_1')">Run ▶</button>
-  <div class="output" id="output_ch04_1"></div>
-  <div class="plot-output" id="plot_ch04_1"></div>
+<div class="d3-container" id="ch04_d3_product"></div>
+<div class="d3-controls">
+  <button id="ch04_d3_product_play">Play &#9654;</button>
+  <label>x₀:</label>
+  <input type="range" id="ch04_d3_product_x0" min="0.3" max="2.8" value="1.0" step="0.05">
+  <span class="value-display" id="ch04_d3_product_x0_val">x₀ = 1.00</span>
+  <label>dx:</label>
+  <input type="range" id="ch04_d3_product_dx" min="0.02" max="0.5" value="0.25" step="0.01">
+  <span class="value-display" id="ch04_d3_product_dx_val">dx = 0.25</span>
 </div>
+<script>
+(function() {
+  const W = 700, H = 440, margin = {top: 40, right: 30, bottom: 50, left: 60};
+  const w = W - margin.left - margin.right, h = H - margin.top - margin.bottom;
+
+  const svg = d3.select("#ch04_d3_product").append("svg")
+    .attr("viewBox", `0 0 ${W} ${H}`)
+    .append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  /* Functions: g(x) = sin(x), h(x) = x^2 */
+  function gFn(x) { return Math.sin(x); }
+  function hFn(x) { return x * x; }
+
+  /* Scales — we map the rectangle into the drawing area */
+  const xScale = d3.scaleLinear().range([0, w]);
+  const yScale = d3.scaleLinear().range([h, 0]);
+
+  /* Axes */
+  const xAxisG = svg.append("g").attr("transform", `translate(0,${h})`);
+  const yAxisG = svg.append("g");
+
+  /* Rect groups */
+  const mainRect = svg.append("rect").attr("fill", "#2d70b3").attr("opacity", 0.2);
+  const stripTop = svg.append("rect").attr("fill", "#388c46").attr("opacity", 0.55);
+  const stripRight = svg.append("rect").attr("fill", "#c74440").attr("opacity", 0.55);
+  const cornerRect = svg.append("rect").attr("fill", "#6042a6").attr("opacity", 0.35);
+
+  /* Labels */
+  const labelG = svg.append("text").attr("font-size", "13px").attr("fill", "#2d70b3").attr("font-weight", 600);
+  const labelH = svg.append("text").attr("font-size", "13px").attr("fill", "#2d70b3").attr("font-weight", 600);
+  const labelStripTop = svg.append("text").attr("font-size", "12px").attr("fill", "#388c46").attr("font-weight", 600);
+  const labelStripRight = svg.append("text").attr("font-size", "12px").attr("fill", "#c74440").attr("font-weight", 600);
+  const labelCorner = svg.append("text").attr("font-size", "11px").attr("fill", "#6042a6").attr("font-weight", 600);
+  const titleText = svg.append("text").attr("x", w / 2).attr("y", -12)
+    .attr("text-anchor", "middle").attr("font-size", "15px").attr("font-weight", 600).attr("fill", "#333");
+
+  /* Dimension arrows / braces — simple lines */
+  const braceG = svg.append("line").attr("stroke", "#2d70b3").attr("stroke-width", 1.5);
+  const braceDg = svg.append("line").attr("stroke", "#c74440").attr("stroke-width", 2);
+  const braceH = svg.append("line").attr("stroke", "#2d70b3").attr("stroke-width", 1.5);
+  const braceDh = svg.append("line").attr("stroke", "#388c46").attr("stroke-width", 2);
+
+  function update(x0, dx, animate) {
+    const g = gFn(x0), hv = hFn(x0);
+    const g2 = gFn(x0 + dx), h2 = hFn(x0 + dx);
+    const dg = g2 - g, dh = h2 - hv;
+
+    const maxX = g + dg + 0.15;
+    const maxY = hv + dh + 0.3;
+    xScale.domain([0, maxX]);
+    yScale.domain([0, maxY]);
+
+    const dur = animate ? 500 : 0;
+
+    xAxisG.transition().duration(dur).call(d3.axisBottom(xScale).ticks(5));
+    yAxisG.transition().duration(dur).call(d3.axisLeft(yScale).ticks(5));
+
+    /* Main rectangle: width g, height h */
+    mainRect.transition().duration(dur)
+      .attr("x", xScale(0)).attr("y", yScale(hv))
+      .attr("width", xScale(g) - xScale(0)).attr("height", yScale(0) - yScale(hv));
+
+    /* Top strip: g * dh (green) */
+    stripTop.transition().duration(dur)
+      .attr("x", xScale(0)).attr("y", yScale(hv + dh))
+      .attr("width", xScale(g) - xScale(0)).attr("height", yScale(hv) - yScale(hv + dh));
+
+    /* Right strip: h * dg (red) */
+    stripRight.transition().duration(dur)
+      .attr("x", xScale(g)).attr("y", yScale(hv))
+      .attr("width", xScale(g + dg) - xScale(g)).attr("height", yScale(0) - yScale(hv));
+
+    /* Corner: dg * dh (purple) */
+    cornerRect.transition().duration(dur)
+      .attr("x", xScale(g)).attr("y", yScale(hv + dh))
+      .attr("width", xScale(g + dg) - xScale(g)).attr("height", yScale(hv) - yScale(hv + dh));
+
+    /* Labels on sides */
+    labelG.transition().duration(dur)
+      .attr("x", xScale(g / 2)).attr("y", yScale(0) + 30)
+      .attr("text-anchor", "middle")
+      .text(`g(x) = sin(${x0.toFixed(2)}) = ${g.toFixed(3)}`);
+    labelH.transition().duration(dur)
+      .attr("x", -10).attr("y", yScale(hv / 2))
+      .attr("text-anchor", "end")
+      .attr("dominant-baseline", "middle")
+      .text(`h(x) = ${x0.toFixed(2)}² = ${hv.toFixed(3)}`);
+
+    /* Strip labels */
+    labelStripTop.transition().duration(dur)
+      .attr("x", xScale(g / 2)).attr("y", yScale(hv + dh / 2))
+      .attr("text-anchor", "middle").attr("dominant-baseline", "middle")
+      .text(`g·dh = ${(g * dh).toFixed(4)}`);
+    labelStripRight.transition().duration(dur)
+      .attr("x", xScale(g + dg / 2)).attr("y", yScale(hv / 2))
+      .attr("text-anchor", "middle").attr("dominant-baseline", "middle")
+      .text(`h·dg = ${(hv * dg).toFixed(4)}`);
+    labelCorner.transition().duration(dur)
+      .attr("x", xScale(g + dg / 2)).attr("y", yScale(hv + dh / 2))
+      .attr("text-anchor", "middle").attr("dominant-baseline", "middle")
+      .text(dg * dh > 0.0005 ? `${(dg * dh).toFixed(5)}` : "");
+
+    const totalDf = g * dh + hv * dg + dg * dh;
+    const approxDf = g * dh + hv * dg;
+    titleText.text(
+      `df = g·dh + h·dg + dg·dh = ${approxDf.toFixed(4)} + ${(dg * dh).toFixed(5)}  ≈  ${approxDf.toFixed(4)}`
+    );
+
+    document.getElementById("ch04_d3_product_x0_val").textContent = `x₀ = ${x0.toFixed(2)}`;
+    document.getElementById("ch04_d3_product_dx_val").textContent = `dx = ${dx.toFixed(2)}`;
+  }
+
+  const sliderX = document.getElementById("ch04_d3_product_x0");
+  const sliderDx = document.getElementById("ch04_d3_product_dx");
+  sliderX.addEventListener("input", () => update(+sliderX.value, +sliderDx.value, true));
+  sliderDx.addEventListener("input", () => update(+sliderX.value, +sliderDx.value, true));
+
+  document.getElementById("ch04_d3_product_play").addEventListener("click", function() {
+    let dxVal = 0.5;
+    sliderDx.value = dxVal;
+    update(+sliderX.value, dxVal, true);
+    const interval = setInterval(() => {
+      dxVal = Math.max(0.02, dxVal - 0.03);
+      sliderDx.value = dxVal;
+      update(+sliderX.value, dxVal, true);
+      if (dxVal <= 0.02) clearInterval(interval);
+    }, 250);
+  });
+
+  update(1.0, 0.25, false);
+})();
+</script>
 ```
 
-### Interactive Python: Visualizing the Chain Rule Propagation
+Press **Play** to watch the nudge $dx$ shrink toward zero. As $dx$ decreases,
+the green strip ($g \cdot dh$) and red strip ($h \cdot dg$) dominate the change
+in area, while the purple corner ($dg \cdot dh$) vanishes, confirming that
+$df \approx g\, dh + h\, dg$.
+
+### Animated: Chain Rule as Composition — Three Number Lines
 
 ```{=html}
-<div class="pyodide-container">
-  <textarea class="code-input" id="code_ch04_2">
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Chain rule: d/dx [sin(x^2)] = cos(x^2) * 2x
-# Visualize how a nudge dx propagates: dx -> dh = 2x*dx -> dg = cos(h)*dh
-
-x0 = 1.5
-dx_values = np.logspace(-1, -6, 50)
-
-actual_dg = np.sin((x0 + dx_values)**2) - np.sin(x0**2)
-chain_approx = np.cos(x0**2) * 2 * x0 * dx_values
-
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
-
-# Left: compare actual vs chain-rule approximation
-ax1.plot(dx_values, actual_dg, 'o-', markersize=3, color='#c74440',
-         label=r'Actual $\Delta g$')
-ax1.plot(dx_values, chain_approx, '--', color='#2d70b3', linewidth=2,
-         label=r"Chain rule: $\cos(x_0^2)\cdot 2x_0\cdot dx$")
-ax1.set_xscale('log')
-ax1.set_xlabel(r'$dx$')
-ax1.set_ylabel(r'Change in $g = \sin(x^2)$')
-ax1.set_title(f'Nudge propagation at $x_0 = {x0}$')
-ax1.legend(fontsize=9)
-ax1.grid(True, alpha=0.3)
-
-# Right: relative error shrinks as dx -> 0
-rel_error = np.abs(actual_dg - chain_approx) / np.abs(actual_dg + 1e-30)
-ax2.loglog(dx_values, rel_error, 'o-', markersize=3, color='#388c46')
-ax2.set_xlabel(r'$dx$')
-ax2.set_ylabel('Relative error')
-ax2.set_title('Chain rule approximation error')
-ax2.grid(True, alpha=0.3)
-
-plt.tight_layout()
-plt.show()
-  </textarea>
-  <button class="run-btn" onclick="runPyodide('code_ch04_2', 'output_ch04_2', 'plot_ch04_2')">Run ▶</button>
-  <div class="output" id="output_ch04_2"></div>
-  <div class="plot-output" id="plot_ch04_2"></div>
+<div class="d3-container" id="ch04_d3_chain"></div>
+<div class="d3-controls">
+  <button id="ch04_d3_chain_play">Play &#9654;</button>
+  <label>x₀:</label>
+  <input type="range" id="ch04_d3_chain_x0" min="0.5" max="2.5" value="1.5" step="0.05">
+  <span class="value-display" id="ch04_d3_chain_x0_val">x₀ = 1.50</span>
+  <label>dx:</label>
+  <input type="range" id="ch04_d3_chain_dx" min="0.01" max="0.4" value="0.2" step="0.01">
+  <span class="value-display" id="ch04_d3_chain_dx_val">dx = 0.20</span>
 </div>
+<script>
+(function() {
+  const W = 700, H = 400, margin = {top: 30, right: 40, bottom: 30, left: 40};
+  const w = W - margin.left - margin.right, h = H - margin.top - margin.bottom;
+
+  const svg = d3.select("#ch04_d3_chain").append("svg")
+    .attr("viewBox", `0 0 ${W} ${H}`)
+    .append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  /* Functions: h(x) = x^2,  g(u) = sin(u),  f(x) = sin(x^2) */
+  function hFn(x) { return x * x; }
+  function gFn(u) { return Math.sin(u); }
+  function hPrime(x) { return 2 * x; }
+  function gPrime(u) { return Math.cos(u); }
+
+  /* Three horizontal number lines */
+  const lineY = [0, h / 2, h];          /* top, middle, bottom */
+  const lineLabels = ["x", "h(x) = x²", "g(h(x)) = sin(x²)"];
+  const lineColors = ["#2d70b3", "#388c46", "#c74440"];
+  const lineDomains = [
+    [0, 3],       /* x range */
+    [0, 7],       /* h range */
+    [-1.1, 1.1]   /* g range */
+  ];
+  const scales = lineDomains.map(d => d3.scaleLinear().domain(d).range([0, w]));
+
+  /* Draw each number line */
+  lineLabels.forEach((lab, i) => {
+    svg.append("line")
+      .attr("x1", 0).attr("x2", w)
+      .attr("y1", lineY[i]).attr("y2", lineY[i])
+      .attr("stroke", "#999").attr("stroke-width", 1);
+    svg.append("g").attr("transform", `translate(0,${lineY[i]})`)
+      .call(d3.axisBottom(scales[i]).ticks(6).tickSize(4))
+      .selectAll("text").attr("font-size", "10px");
+    svg.append("text")
+      .attr("x", -8).attr("y", lineY[i] - 10)
+      .attr("text-anchor", "end").attr("font-size", "13px")
+      .attr("fill", lineColors[i]).attr("font-weight", 600)
+      .text(lab);
+  });
+
+  /* Markers: circles for x, h(x), g(h(x)) */
+  const dots = lineColors.map((c, i) =>
+    svg.append("circle").attr("cy", lineY[i]).attr("r", 6).attr("fill", c)
+  );
+  /* Nudge markers */
+  const nudgeDots = lineColors.map((c, i) =>
+    svg.append("circle").attr("cy", lineY[i]).attr("r", 5)
+      .attr("fill", "none").attr("stroke", c).attr("stroke-width", 2)
+  );
+
+  /* Nudge brackets (lines showing the interval) */
+  const nudgeBars = lineColors.map((c, i) =>
+    svg.append("line").attr("y1", lineY[i] + 10).attr("y2", lineY[i] + 10)
+      .attr("stroke", c).attr("stroke-width", 3).attr("stroke-linecap", "round")
+  );
+  const nudgeLabels = lineColors.map((c, i) =>
+    svg.append("text").attr("y", lineY[i] + 26)
+      .attr("text-anchor", "middle").attr("font-size", "12px")
+      .attr("fill", c).attr("font-weight", 600)
+  );
+
+  /* Arrows connecting lines */
+  const arrowData = [
+    {from: 0, to: 1, label: "h"},
+    {from: 1, to: 2, label: "g"}
+  ];
+  const arrows = arrowData.map(a => {
+    const g = svg.append("g");
+    g.append("line")
+      .attr("stroke", "#888").attr("stroke-width", 1.2)
+      .attr("stroke-dasharray", "4,3")
+      .attr("marker-end", "url(#ch04_chain_arrow)");
+    g.append("text")
+      .attr("font-size", "12px").attr("fill", "#666").attr("font-style", "italic");
+    return g;
+  });
+
+  /* Arrow marker definition */
+  d3.select("#ch04_d3_chain svg").append("defs").append("marker")
+    .attr("id", "ch04_chain_arrow").attr("viewBox", "0 0 10 10")
+    .attr("refX", 8).attr("refY", 5)
+    .attr("markerWidth", 6).attr("markerHeight", 6)
+    .attr("orient", "auto-start-reverse")
+    .append("path").attr("d", "M 0 0 L 10 5 L 0 10 z").attr("fill", "#888");
+
+  /* Summary text */
+  const summaryText = svg.append("text")
+    .attr("x", w / 2).attr("y", h + 25)
+    .attr("text-anchor", "middle").attr("font-size", "13px").attr("fill", "#333");
+
+  function update(x0, dx, animate) {
+    const hVal = hFn(x0);
+    const gVal = gFn(hVal);
+    const hVal2 = hFn(x0 + dx);
+    const gVal2 = gFn(hVal2);
+    const dh = hVal2 - hVal;
+    const dgActual = gVal2 - gVal;
+    const dhApprox = hPrime(x0) * dx;
+    const dgApprox = gPrime(hVal) * dh;
+
+    const dur = animate ? 400 : 0;
+    const vals = [x0, hVal, gVal];
+    const vals2 = [x0 + dx, hVal2, gVal2];
+    const nudges = [dx, dh, dgActual];
+    const nudgeNames = ["dx", "dh", "dg"];
+
+    /* Update dots and nudge markers */
+    dots.forEach((d, i) => d.transition().duration(dur).attr("cx", scales[i](vals[i])));
+    nudgeDots.forEach((d, i) => d.transition().duration(dur).attr("cx", scales[i](vals2[i])));
+
+    /* Nudge bars */
+    nudgeBars.forEach((b, i) => {
+      const x1 = scales[i](vals[i]), x2 = scales[i](vals2[i]);
+      b.transition().duration(dur).attr("x1", x1).attr("x2", x2);
+    });
+    nudgeLabels.forEach((l, i) => {
+      const mid = (scales[i](vals[i]) + scales[i](vals2[i])) / 2;
+      l.transition().duration(dur).attr("x", mid);
+      l.text(`${nudgeNames[i]} = ${nudges[i].toFixed(4)}`);
+    });
+
+    /* Arrows from dot on line i to dot on line i+1 */
+    arrowData.forEach((a, i) => {
+      const fromX = scales[a.from](vals[a.from]);
+      const toX = scales[a.to](vals[a.to]);
+      const fromY = lineY[a.from] + 2;
+      const toY = lineY[a.to] - 8;
+      const line = arrows[i].select("line");
+      line.transition().duration(dur)
+        .attr("x1", fromX).attr("y1", fromY)
+        .attr("x2", toX).attr("y2", toY);
+      const txt = arrows[i].select("text");
+      txt.transition().duration(dur)
+        .attr("x", (fromX + toX) / 2 + 12).attr("y", (fromY + toY) / 2);
+      txt.text(a.label);
+    });
+
+    const chainDeriv = gPrime(hVal) * hPrime(x0);
+    summaryText.text(
+      `dg/dx = g'(h)·h'(x) = cos(${hVal.toFixed(2)})·${hPrime(x0).toFixed(2)} = ${chainDeriv.toFixed(4)}` +
+      `    |    Actual Δg/dx = ${(dgActual / dx).toFixed(4)}`
+    );
+
+    document.getElementById("ch04_d3_chain_x0_val").textContent = `x₀ = ${x0.toFixed(2)}`;
+    document.getElementById("ch04_d3_chain_dx_val").textContent = `dx = ${dx.toFixed(2)}`;
+  }
+
+  const sliderX = document.getElementById("ch04_d3_chain_x0");
+  const sliderDx = document.getElementById("ch04_d3_chain_dx");
+  sliderX.addEventListener("input", () => update(+sliderX.value, +sliderDx.value, true));
+  sliderDx.addEventListener("input", () => update(+sliderX.value, +sliderDx.value, true));
+
+  document.getElementById("ch04_d3_chain_play").addEventListener("click", function() {
+    let dxVal = 0.4;
+    sliderDx.value = dxVal;
+    update(+sliderX.value, dxVal, true);
+    const interval = setInterval(() => {
+      dxVal = Math.max(0.01, dxVal - 0.02);
+      sliderDx.value = dxVal;
+      update(+sliderX.value, dxVal, true);
+      if (dxVal <= 0.01) clearInterval(interval);
+    }, 200);
+  });
+
+  update(1.5, 0.2, false);
+})();
+</script>
 ```
+
+Press **Play** to watch the nudge $dx$ shrink. Observe how a small perturbation
+on the top number line ($x$) propagates first to the middle line ($h(x) = x^2$)
+as $dh = h'(x)\, dx$, and then to the bottom line ($g(h(x)) = \sin(x^2)$) as
+$dg = g'(h)\, dh$. As $dx \to 0$, the ratio $\Delta g / dx$ converges to
+the chain rule value $g'(h(x)) \cdot h'(x)$.
 
 ## Summary
 

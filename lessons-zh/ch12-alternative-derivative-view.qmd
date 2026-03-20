@@ -25,9 +25,7 @@ date: 2023-04-01
 ## 课程视频
 
 ```{=html}
-<video controls width="100%" preload="metadata">
-  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/12_The%20other%20way%20to%20visualize%20derivatives%20%EF%BD%9C%20Chapter%2012%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
-</video>
+<div class="video-container"><iframe src="https://www.youtube.com/embed/CfW845LNObM" title="The other way to visualize derivatives" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
 ```
 
 ## 课程关键帧
@@ -215,111 +213,377 @@ $$
 
 此图绘制了 $g'(x) = -1/x^2$。阴影带标记了**稳定区域** $|g'| < 1$。在 $x = \phi$（绿色虚线）处，导数落在此带内，确认了稳定性。在 $x = \psi$（紫色虚线）处，导数远在带外，确认了不稳定性。
 
-### 交互演示：迭代收敛到黄金比例（Python）
+### 动画演示：$f(x) = x^2$ 的变换视角
 
 ```{=html}
-<div class="pyodide-container">
-  <textarea class="code-input" id="code_ch12_1">
-import numpy as np
-import matplotlib.pyplot as plt
-
-def g(x):
-    return 1 + 1/x
-
-# Iterate from several seed values
-seeds = [0.5, 2.0, 5.0, 0.2, 10.0]
-n_iter = 20
-phi = (1 + np.sqrt(5)) / 2
-
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4))
-
-for x0 in seeds:
-    xs = [x0]
-    for _ in range(n_iter):
-        xs.append(g(xs[-1]))
-    ax1.plot(range(len(xs)), xs, 'o-', markersize=3, label=f'$x_0 = {x0}$')
-
-ax1.axhline(y=phi, color='black', linestyle='--', label=f'$\\phi = {phi:.4f}$')
-ax1.set_xlabel('Iteration n')
-ax1.set_ylabel('$x_n$')
-ax1.set_title('Convergence to $\\phi$ from various seeds')
-ax1.legend(fontsize=8)
-ax1.grid(True, alpha=0.3)
-
-# Show the derivative magnitude at each iterate from x0 = 2
-x0 = 2.0
-xs = [x0]
-derivs = []
-for _ in range(n_iter):
-    derivs.append(abs(-1 / xs[-1]**2))
-    xs.append(g(xs[-1]))
-
-ax2.plot(range(len(derivs)), derivs, 's-', color='steelblue', markersize=4)
-ax2.axhline(y=1, color='red', linestyle='--', label='$|g\'| = 1$ threshold')
-ax2.axhline(y=1/phi**2, color='green', linestyle=':', label=f'$1/\\phi^2 \\approx {1/phi**2:.3f}$')
-ax2.set_xlabel('Iteration n')
-ax2.set_ylabel("$|g'(x_n)|$")
-ax2.set_title("Derivative magnitude along iterates")
-ax2.legend(fontsize=8)
-ax2.grid(True, alpha=0.3)
-
-plt.tight_layout()
-plt.show()
-  </textarea>
-  <button class="run-btn" onclick="runPyodide('code_ch12_1', 'output_ch12_1', 'plot_ch12_1')">Run ▶</button>
-  <div class="output" id="output_ch12_1"></div>
-  <div class="plot-output" id="plot_ch12_1"></div>
+<div class="d3-container" id="ch12_transform"></div>
+<div class="d3-controls">
+  <button id="ch12_transform_play">Play &#9654;</button>
+  <button id="ch12_transform_reset">Reset</button>
+  <label>Center x&#8320;:</label>
+  <input type="range" id="ch12_transform_x0" min="-2.5" max="3" value="1" step="0.1">
+  <span class="value-display" id="ch12_transform_x0_val">x&#8320; = 1.0</span>
+  <span class="value-display" id="ch12_transform_info"></span>
 </div>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+(function() {
+  const W = 700, H = 340, margin = {top: 30, right: 30, bottom: 30, left: 30};
+  const w = W - margin.left - margin.right;
+  const hTotal = H - margin.top - margin.bottom;
+  const lineY1 = hTotal * 0.25;   // input number line y
+  const lineY2 = hTotal * 0.75;   // output number line y
+  const arrowRegion = (lineY1 + lineY2) / 2;
+
+  const svg = d3.select("#ch12_transform").append("svg")
+    .attr("viewBox", `0 0 ${W} ${H}`)
+    .append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  // Scales: input domain [-3, 4], output domain [0, 10] (for x^2 range)
+  const xIn = d3.scaleLinear().domain([-3, 4]).range([0, w]);
+  const xOut = d3.scaleLinear().domain([-1, 10]).range([0, w]);
+
+  // Input number line
+  svg.append("line").attr("x1", 0).attr("y1", lineY1).attr("x2", w).attr("y2", lineY1)
+    .attr("stroke", "#333").attr("stroke-width", 1.5);
+  svg.append("text").attr("x", w + 5).attr("y", lineY1 + 4)
+    .attr("font-size", "12px").attr("fill", "#333").text("Input");
+  // Ticks on input
+  for (let v = -3; v <= 4; v++) {
+    svg.append("line").attr("x1", xIn(v)).attr("y1", lineY1 - 5).attr("x2", xIn(v)).attr("y2", lineY1 + 5)
+      .attr("stroke", "#333").attr("stroke-width", 1);
+    svg.append("text").attr("x", xIn(v)).attr("y", lineY1 - 10)
+      .attr("text-anchor", "middle").attr("font-size", "10px").attr("fill", "#555").text(v);
+  }
+
+  // Output number line
+  svg.append("line").attr("x1", 0).attr("y1", lineY2).attr("x2", w).attr("y2", lineY2)
+    .attr("stroke", "#333").attr("stroke-width", 1.5);
+  svg.append("text").attr("x", w + 5).attr("y", lineY2 + 4)
+    .attr("font-size", "12px").attr("fill", "#333").text("Output");
+  // Ticks on output
+  for (let v = 0; v <= 10; v++) {
+    svg.append("line").attr("x1", xOut(v)).attr("y1", lineY2 - 5).attr("x2", xOut(v)).attr("y2", lineY2 + 5)
+      .attr("stroke", "#333").attr("stroke-width", 1);
+    svg.append("text").attr("x", xOut(v)).attr("y", lineY2 + 18)
+      .attr("text-anchor", "middle").attr("font-size", "10px").attr("fill", "#555").text(v);
+  }
+
+  // Title labels
+  svg.append("text").attr("x", w / 2).attr("y", -8)
+    .attr("text-anchor", "middle").attr("font-size", "13px").attr("font-weight", 600)
+    .attr("fill", "#333").text("f(x) = x\u00B2 : Input \u2192 Output");
+
+  const arrowGroup = svg.append("g");
+  const dotInGroup = svg.append("g");
+  const dotOutGroup = svg.append("g");
+
+  // f(x) = x^2
+  function f(x) { return x * x; }
+  function fprime(x) { return 2 * x; }
+
+  const nDots = 11;
+
+  function update(x0, animate) {
+    const deriv = fprime(x0);
+    const spread = 0.4;
+    const pts = d3.range(nDots).map(i => {
+      const t = -1 + 2 * i / (nDots - 1);  // t in [-1, 1]
+      return x0 + t * spread;
+    });
+
+    document.getElementById("ch12_transform_x0_val").textContent =
+      `x\u2080 = ${x0.toFixed(1)}`;
+    document.getElementById("ch12_transform_info").textContent =
+      `f'(${x0.toFixed(1)}) = ${deriv.toFixed(2)} \u2014 local stretch factor: ${Math.abs(deriv).toFixed(2)}`;
+
+    const dur = animate ? 600 : 0;
+
+    // Input dots
+    const inDots = dotInGroup.selectAll("circle").data(pts);
+    inDots.enter().append("circle")
+      .attr("cy", lineY1).attr("r", 5).attr("fill", "#2d70b3").attr("opacity", 0.8)
+      .merge(inDots).transition().duration(dur)
+      .attr("cx", d => xIn(d));
+    inDots.exit().remove();
+
+    // Output dots
+    const outData = pts.map(d => f(d));
+    const outDots = dotOutGroup.selectAll("circle").data(outData);
+    outDots.enter().append("circle")
+      .attr("cy", lineY2).attr("r", 5).attr("fill", "#c74440").attr("opacity", 0.8)
+      .merge(outDots).transition().duration(dur)
+      .attr("cx", d => xOut(d));
+    outDots.exit().remove();
+
+    // Arrows connecting input to output
+    const arrowData = pts.map((inp, i) => ({inp, out: outData[i]}));
+    const arrows = arrowGroup.selectAll("line").data(arrowData);
+    arrows.enter().append("line")
+      .attr("stroke", "#999").attr("stroke-width", 0.8).attr("stroke-dasharray", "3,3")
+      .attr("y1", lineY1 + 6).attr("y2", lineY2 - 6)
+      .merge(arrows).transition().duration(dur)
+      .attr("x1", d => xIn(d.inp))
+      .attr("x2", d => xOut(d.out));
+    arrows.exit().remove();
+
+    // Highlight center point on input
+    const centerIn = dotInGroup.selectAll(".center-in").data([x0]);
+    centerIn.enter().append("circle").attr("class", "center-in")
+      .attr("cy", lineY1).attr("r", 7).attr("fill", "none").attr("stroke", "#388c46").attr("stroke-width", 2.5)
+      .merge(centerIn).transition().duration(dur)
+      .attr("cx", d => xIn(d));
+
+    // Highlight center point on output
+    const centerOut = dotOutGroup.selectAll(".center-out").data([f(x0)]);
+    centerOut.enter().append("circle").attr("class", "center-out")
+      .attr("cy", lineY2).attr("r", 7).attr("fill", "none").attr("stroke", "#388c46").attr("stroke-width", 2.5)
+      .merge(centerOut).transition().duration(dur)
+      .attr("cx", d => xOut(d));
+
+    // Bracket showing input width
+    const inMin = xIn(pts[0]), inMax = xIn(pts[nDots - 1]);
+    const bracketIn = svg.selectAll(".bracket-in").data([1]);
+    bracketIn.enter().append("line").attr("class", "bracket-in")
+      .attr("y1", lineY1 + 14).attr("y2", lineY1 + 14)
+      .attr("stroke", "#2d70b3").attr("stroke-width", 2)
+      .merge(bracketIn).transition().duration(dur)
+      .attr("x1", inMin).attr("x2", inMax);
+
+    const bracketInLabel = svg.selectAll(".bracket-in-label").data([1]);
+    bracketInLabel.enter().append("text").attr("class", "bracket-in-label")
+      .attr("y", lineY1 + 26).attr("text-anchor", "middle")
+      .attr("font-size", "10px").attr("fill", "#2d70b3")
+      .merge(bracketInLabel).transition().duration(dur)
+      .attr("x", (inMin + inMax) / 2)
+      .textTween(function() {
+        return function() { return `\u03B4 = ${(2 * spread).toFixed(2)}`; };
+      });
+
+    // Bracket showing output width
+    const outMin = xOut(Math.min(...outData)), outMax = xOut(Math.max(...outData));
+    const bracketOut = svg.selectAll(".bracket-out").data([1]);
+    bracketOut.enter().append("line").attr("class", "bracket-out")
+      .attr("y1", lineY2 - 14).attr("y2", lineY2 - 14)
+      .attr("stroke", "#c74440").attr("stroke-width", 2)
+      .merge(bracketOut).transition().duration(dur)
+      .attr("x1", outMin).attr("x2", outMax);
+
+    const outWidth = Math.max(...outData) - Math.min(...outData);
+    const bracketOutLabel = svg.selectAll(".bracket-out-label").data([1]);
+    bracketOutLabel.enter().append("text").attr("class", "bracket-out-label")
+      .attr("y", lineY2 - 18).attr("text-anchor", "middle")
+      .attr("font-size", "10px").attr("fill", "#c74440")
+      .merge(bracketOutLabel).transition().duration(dur)
+      .attr("x", (outMin + outMax) / 2)
+      .textTween(function() {
+        return function() { return `|f'|\u00B7\u03B4 \u2248 ${outWidth.toFixed(2)}`; };
+      });
+  }
+
+  const slider = document.getElementById("ch12_transform_x0");
+  slider.addEventListener("input", () => update(+slider.value, true));
+
+  document.getElementById("ch12_transform_reset").addEventListener("click", function() {
+    slider.value = 1;
+    update(1, true);
+  });
+
+  // Animate: sweep x0 from -2 to 3
+  document.getElementById("ch12_transform_play").addEventListener("click", function() {
+    let val = -2.0;
+    slider.value = val;
+    update(val, true);
+    const interval = setInterval(() => {
+      val = Math.round((val + 0.2) * 10) / 10;
+      slider.value = val;
+      update(val, true);
+      if (val >= 3.0) clearInterval(interval);
+    }, 500);
+  });
+
+  update(1, false);
+})();
+</script>
 ```
 
-### 交互演示：数轴上的变换可视化（Python）
+拖动 **Center x_0** 滑块，在输入数轴上移动一组均匀分布的输入点。下方数轴上的输出点显示 $f(x) = x^2$ 将每个点映射到的位置。观察当 $|f'(x_0)| > 1$ 时输出点簇如何扩散（拉伸），当 $|f'(x_0)| < 1$ 时如何聚拢（压缩）。绿色圆圈标记了基准点及其像。点击 **Play** 自动扫过整条数轴。
+
+### 动画演示：$g(x) = 1 + 1/x$ 的蛛网图
 
 ```{=html}
-<div class="pyodide-container">
-  <textarea class="code-input" id="code_ch12_2">
-import numpy as np
-import matplotlib.pyplot as plt
-
-def g(x):
-    return 1 + 1/x
-
-phi = (1 + np.sqrt(5)) / 2
-
-# Show how a cluster of points near phi contracts under iteration
-fig, axes = plt.subplots(4, 1, figsize=(10, 6), sharex=True)
-
-center = phi
-spread = 0.5
-n_pts = 21
-pts = np.linspace(center - spread, center + spread, n_pts)
-
-for i, ax in enumerate(axes):
-    ax.scatter(pts, np.zeros_like(pts), c='steelblue', s=30, zorder=3)
-    ax.axvline(x=phi, color='green', linestyle='--', alpha=0.7, label='$\\phi$' if i == 0 else '')
-    ax.set_xlim(0.5, 2.8)
-    ax.set_yticks([])
-    ax.set_ylabel(f'Iter {i}', rotation=0, labelpad=30)
-    ax.axhline(y=0, color='gray', linewidth=0.5)
-
-    # Compute width of cluster
-    width = pts.max() - pts.min()
-    ax.set_title(f'Cluster width: {width:.4f}', fontsize=9, loc='right')
-
-    # Apply g for next iteration
-    pts = g(pts)
-
-axes[0].legend(fontsize=9)
-axes[-1].set_xlabel('Number line')
-fig.suptitle('Contraction of a neighborhood near $\\phi$ under iteration of $g$',
-             fontsize=11, y=1.02)
-plt.tight_layout()
-plt.show()
-  </textarea>
-  <button class="run-btn" onclick="runPyodide('code_ch12_2', 'output_ch12_2', 'plot_ch12_2')">Run ▶</button>
-  <div class="output" id="output_ch12_2"></div>
-  <div class="plot-output" id="plot_ch12_2"></div>
+<div class="d3-container" id="ch12_cobweb"></div>
+<div class="d3-controls">
+  <button id="ch12_cobweb_play">Play &#9654;</button>
+  <button id="ch12_cobweb_reset">Reset</button>
+  <label>Seed x&#8320;:</label>
+  <input type="range" id="ch12_cobweb_x0" min="0.2" max="5" value="0.5" step="0.1">
+  <span class="value-display" id="ch12_cobweb_x0_val">x&#8320; = 0.5</span>
+  <label style="margin-left:12px;">Iterations:</label>
+  <input type="range" id="ch12_cobweb_n" min="1" max="25" value="12" step="1">
+  <span class="value-display" id="ch12_cobweb_n_val">n = 12</span>
+  <span class="value-display" id="ch12_cobweb_info"></span>
 </div>
+<script>
+(function() {
+  const W = 700, H = 500, margin = {top: 30, right: 30, bottom: 50, left: 60};
+  const w = W - margin.left - margin.right, h = H - margin.top - margin.bottom;
+
+  const svg = d3.select("#ch12_cobweb").append("svg")
+    .attr("viewBox", `0 0 ${W} ${H}`)
+    .append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const phi = (1 + Math.sqrt(5)) / 2;
+
+  const xScale = d3.scaleLinear().domain([0, 5]).range([0, w]);
+  const yScale = d3.scaleLinear().domain([0, 5]).range([h, 0]);
+
+  // Axes
+  svg.append("g").attr("transform", `translate(0,${h})`).call(d3.axisBottom(xScale).ticks(10))
+    .append("text").attr("x", w / 2).attr("y", 40).attr("fill", "#333")
+    .attr("text-anchor", "middle").attr("font-size", "14px").text("x");
+  svg.append("g").call(d3.axisLeft(yScale).ticks(10))
+    .append("text").attr("x", -h / 2).attr("y", -45).attr("fill", "#333")
+    .attr("text-anchor", "middle").attr("transform", "rotate(-90)")
+    .attr("font-size", "14px").text("g(x)");
+
+  // g(x) = 1 + 1/x curve
+  function g(x) { return 1 + 1 / x; }
+  const curveData = d3.range(0.15, 5.01, 0.02).map(x => [x, g(x)]);
+  svg.append("path").datum(curveData)
+    .attr("d", d3.line().x(d => xScale(d[0])).y(d => yScale(d[1])))
+    .attr("fill", "none").attr("stroke", "#2d70b3").attr("stroke-width", 2.5);
+
+  // y = x line
+  svg.append("line")
+    .attr("x1", xScale(0)).attr("y1", yScale(0))
+    .attr("x2", xScale(5)).attr("y2", yScale(5))
+    .attr("stroke", "#888").attr("stroke-width", 1.5).attr("stroke-dasharray", "6,4");
+
+  // Fixed point markers
+  svg.append("circle").attr("cx", xScale(phi)).attr("cy", yScale(phi))
+    .attr("r", 7).attr("fill", "#388c46").attr("opacity", 0.8);
+  svg.append("text").attr("x", xScale(phi) + 10).attr("y", yScale(phi) - 8)
+    .attr("font-size", "13px").attr("fill", "#388c46").attr("font-weight", 600)
+    .text("\u03C6 \u2248 1.618");
+
+  // Labels
+  svg.append("text").attr("x", xScale(4.3)).attr("y", yScale(g(4.3)) - 8)
+    .attr("font-size", "12px").attr("fill", "#2d70b3").text("g(x) = 1 + 1/x");
+  svg.append("text").attr("x", xScale(4.5)).attr("y", yScale(4.5) - 8)
+    .attr("font-size", "12px").attr("fill", "#888").text("y = x");
+
+  const cobwebGroup = svg.append("g");
+  const iterDotGroup = svg.append("g");
+
+  let animTimer = null;
+
+  function drawCobweb(x0, maxIter, animate) {
+    cobwebGroup.selectAll("*").remove();
+    iterDotGroup.selectAll("*").remove();
+
+    // Build cobweb path segments
+    const segments = [];
+    let xCur = x0;
+    for (let i = 0; i < maxIter; i++) {
+      const yCur = g(xCur);
+      // Vertical line from (xCur, xCur) to (xCur, g(xCur))
+      segments.push({x1: xCur, y1: (i === 0 ? 0 : xCur), x2: xCur, y2: yCur, iter: i, type: 'v'});
+      // Horizontal line from (xCur, g(xCur)) to (g(xCur), g(xCur))
+      segments.push({x1: xCur, y1: yCur, x2: yCur, y2: yCur, iter: i, type: 'h'});
+      xCur = yCur;
+    }
+
+    const finalVal = xCur;
+    document.getElementById("ch12_cobweb_info").textContent =
+      `x_${maxIter} = ${finalVal.toFixed(6)}  |  \u03C6 = ${phi.toFixed(6)}  |  error = ${Math.abs(finalVal - phi).toExponential(2)}`;
+
+    if (animate) {
+      // Draw segments one by one
+      let idx = 0;
+      if (animTimer) clearInterval(animTimer);
+      animTimer = setInterval(() => {
+        if (idx >= segments.length) { clearInterval(animTimer); animTimer = null; return; }
+        const s = segments[idx];
+        const color = d3.interpolateRgb("#c74440", "#388c46")(idx / segments.length);
+        cobwebGroup.append("line")
+          .attr("x1", xScale(s.x1)).attr("y1", yScale(s.y1))
+          .attr("x2", xScale(s.x1)).attr("y2", yScale(s.y1))
+          .attr("stroke", color).attr("stroke-width", 1.5).attr("opacity", 0.85)
+          .transition().duration(250)
+          .attr("x2", xScale(s.x2)).attr("y2", yScale(s.y2));
+
+        // Add dot at horizontal endpoint (the next iterate on y=x)
+        if (s.type === 'h') {
+          iterDotGroup.append("circle")
+            .attr("cx", xScale(s.x2)).attr("cy", yScale(s.y2))
+            .attr("r", 0).attr("fill", color)
+            .transition().delay(250).duration(150).attr("r", 3.5);
+        }
+        idx++;
+      }, 300);
+    } else {
+      // Draw all at once
+      segments.forEach((s, idx) => {
+        const color = d3.interpolateRgb("#c74440", "#388c46")(idx / segments.length);
+        cobwebGroup.append("line")
+          .attr("x1", xScale(s.x1)).attr("y1", yScale(s.y1))
+          .attr("x2", xScale(s.x2)).attr("y2", yScale(s.y2))
+          .attr("stroke", color).attr("stroke-width", 1.5).attr("opacity", 0.85);
+        if (s.type === 'h') {
+          iterDotGroup.append("circle")
+            .attr("cx", xScale(s.x2)).attr("cy", yScale(s.y2))
+            .attr("r", 3.5).attr("fill", color);
+        }
+      });
+    }
+
+    // Starting point
+    iterDotGroup.append("circle")
+      .attr("cx", xScale(x0)).attr("cy", yScale(0))
+      .attr("r", 5).attr("fill", "#c74440").attr("stroke", "#333").attr("stroke-width", 1);
+  }
+
+  function readControls() {
+    const x0 = +document.getElementById("ch12_cobweb_x0").value;
+    const n = +document.getElementById("ch12_cobweb_n").value;
+    document.getElementById("ch12_cobweb_x0_val").textContent = `x\u2080 = ${x0.toFixed(1)}`;
+    document.getElementById("ch12_cobweb_n_val").textContent = `n = ${n}`;
+    return {x0, n};
+  }
+
+  document.getElementById("ch12_cobweb_x0").addEventListener("input", function() {
+    if (animTimer) { clearInterval(animTimer); animTimer = null; }
+    const {x0, n} = readControls();
+    drawCobweb(x0, n, false);
+  });
+
+  document.getElementById("ch12_cobweb_n").addEventListener("input", function() {
+    if (animTimer) { clearInterval(animTimer); animTimer = null; }
+    const {x0, n} = readControls();
+    drawCobweb(x0, n, false);
+  });
+
+  document.getElementById("ch12_cobweb_play").addEventListener("click", function() {
+    const {x0, n} = readControls();
+    drawCobweb(x0, n, true);
+  });
+
+  document.getElementById("ch12_cobweb_reset").addEventListener("click", function() {
+    if (animTimer) { clearInterval(animTimer); animTimer = null; }
+    document.getElementById("ch12_cobweb_x0").value = 0.5;
+    document.getElementById("ch12_cobweb_n").value = 12;
+    const {x0, n} = readControls();
+    drawCobweb(x0, n, false);
+  });
+
+  // Initial draw
+  drawCobweb(0.5, 12, false);
+})();
+</script>
 ```
+
+点击 **Play** 观看蛛网图逐步绘制。从初始值 $x_0$ 出发，每次迭代交替地垂直跳到曲线 $g(x) = 1 + 1/x$ 和水平跳到对角线 $y = x$。路径向内螺旋收敛到黄金比例 $\phi \approx 1.618$，展示了 $\phi$ 是稳定吸引子。使用滑块调节初始值和迭代次数，或点击 **Reset** 恢复默认值。
 
 ### 这一视角为何重要
 

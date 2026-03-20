@@ -30,9 +30,7 @@ logarithm unify the treatment of all exponential functions.
 ## Lecture Video
 
 ```{=html}
-<video controls width="100%" preload="metadata">
-  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/05_What%27s%20so%20special%20about%20Euler%27s%20number%20e%EF%BC%9F%20%EF%BD%9C%20Chapter%205%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
-</video>
+<div class="video-container"><iframe src="https://www.youtube.com/embed/m2MIpDrF7Es" title="What's so special about Euler's number e?" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
 ```
 
 ## Key Video Frames
@@ -248,86 +246,347 @@ Any other base $a$ could be used — since $a^t = e^{(\ln a)\,t}$ — but $e$
 renders the relationship between the exponent and the rate of change
 transparent.
 
-### Interactive Python: Numerical Exploration of the Proportionality Constant
+### Animated: Exponential Growth — $e^t$ vs $2^t$ with Tangent Lines
 
 ```{=html}
-<div class="pyodide-container">
-  <textarea class="code-input" id="code_ch05_1">
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Numerically compute lim (a^dt - 1)/dt as dt -> 0 for several bases
-bases = [2, 3, np.e, 5, 8, 10]
-dt_values = np.logspace(-1, -8, 50)
-
-fig, ax = plt.subplots(figsize=(9, 5))
-
-for a in bases:
-    ratios = (a**dt_values - 1) / dt_values
-    label = f'a = e' if np.isclose(a, np.e) else f'a = {a:.0f}'
-    ax.semilogx(dt_values, ratios, label=f'{label}  (ln a = {np.log(a):.4f})')
-
-ax.set_xlabel('dt')
-ax.set_ylabel('$(a^{dt} - 1) \\,/\\, dt$')
-ax.set_title('Proportionality constant converges to ln(a)')
-ax.legend()
-ax.grid(True, alpha=0.3)
-plt.tight_layout()
-plt.show()
-  </textarea>
-  <button class="run-btn" onclick="runPyodide('code_ch05_1', 'output_ch05_1', 'plot_ch05_1')">Run ▶</button>
-  <div class="output" id="output_ch05_1"></div>
-  <div class="plot-output" id="plot_ch05_1"></div>
+<div class="d3-container" id="ch05_d3_exp_growth"></div>
+<div class="d3-controls">
+  <button id="ch05_d3_exp_growth_play">Play ▶</button>
+  <button id="ch05_d3_exp_growth_reset">Reset</button>
+  <label>Base a:</label>
+  <input type="range" id="ch05_d3_exp_growth_base" min="1.5" max="4.0" value="2.0" step="0.01">
+  <span class="value-display" id="ch05_d3_exp_growth_base_val">a = 2.00</span>
+  <label style="margin-left:12px;">Point t₀:</label>
+  <input type="range" id="ch05_d3_exp_growth_t0" min="-1.0" max="2.5" value="1.0" step="0.05">
+  <span class="value-display" id="ch05_d3_exp_growth_t0_val">t₀ = 1.00</span>
 </div>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+(function() {
+  const W = 720, H = 420, margin = {top: 35, right: 30, bottom: 55, left: 65};
+  const w = W - margin.left - margin.right, h = H - margin.top - margin.bottom;
+
+  const svg = d3.select("#ch05_d3_exp_growth").append("svg")
+    .attr("viewBox", `0 0 ${W} ${H}`)
+    .append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const xDomain = [-1.5, 3.0], yDomain = [-1, 12];
+  const xScale = d3.scaleLinear().domain(xDomain).range([0, w]);
+  const yScale = d3.scaleLinear().domain(yDomain).range([h, 0]);
+
+  // Axes
+  svg.append("g").attr("transform", `translate(0,${h})`).call(d3.axisBottom(xScale).ticks(8))
+    .append("text").attr("x", w / 2).attr("y", 42).attr("fill", "#333")
+    .attr("text-anchor", "middle").attr("font-size", "14px").text("t");
+  svg.append("g").call(d3.axisLeft(yScale).ticks(8))
+    .append("text").attr("x", -h / 2).attr("y", -50).attr("fill", "#333")
+    .attr("text-anchor", "middle").attr("transform", "rotate(-90)")
+    .attr("font-size", "14px").text("Value");
+
+  // Gridlines
+  svg.append("g").attr("class", "grid").attr("transform", `translate(0,${h})`)
+    .call(d3.axisBottom(xScale).ticks(8).tickSize(-h).tickFormat(""))
+    .selectAll("line").attr("stroke", "#ddd");
+  svg.append("g").attr("class", "grid")
+    .call(d3.axisLeft(yScale).ticks(8).tickSize(-w).tickFormat(""))
+    .selectAll("line").attr("stroke", "#ddd");
+
+  // e^t curve (always shown for reference)
+  const nPts = 300;
+  const tVals = d3.range(xDomain[0], xDomain[1], (xDomain[1] - xDomain[0]) / nPts);
+
+  function expCurve(base) {
+    return tVals.map(t => [t, Math.pow(base, t)]).filter(d => d[1] <= yDomain[1] * 1.1);
+  }
+
+  const lineGen = d3.line().x(d => xScale(d[0])).y(d => yScale(d[1]))
+    .defined(d => d[1] >= yDomain[0] && d[1] <= yDomain[1] * 1.1);
+
+  // e^t reference curve
+  const eRefPath = svg.append("path")
+    .datum(expCurve(Math.E))
+    .attr("d", lineGen)
+    .attr("fill", "none").attr("stroke", "#388c46").attr("stroke-width", 2)
+    .attr("stroke-dasharray", "6,4").attr("opacity", 0.7);
+
+  // a^t main curve
+  const aPath = svg.append("path")
+    .attr("fill", "none").attr("stroke", "#2d70b3").attr("stroke-width", 2.5);
+
+  // Tangent line for a^t
+  const tangentLine = svg.append("line")
+    .attr("stroke", "#c74440").attr("stroke-width", 2);
+
+  // Height line (dashed)
+  const heightLine = svg.append("line")
+    .attr("stroke", "#c74440").attr("stroke-width", 1.5).attr("stroke-dasharray", "4,3");
+
+  // Slope indicator line for e^t
+  const eTangentLine = svg.append("line")
+    .attr("stroke", "#388c46").attr("stroke-width", 1.5).attr("opacity", 0.7);
+
+  // Point on a^t
+  const aPoint = svg.append("circle").attr("r", 6).attr("fill", "#c74440");
+
+  // Point on e^t
+  const ePoint = svg.append("circle").attr("r", 5).attr("fill", "#388c46").attr("opacity", 0.7);
+
+  // Labels
+  const aLabel = svg.append("text").attr("font-size", "13px").attr("font-weight", 600).attr("fill", "#2d70b3");
+  const eLabel = svg.append("text").attr("font-size", "13px").attr("fill", "#388c46").attr("opacity", 0.8);
+  const slopeLabel = svg.append("text").attr("font-size", "12px").attr("fill", "#c74440");
+
+  // Legend
+  svg.append("line").attr("x1", w - 170).attr("x2", w - 145).attr("y1", 10).attr("y2", 10)
+    .attr("stroke", "#2d70b3").attr("stroke-width", 2.5);
+  svg.append("text").attr("x", w - 140).attr("y", 14).attr("font-size", "12px").attr("fill", "#2d70b3").text("aᵗ");
+
+  svg.append("line").attr("x1", w - 170).attr("x2", w - 145).attr("y1", 28).attr("y2", 28)
+    .attr("stroke", "#388c46").attr("stroke-width", 2).attr("stroke-dasharray", "6,4");
+  svg.append("text").attr("x", w - 140).attr("y", 32).attr("font-size", "12px").attr("fill", "#388c46").text("eᵗ (reference)");
+
+  function update(base, t0) {
+    const lnA = Math.log(base);
+    const aVal = Math.pow(base, t0);
+    const eVal = Math.exp(t0);
+    const slopeA = lnA * aVal;
+
+    // Update a^t curve
+    aPath.datum(expCurve(base)).attr("d", lineGen);
+
+    // a^t tangent line
+    const tanLen = 1.2;
+    const t1a = t0 - tanLen, t2a = t0 + tanLen;
+    const y1a = aVal + slopeA * (t1a - t0), y2a = aVal + slopeA * (t2a - t0);
+    tangentLine
+      .attr("x1", xScale(t1a)).attr("y1", yScale(y1a))
+      .attr("x2", xScale(t2a)).attr("y2", yScale(y2a));
+
+    // Height line from x-axis to point
+    heightLine
+      .attr("x1", xScale(t0)).attr("y1", yScale(0))
+      .attr("x2", xScale(t0)).attr("y2", yScale(aVal));
+
+    // e^t tangent (slope = e^t0 always)
+    const y1e = eVal + eVal * (t1a - t0), y2e = eVal + eVal * (t2a - t0);
+    eTangentLine
+      .attr("x1", xScale(t1a)).attr("y1", yScale(y1e))
+      .attr("x2", xScale(t2a)).attr("y2", yScale(y2e));
+
+    // Points
+    aPoint.attr("cx", xScale(t0)).attr("cy", yScale(aVal));
+    ePoint.attr("cx", xScale(t0)).attr("cy", yScale(Math.min(eVal, yDomain[1])));
+
+    // Labels
+    aLabel.attr("x", 10).attr("y", 20)
+      .text(`aᵗ = ${base.toFixed(2)}^${t0.toFixed(2)} = ${aVal.toFixed(3)}`);
+    eLabel.attr("x", 10).attr("y", 38)
+      .text(`eᵗ = e^${t0.toFixed(2)} = ${eVal.toFixed(3)}`);
+    slopeLabel.attr("x", 10).attr("y", 56)
+      .text(`slope of aᵗ = ln(${base.toFixed(2)}) · ${aVal.toFixed(3)} = ${slopeA.toFixed(3)}  (height = ${aVal.toFixed(3)})`);
+  }
+
+  // Sliders
+  const baseSlider = document.getElementById("ch05_d3_exp_growth_base");
+  const t0Slider = document.getElementById("ch05_d3_exp_growth_t0");
+  const baseVal = document.getElementById("ch05_d3_exp_growth_base_val");
+  const t0Val = document.getElementById("ch05_d3_exp_growth_t0_val");
+
+  function readAndUpdate() {
+    const base = +baseSlider.value;
+    const t0 = +t0Slider.value;
+    baseVal.textContent = `a = ${base.toFixed(2)}`;
+    t0Val.textContent = `t₀ = ${t0.toFixed(2)}`;
+    update(base, t0);
+  }
+
+  baseSlider.addEventListener("input", readAndUpdate);
+  t0Slider.addEventListener("input", readAndUpdate);
+
+  // Play: animate t0 sweeping from left to right
+  let animId = null;
+  document.getElementById("ch05_d3_exp_growth_play").addEventListener("click", function() {
+    if (animId) { cancelAnimationFrame(animId); animId = null; }
+    let t0 = -1.0;
+    const speed = 0.012;
+    function step() {
+      t0 += speed;
+      if (t0 > 2.5) { animId = null; return; }
+      t0Slider.value = t0;
+      readAndUpdate();
+      animId = requestAnimationFrame(step);
+    }
+    animId = requestAnimationFrame(step);
+  });
+
+  document.getElementById("ch05_d3_exp_growth_reset").addEventListener("click", function() {
+    if (animId) { cancelAnimationFrame(animId); animId = null; }
+    baseSlider.value = 2.0;
+    t0Slider.value = 1.0;
+    readAndUpdate();
+  });
+
+  readAndUpdate();
+})();
+</script>
 ```
 
-### Interactive Python: Exponential Growth Model $M(t) = M_0 \, e^{kt}$
+Use the **Base a** slider to switch between exponentials. When $a = e \approx 2.72$,
+the red tangent-line slope exactly matches the height of the point (the dashed
+vertical segment), confirming $\frac{d}{dt}e^t = e^t$. For $a = 2$, notice
+how the tangent slope is only $\ln 2 \approx 0.693$ times the height. Press
+**Play** to animate the point sweeping across the curve.
+
+### Animated: Proportionality Constant $(a^{dt} - 1)/dt$ Converging as $dt \to 0$
 
 ```{=html}
-<div class="pyodide-container">
-  <textarea class="code-input" id="code_ch05_2">
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Compare exponential growth for different values of k
-t = np.linspace(0, 3, 200)
-M0 = 1.0
-k_values = [0.5, np.log(2), 1.0, np.log(3)]
-
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 5))
-
-for k in k_values:
-    M = M0 * np.exp(k * t)
-    ax1.plot(t, M, label=f'k = {k:.4f}')
-
-ax1.set_xlabel('Time t')
-ax1.set_ylabel('$M(t) = e^{kt}$')
-ax1.set_title('Exponential growth for various k')
-ax1.legend()
-ax1.grid(True, alpha=0.3)
-
-# Verify derivative numerically: d/dt e^(kt) should equal k * e^(kt)
-k = np.log(2)
-dt = 1e-6
-deriv_numerical = (np.exp(k * (t + dt)) - np.exp(k * t)) / dt
-deriv_exact = k * np.exp(k * t)
-
-ax2.plot(t, deriv_exact, label='Exact: $\\ln(2) \\cdot 2^t$', linewidth=2)
-ax2.plot(t, deriv_numerical, '--', label='Numerical derivative', linewidth=2)
-ax2.set_xlabel('Time t')
-ax2.set_ylabel('$dM/dt$')
-ax2.set_title('Derivative of $2^t = e^{(\\ln 2)\\,t}$')
-ax2.legend()
-ax2.grid(True, alpha=0.3)
-
-plt.tight_layout()
-plt.show()
-  </textarea>
-  <button class="run-btn" onclick="runPyodide('code_ch05_2', 'output_ch05_2', 'plot_ch05_2')">Run ▶</button>
-  <div class="output" id="output_ch05_2"></div>
-  <div class="plot-output" id="plot_ch05_2"></div>
+<div class="d3-container" id="ch05_d3_prop_const"></div>
+<div class="d3-controls">
+  <button id="ch05_d3_prop_const_play">Animate ▶</button>
+  <button id="ch05_d3_prop_const_reset">Reset</button>
+  <label>dt value:</label>
+  <input type="range" id="ch05_d3_prop_const_dt" min="0.001" max="1.5" value="1.0" step="0.001">
+  <span class="value-display" id="ch05_d3_prop_const_dt_val">dt = 1.000</span>
 </div>
+<script>
+(function() {
+  const W = 720, H = 440, margin = {top: 35, right: 30, bottom: 55, left: 65};
+  const w = W - margin.left - margin.right, h = H - margin.top - margin.bottom;
+
+  const svg = d3.select("#ch05_d3_prop_const").append("svg")
+    .attr("viewBox", `0 0 ${W} ${H}`)
+    .append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const bases = [
+    {a: 2, color: "#2d70b3", label: "a = 2"},
+    {a: Math.E, color: "#388c46", label: "a = e"},
+    {a: 3, color: "#c74440", label: "a = 3"},
+    {a: 5, color: "#9b59b6", label: "a = 5"},
+    {a: 8, color: "#e67e22", label: "a = 8"},
+    {a: 10, color: "#1abc9c", label: "a = 10"}
+  ];
+
+  const xDomain = [0, 1.5], yDomain = [0, 3.5];
+  const xScale = d3.scaleLinear().domain(xDomain).range([0, w]);
+  const yScale = d3.scaleLinear().domain(yDomain).range([h, 0]);
+
+  // Axes
+  svg.append("g").attr("transform", `translate(0,${h})`).call(d3.axisBottom(xScale).ticks(8))
+    .append("text").attr("x", w / 2).attr("y", 42).attr("fill", "#333")
+    .attr("text-anchor", "middle").attr("font-size", "14px").text("dt");
+  svg.append("g").call(d3.axisLeft(yScale).ticks(8))
+    .append("text").attr("x", -h / 2).attr("y", -50).attr("fill", "#333")
+    .attr("text-anchor", "middle").attr("transform", "rotate(-90)")
+    .attr("font-size", "14px").text("(aᵈᵗ − 1) / dt");
+
+  // Gridlines
+  svg.append("g").attr("class", "grid").attr("transform", `translate(0,${h})`)
+    .call(d3.axisBottom(xScale).ticks(8).tickSize(-h).tickFormat(""))
+    .selectAll("line").attr("stroke", "#eee");
+  svg.append("g").attr("class", "grid")
+    .call(d3.axisLeft(yScale).ticks(8).tickSize(-w).tickFormat(""))
+    .selectAll("line").attr("stroke", "#eee");
+
+  // Draw curves for each base
+  const nPts = 300;
+  const dtVals = d3.range(0.005, xDomain[1] + 0.005, xDomain[1] / nPts);
+  const lineGen = d3.line().x(d => xScale(d[0])).y(d => yScale(d[1]))
+    .defined(d => d[1] >= yDomain[0] && d[1] <= yDomain[1]);
+
+  bases.forEach(b => {
+    const data = dtVals.map(dt => [dt, (Math.pow(b.a, dt) - 1) / dt]);
+    svg.append("path").datum(data).attr("d", lineGen)
+      .attr("fill", "none").attr("stroke", b.color).attr("stroke-width", 2);
+
+    // Dashed horizontal line at ln(a) = limit
+    const lnA = Math.log(b.a);
+    if (lnA <= yDomain[1]) {
+      svg.append("line")
+        .attr("x1", xScale(0)).attr("y1", yScale(lnA))
+        .attr("x2", xScale(xDomain[1])).attr("y2", yScale(lnA))
+        .attr("stroke", b.color).attr("stroke-width", 1).attr("stroke-dasharray", "5,4").attr("opacity", 0.5);
+    }
+  });
+
+  // y = 1 highlight line (the e target)
+  svg.append("line")
+    .attr("x1", xScale(0)).attr("y1", yScale(1))
+    .attr("x2", xScale(xDomain[1])).attr("y2", yScale(1))
+    .attr("stroke", "#333").attr("stroke-width", 1.5).attr("stroke-dasharray", "8,4").attr("opacity", 0.4);
+  svg.append("text").attr("x", xScale(xDomain[1]) - 5).attr("y", yScale(1) - 6)
+    .attr("text-anchor", "end").attr("font-size", "12px").attr("fill", "#333").text("limit = 1 (base e)");
+
+  // Legend
+  const legend = svg.append("g").attr("transform", `translate(${w - 130}, 5)`);
+  bases.forEach((b, i) => {
+    const lnA = Math.log(b.a);
+    legend.append("line").attr("x1", 0).attr("x2", 20).attr("y1", i * 18).attr("y2", i * 18)
+      .attr("stroke", b.color).attr("stroke-width", 2);
+    legend.append("text").attr("x", 25).attr("y", i * 18 + 4).attr("font-size", "11px").attr("fill", b.color)
+      .text(`${b.label} → ln a = ${lnA.toFixed(4)}`);
+  });
+
+  // Moving vertical marker at current dt
+  const marker = svg.append("line")
+    .attr("y1", yScale(yDomain[0])).attr("y2", yScale(yDomain[1]))
+    .attr("stroke", "#333").attr("stroke-width", 1.5).attr("stroke-dasharray", "3,3");
+
+  // Dots on each curve at current dt
+  const dots = svg.append("g");
+  const dotElems = bases.map(b =>
+    dots.append("circle").attr("r", 5).attr("fill", b.color).attr("stroke", "#fff").attr("stroke-width", 1)
+  );
+
+  // Value readout
+  const readout = svg.append("g");
+  const readoutTexts = bases.map((b, i) =>
+    readout.append("text").attr("x", 10).attr("y", h - 8 - (bases.length - 1 - i) * 15)
+      .attr("font-size", "11px").attr("fill", b.color)
+  );
+
+  function updateMarker(dt) {
+    marker.attr("x1", xScale(dt)).attr("x2", xScale(dt));
+    bases.forEach((b, i) => {
+      const val = (Math.pow(b.a, dt) - 1) / dt;
+      const yp = Math.min(Math.max(val, yDomain[0]), yDomain[1]);
+      dotElems[i].attr("cx", xScale(dt)).attr("cy", yScale(yp));
+      readoutTexts[i].text(`${b.label}: (${b.a.toFixed(1)}^${dt.toFixed(3)} − 1)/${dt.toFixed(3)} = ${val.toFixed(4)}  (ln a = ${Math.log(b.a).toFixed(4)})`);
+    });
+    document.getElementById("ch05_d3_prop_const_dt_val").textContent = `dt = ${dt.toFixed(3)}`;
+  }
+
+  const dtSlider = document.getElementById("ch05_d3_prop_const_dt");
+  dtSlider.addEventListener("input", () => updateMarker(+dtSlider.value));
+
+  let animId = null;
+  document.getElementById("ch05_d3_prop_const_play").addEventListener("click", function() {
+    if (animId) { cancelAnimationFrame(animId); animId = null; }
+    let dt = 1.5;
+    function step() {
+      dt *= 0.988;
+      if (dt < 0.002) { animId = null; return; }
+      dtSlider.value = dt;
+      updateMarker(dt);
+      animId = requestAnimationFrame(step);
+    }
+    animId = requestAnimationFrame(step);
+  });
+
+  document.getElementById("ch05_d3_prop_const_reset").addEventListener("click", function() {
+    if (animId) { cancelAnimationFrame(animId); animId = null; }
+    dtSlider.value = 1.0;
+    updateMarker(1.0);
+  });
+
+  updateMarker(1.0);
+})();
+</script>
 ```
+
+Press **Animate** to watch $dt$ shrink toward zero. For each base $a$, the
+ratio $(a^{dt} - 1)/dt$ converges to $\ln a$. Notice that the green curve
+($a = e$) converges to exactly $1$ — the horizontal dashed line — confirming
+that $e$ is the unique base where the proportionality constant is unity.
 
 ## Summary
 

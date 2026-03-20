@@ -26,9 +26,7 @@ date: 2023-04-01
 ## 课程视频
 
 ```{=html}
-<video controls width="100%" preload="metadata">
-  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/08_Integration%20and%20the%20fundamental%20theorem%20of%20calculus%20%EF%BD%9C%20Chapter%208%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
-</video>
+<div class="video-container"><iframe src="https://www.youtube.com/embed/rfG8ce4nNh0" title="Integration and the fundamental theorem of calculus" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
 ```
 
 ## 课程关键帧
@@ -214,108 +212,270 @@ $$
 \int_a^b f(t)\, dt = (\text{轴上方面积}) - (\text{轴下方面积}).
 $$
 
-### 交互演示：黎曼和的收敛（Python）
+### 动画演示：黎曼和的收敛
 
 ```{=html}
-<div class="pyodide-container">
-  <textarea class="code-input" id="code_ch08_1">
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Riemann sum approximation for integral of v(t) = t(8-t) over [0, 8]
-def v(t):
-    return t * (8 - t)
-
-exact = 256 / 3  # exact integral value
-
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
-
-# Left: visualize rectangles for a specific N
-N = 20
-dt = 8 / N
-t_vals = np.array([i * dt for i in range(N)])
-heights = v(t_vals)
-
-t_fine = np.linspace(0, 8, 300)
-ax1.plot(t_fine, v(t_fine), 'k-', linewidth=2, label='$v(t) = t(8-t)$')
-ax1.bar(t_vals, heights, width=dt, alpha=0.4, align='edge', color='steelblue',
-        edgecolor='steelblue')
-ax1.set_xlabel('t (seconds)')
-ax1.set_ylabel('v(t) (m/s)')
-ax1.set_title(f'Left Riemann Sum (N = {N})')
-ax1.legend()
-
-# Right: convergence as N increases
-Ns = np.arange(5, 201, 5)
-errors = []
-for n in Ns:
-    dt_n = 8 / n
-    approx = sum(v(i * dt_n) * dt_n for i in range(n))
-    errors.append(abs(approx - exact))
-
-ax2.semilogy(Ns, errors, 'o-', markersize=3, color='#c74440')
-ax2.set_xlabel('Number of rectangles N')
-ax2.set_ylabel('Absolute error')
-ax2.set_title('Convergence to exact integral')
-ax2.grid(True, alpha=0.3)
-
-plt.tight_layout()
-plt.show()
-  </textarea>
-  <button class="run-btn" onclick="runPyodide('code_ch08_1', 'output_ch08_1', 'plot_ch08_1')">Run ▶</button>
-  <div class="output" id="output_ch08_1"></div>
-  <div class="plot-output" id="plot_ch08_1"></div>
+<div class="d3-container" id="d3_ch08_riemann"></div>
+<div class="d3-controls">
+  <button id="d3_ch08_riemann_play">Play &#9654;</button>
+  <label>Rectangles N:</label>
+  <input type="range" id="d3_ch08_riemann_n" min="2" max="120" value="8" step="1">
+  <span class="value-display" id="d3_ch08_riemann_n_val">N = 8</span>
+  <span class="value-display" id="d3_ch08_riemann_approx"></span>
 </div>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+(function() {
+  const W = 700, H = 400, margin = {top: 30, right: 30, bottom: 50, left: 60};
+  const w = W - margin.left - margin.right, h = H - margin.top - margin.bottom;
+  const tMax = 8;
+
+  function v(t) { return t * (8 - t); }
+  const exact = 256 / 3;
+
+  const svg = d3.select("#d3_ch08_riemann").append("svg")
+    .attr("viewBox", `0 0 ${W} ${H}`)
+    .append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const x = d3.scaleLinear().domain([0, tMax]).range([0, w]);
+  const y = d3.scaleLinear().domain([0, 18]).range([h, 0]);
+
+  // Axes
+  svg.append("g").attr("transform", `translate(0,${h})`).call(d3.axisBottom(x).ticks(8))
+    .append("text").attr("x", w / 2).attr("y", 40).attr("fill", "#333")
+    .attr("text-anchor", "middle").attr("font-size", "14px").text("t (seconds)");
+  svg.append("g").call(d3.axisLeft(y).ticks(6))
+    .append("text").attr("x", -h / 2).attr("y", -45).attr("fill", "#333")
+    .attr("text-anchor", "middle").attr("transform", "rotate(-90)")
+    .attr("font-size", "14px").text("v(t) = t(8 \u2212 t)");
+
+  // The curve v(t) = t(8-t)
+  const curveData = d3.range(0, tMax + 0.02, 0.02).map(function(t) { return [t, v(t)]; });
+  svg.append("path").datum(curveData)
+    .attr("d", d3.line().x(function(d) { return x(d[0]); }).y(function(d) { return y(d[1]); }))
+    .attr("fill", "none").attr("stroke", "#2d70b3").attr("stroke-width", 2.5);
+
+  // Exact area fill (light)
+  var areaGen = d3.area()
+    .x(function(d) { return x(d[0]); })
+    .y0(y(0))
+    .y1(function(d) { return y(d[1]); });
+  svg.append("path").datum(curveData)
+    .attr("d", areaGen)
+    .attr("fill", "#2d70b3").attr("opacity", 0.06);
+
+  // Label for sum value
+  const sumLabel = svg.append("text").attr("x", w - 10).attr("y", 20)
+    .attr("text-anchor", "end").attr("font-size", "14px").attr("font-weight", 600);
+
+  const barsGroup = svg.append("g");
+
+  function update(N, animate) {
+    var dt = tMax / N;
+    var data = d3.range(N).map(function(i) {
+      var ti = i * dt;
+      return { t: ti, height: v(ti), area: v(ti) * dt };
+    });
+    var approx = d3.sum(data, function(d) { return d.area; });
+
+    document.getElementById("d3_ch08_riemann_n_val").textContent = "N = " + N;
+    document.getElementById("d3_ch08_riemann_approx").textContent =
+      "Sum = " + approx.toFixed(3) + "  |  Exact = " + exact.toFixed(3) +
+      "  |  Error = " + Math.abs(approx - exact).toFixed(4);
+
+    sumLabel.text("\u03A3 \u2248 " + approx.toFixed(3) + ",  exact = " + exact.toFixed(3));
+
+    var bars = barsGroup.selectAll("rect").data(data, function(d, i) { return i; });
+
+    bars.exit().transition().duration(animate ? 300 : 0)
+      .attr("height", 0).attr("y", y(0)).remove();
+
+    var enter = bars.enter().append("rect")
+      .attr("x", function(d) { return x(d.t); })
+      .attr("y", y(0))
+      .attr("width", Math.max(1, x(dt) - x(0) - 1))
+      .attr("height", 0)
+      .attr("fill", "#388c46").attr("opacity", 0.6)
+      .attr("stroke", "#388c46").attr("stroke-width", 0.5);
+
+    enter.merge(bars).transition().duration(animate ? 600 : 0)
+      .attr("x", function(d) { return x(d.t); })
+      .attr("width", Math.max(1, x(dt) - x(0) - 1))
+      .attr("y", function(d) { return y(Math.max(0, d.height)); })
+      .attr("height", function(d) { return y(0) - y(Math.max(0, d.height)); });
+  }
+
+  var slider = document.getElementById("d3_ch08_riemann_n");
+  slider.addEventListener("input", function() { update(+slider.value, true); });
+
+  document.getElementById("d3_ch08_riemann_play").addEventListener("click", function() {
+    var n = 2;
+    slider.value = n;
+    update(n, true);
+    var interval = setInterval(function() {
+      n = Math.min(120, n + (n < 10 ? 1 : n < 30 ? 2 : n < 60 ? 5 : 10));
+      slider.value = n;
+      update(n, true);
+      if (n >= 120) clearInterval(interval);
+    }, 700);
+  });
+
+  update(8, false);
+})();
+</script>
 ```
 
-### 交互演示：原函数与微积分基本定理（Python）
+按 **Play** 观察黎曼和矩形在速度曲线 $v(t) = t(8 - t)$ 下不断细化。随着 $N$ 增大，求和收敛至精确积分 $\tfrac{256}{3} \approx 85.333$。
+
+### 动画演示：微积分基本定理的实际运作
 
 ```{=html}
-<div class="pyodide-container">
-  <textarea class="code-input" id="code_ch08_2">
-import numpy as np
-import matplotlib.pyplot as plt
-
-def v(t):
-    return t * (8 - t)
-
-def S(t):
-    return 4 * t**2 - t**3 / 3
-
-t = np.linspace(0, 8, 300)
-
-fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 6), sharex=True)
-
-# Top: velocity function
-ax1.plot(t, v(t), color='#2d70b3', linewidth=2)
-ax1.fill_between(t, v(t), alpha=0.15, color='#2d70b3')
-ax1.set_ylabel('$v(t) = t(8-t)$ (m/s)')
-ax1.set_title('Velocity and its antiderivative (distance)')
-ax1.axhline(0, color='gray', linewidth=0.5)
-
-# Bottom: antiderivative (distance function)
-ax2.plot(t, S(t), color='#388c46', linewidth=2)
-ax2.set_xlabel('t (seconds)')
-ax2.set_ylabel('$S(t) = 4t^2 - t^3/3$ (m)')
-ax2.axhline(0, color='gray', linewidth=0.5)
-
-# Mark the total distance at t=8
-ax2.plot(8, S(8), 'ro', markersize=8)
-ax2.annotate(f'S(8) = {S(8):.2f} m', xy=(8, S(8)),
-             xytext=(5.5, S(8) + 5), fontsize=10,
-             arrowprops=dict(arrowstyle='->', color='red'))
-
-plt.tight_layout()
-plt.show()
-
-print(f"Total distance over [0, 8]: S(8) - S(0) = {S(8) - S(0):.4f} meters")
-print(f"Distance over [1, 7]:       S(7) - S(1) = {S(7) - S(1):.4f} meters")
-  </textarea>
-  <button class="run-btn" onclick="runPyodide('code_ch08_2', 'output_ch08_2', 'plot_ch08_2')">Run ▶</button>
-  <div class="output" id="output_ch08_2"></div>
-  <div class="plot-output" id="plot_ch08_2"></div>
+<div class="d3-container" id="d3_ch08_ftc"></div>
+<div class="d3-controls">
+  <label>Position T:</label>
+  <input type="range" id="d3_ch08_ftc_T" min="0.1" max="7.9" value="4" step="0.05">
+  <span class="value-display" id="d3_ch08_ftc_T_val">T = 4.00</span>
+  <label style="margin-left:12px;">Sliver width dT:</label>
+  <input type="range" id="d3_ch08_ftc_dT" min="0.05" max="1.5" value="0.4" step="0.05">
+  <span class="value-display" id="d3_ch08_ftc_dT_val">dT = 0.40</span>
+  <span class="value-display" id="d3_ch08_ftc_info"></span>
 </div>
+<script>
+(function() {
+  var W = 700, H = 520, margin = {top: 25, right: 30, bottom: 45, left: 60};
+  var w = W - margin.left - margin.right;
+  var hTop = 190, hBot = 190, gap = 60;
+  var tMax = 8;
+
+  function f(t) { return t * (8 - t); }
+  function F(t) { return 4 * t * t - t * t * t / 3; }
+
+  var svgRoot = d3.select("#d3_ch08_ftc").append("svg")
+    .attr("viewBox", "0 0 " + W + " " + H);
+
+  // ---- Top panel: f(t) = v(t) ----
+  var gTop = svgRoot.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  var xScale = d3.scaleLinear().domain([0, tMax]).range([0, w]);
+  var yTop = d3.scaleLinear().domain([0, 18]).range([hTop, 0]);
+
+  gTop.append("g").attr("transform", "translate(0," + hTop + ")").call(d3.axisBottom(xScale).ticks(8));
+  gTop.append("g").call(d3.axisLeft(yTop).ticks(5));
+  gTop.append("text").attr("x", w / 2).attr("y", -8).attr("text-anchor", "middle")
+    .attr("font-size", "14px").attr("font-weight", 600).attr("fill", "#2d70b3")
+    .text("f(t) = t(8 \u2212 t)");
+
+  // Curve
+  var curveData = d3.range(0, tMax + 0.02, 0.02).map(function(t) { return [t, f(t)]; });
+  gTop.append("path").datum(curveData)
+    .attr("d", d3.line().x(function(d) { return xScale(d[0]); }).y(function(d) { return yTop(d[1]); }))
+    .attr("fill", "none").attr("stroke", "#2d70b3").attr("stroke-width", 2.5);
+
+  // Shaded area [0, T]
+  var shadePath = gTop.append("path").attr("fill", "#388c46").attr("opacity", 0.15);
+  // Sliver [T, T+dT]
+  var sliverRect = gTop.append("rect").attr("fill", "#c74440").attr("opacity", 0.55);
+  // dA label
+  var dALabel = gTop.append("text").attr("font-size", "13px").attr("fill", "#c74440")
+    .attr("font-weight", 600).attr("text-anchor", "middle");
+  // Height indicator line
+  var heightLine = gTop.append("line").attr("stroke", "#c74440")
+    .attr("stroke-width", 1.5).attr("stroke-dasharray", "4,3");
+
+  // ---- Bottom panel: F(t) = antiderivative ----
+  var gBot = svgRoot.append("g")
+    .attr("transform", "translate(" + margin.left + "," + (margin.top + hTop + gap) + ")");
+
+  var yBot = d3.scaleLinear().domain([0, 90]).range([hBot, 0]);
+
+  gBot.append("g").attr("transform", "translate(0," + hBot + ")").call(d3.axisBottom(xScale).ticks(8))
+    .append("text").attr("x", w / 2).attr("y", 38).attr("fill", "#333")
+    .attr("text-anchor", "middle").attr("font-size", "14px").text("t (seconds)");
+  gBot.append("g").call(d3.axisLeft(yBot).ticks(5));
+  gBot.append("text").attr("x", w / 2).attr("y", -8).attr("text-anchor", "middle")
+    .attr("font-size", "14px").attr("font-weight", 600).attr("fill", "#388c46")
+    .text("F(t) = 4t\u00B2 \u2212 t\u00B3/3  (antiderivative)");
+
+  // Antiderivative curve
+  var antiData = d3.range(0, tMax + 0.02, 0.02).map(function(t) { return [t, F(t)]; });
+  gBot.append("path").datum(antiData)
+    .attr("d", d3.line().x(function(d) { return xScale(d[0]); }).y(function(d) { return yBot(d[1]); }))
+    .attr("fill", "none").attr("stroke", "#388c46").attr("stroke-width", 2.5);
+
+  // Dot on F(t) at T
+  var dotF = gBot.append("circle").attr("r", 5).attr("fill", "#c74440");
+  // Tangent line segment at T
+  var tangentLine = gBot.append("line").attr("stroke", "#c74440")
+    .attr("stroke-width", 2).attr("stroke-dasharray", "6,3");
+  // Slope label
+  var slopeLabel = gBot.append("text").attr("font-size", "12px").attr("fill", "#c74440")
+    .attr("font-weight", 600);
+
+  function update() {
+    var T = +document.getElementById("d3_ch08_ftc_T").value;
+    var dT = +document.getElementById("d3_ch08_ftc_dT").value;
+
+    document.getElementById("d3_ch08_ftc_T_val").textContent = "T = " + T.toFixed(2);
+    document.getElementById("d3_ch08_ftc_dT_val").textContent = "dT = " + dT.toFixed(2);
+
+    var fT = f(T);
+    var dA = fT * dT;
+    var FT = F(T);
+
+    document.getElementById("d3_ch08_ftc_info").textContent =
+      "f(T) = " + fT.toFixed(2) + "  |  dA \u2248 f(T)\u00B7dT = " + dA.toFixed(3) +
+      "  |  F(T) = " + FT.toFixed(2);
+
+    // Update shaded area [0, T]
+    var areaPoints = d3.range(0, T + 0.02, 0.02).map(function(t) { return [t, f(t)]; });
+    if (areaPoints.length > 0) {
+      var areaPath = "M" + xScale(0) + "," + yTop(0);
+      areaPoints.forEach(function(d) { areaPath += " L" + xScale(d[0]) + "," + yTop(d[1]); });
+      areaPath += " L" + xScale(T) + "," + yTop(0) + " Z";
+      shadePath.attr("d", areaPath);
+    }
+
+    // Sliver rectangle
+    var sliverH = Math.max(0, fT);
+    sliverRect
+      .attr("x", xScale(T))
+      .attr("y", yTop(sliverH))
+      .attr("width", Math.max(1, xScale(T + dT) - xScale(T)))
+      .attr("height", yTop(0) - yTop(sliverH));
+
+    // dA label
+    dALabel.attr("x", xScale(T + dT / 2)).attr("y", yTop(sliverH) - 8)
+      .text("dA \u2248 " + dA.toFixed(2));
+
+    // Height line from axis to curve at T
+    heightLine
+      .attr("x1", xScale(T)).attr("y1", yTop(0))
+      .attr("x2", xScale(T)).attr("y2", yTop(fT));
+
+    // Dot on antiderivative
+    dotF.attr("cx", xScale(T)).attr("cy", yBot(FT));
+
+    // Tangent line: slope = f(T)
+    var tangentHalf = 0.8;
+    var t1 = Math.max(0, T - tangentHalf), t2 = Math.min(tMax, T + tangentHalf);
+    tangentLine
+      .attr("x1", xScale(t1)).attr("y1", yBot(FT + fT * (t1 - T)))
+      .attr("x2", xScale(t2)).attr("y2", yBot(FT + fT * (t2 - T)));
+
+    slopeLabel.attr("x", xScale(t2) + 5).attr("y", yBot(FT + fT * (t2 - T)) + 4)
+      .text("slope = f(T) = " + fT.toFixed(2));
+  }
+
+  document.getElementById("d3_ch08_ftc_T").addEventListener("input", update);
+  document.getElementById("d3_ch08_ftc_dT").addEventListener("input", update);
+
+  update();
+})();
+</script>
 ```
+
+移动 **Position T** 滑块探索 $f(t)$ 与其原函数 $F(t)$ 之间的联系。上方面板显示 $f(t) = t(8 - t)$，以及阴影面积 $\int_0^T f(t)\,dt$（绿色）和红色薄片 $dA \approx f(T) \cdot dT$。下方面板显示 $F(t) = 4t^2 - t^3/3$，在 $T$ 处有一个红点和一条切线，其斜率等于 $f(T)$——证实 $F'(T) = f(T)$。
 
 ## 速查表
 

@@ -25,9 +25,7 @@ date: 2023-04-01
 ## 课程视频
 
 ```{=html}
-<video controls width="100%" preload="metadata">
-  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/10_Higher%20order%20derivatives%20%EF%BD%9C%20Chapter%2010%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
-</video>
+<div class="video-container"><iframe src="https://www.youtube.com/embed/BLkz5LGWihw" title="Higher order derivatives" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
 ```
 
 ## 课程关键帧
@@ -181,100 +179,289 @@ $$
 
 实线蓝色曲线是 $f(x) = \cos(x)$。虚线曲线显示以 $x = 0$ 为中心、阶数递增的泰勒多项式逼近。逼近中每增加一项都依赖于 $\cos(x)$ 在原点处更高阶的导数，说明了这些导数在函数逼近中不可或缺的作用。
 
-### 交互演示：计算与可视化高阶导数（Python）
+### 动画演示：位置、速度与加速度
 
 ```{=html}
-<div class="pyodide-container">
-  <textarea class="code-input" id="code_ch10_1">
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Define f(x) = x^3 - 6x^2 + 9x and its derivatives
-x = np.linspace(-0.5, 4.5, 300)
-f  = x**3 - 6*x**2 + 9*x
-fp = 3*x**2 - 12*x + 9
-fpp = 6*x - 12
-
-fig, axes = plt.subplots(1, 3, figsize=(12, 4), sharex=True)
-
-axes[0].plot(x, f, color='#2d70b3', linewidth=2)
-axes[0].axhline(0, color='grey', linewidth=0.5)
-axes[0].set_title("$s(t) = t^3 - 6t^2 + 9t$")
-axes[0].set_ylabel("Position")
-axes[0].set_xlabel("t")
-
-axes[1].plot(x, fp, color='#388c46', linewidth=2)
-axes[1].axhline(0, color='grey', linewidth=0.5)
-axes[1].set_title("$v(t) = 3t^2 - 12t + 9$")
-axes[1].set_ylabel("Velocity")
-axes[1].set_xlabel("t")
-
-axes[2].plot(x, fpp, color='#c74440', linewidth=2)
-axes[2].axhline(0, color='grey', linewidth=0.5)
-axes[2].set_title("$a(t) = 6t - 12$")
-axes[2].set_ylabel("Acceleration")
-axes[2].set_xlabel("t")
-
-# Shade concavity regions on the position plot
-axes[0].fill_between(x, f, where=(fpp > 0), alpha=0.15, color='green', label='Concave up')
-axes[0].fill_between(x, f, where=(fpp < 0), alpha=0.15, color='red', label='Concave down')
-axes[0].legend(fontsize=8)
-
-plt.tight_layout()
-plt.show()
-  </textarea>
-  <button class="run-btn" onclick="runPyodide('code_ch10_1', 'output_ch10_1', 'plot_ch10_1')">Run ▶</button>
-  <div class="output" id="output_ch10_1"></div>
-  <div class="plot-output" id="plot_ch10_1"></div>
+<div class="d3-container" id="ch10_d3_pva"></div>
+<div class="d3-controls">
+  <button id="ch10_d3_pva_play">Play &#9654;</button>
+  <button id="ch10_d3_pva_pause">Pause</button>
+  <label>Time t:</label>
+  <input type="range" id="ch10_d3_pva_slider" min="0" max="4" value="0" step="0.02">
+  <span class="value-display" id="ch10_d3_pva_val">t = 0.00</span>
 </div>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+(function() {
+  const W = 700, H = 520, margin = {top: 25, right: 30, bottom: 35, left: 60};
+  const w = W - margin.left - margin.right;
+  const panelH = (H - margin.top - margin.bottom - 40) / 3;
+  const gap = 20;
+
+  // Functions: s(t) = t^3 - 6t^2 + 9t
+  function sFunc(t) { return t*t*t - 6*t*t + 9*t; }
+  function vFunc(t) { return 3*t*t - 12*t + 9; }
+  function aFunc(t) { return 6*t - 12; }
+
+  const tMin = -0.2, tMax = 4.2;
+  const pts = d3.range(tMin, tMax, 0.02);
+
+  const panels = [
+    { fn: sFunc, label: "s(t) = t\u00B3 \u2212 6t\u00B2 + 9t", color: "#2d70b3", yLabel: "Position" },
+    { fn: vFunc, label: "v(t) = 3t\u00B2 \u2212 12t + 9", color: "#388c46", yLabel: "Velocity" },
+    { fn: aFunc, label: "a(t) = 6t \u2212 12", color: "#c74440", yLabel: "Acceleration" }
+  ];
+
+  // Compute y-ranges
+  panels.forEach(p => {
+    const vals = pts.map(p.fn);
+    const lo = d3.min(vals), hi = d3.max(vals);
+    const pad = (hi - lo) * 0.15 || 1;
+    p.yMin = lo - pad;
+    p.yMax = hi + pad;
+  });
+
+  const svg = d3.select("#ch10_d3_pva").append("svg")
+    .attr("viewBox", `0 0 ${W} ${H}`);
+
+  const xScale = d3.scaleLinear().domain([tMin, tMax]).range([0, w]);
+
+  panels.forEach((p, i) => {
+    const yOff = margin.top + i * (panelH + gap);
+    const g = svg.append("g").attr("transform", `translate(${margin.left},${yOff})`);
+    const yScale = d3.scaleLinear().domain([p.yMin, p.yMax]).range([panelH, 0]);
+    p.yScale = yScale;
+    p.group = g;
+
+    // Axes
+    g.append("g").attr("transform", `translate(0,${panelH})`)
+      .call(d3.axisBottom(xScale).ticks(8)).selectAll("text").attr("font-size", "10px");
+    g.append("g").call(d3.axisLeft(yScale).ticks(5))
+      .selectAll("text").attr("font-size", "10px");
+
+    // Zero line
+    if (p.yMin < 0 && p.yMax > 0) {
+      g.append("line").attr("x1", 0).attr("x2", w)
+        .attr("y1", yScale(0)).attr("y2", yScale(0))
+        .attr("stroke", "#999").attr("stroke-width", 0.5).attr("stroke-dasharray", "3,3");
+    }
+
+    // Curve
+    const line = d3.line().x(d => xScale(d)).y(d => yScale(p.fn(d)));
+    g.append("path").datum(pts).attr("d", line)
+      .attr("fill", "none").attr("stroke", p.color).attr("stroke-width", 2);
+
+    // Label
+    g.append("text").attr("x", 5).attr("y", 14)
+      .attr("font-size", "12px").attr("font-weight", 600).attr("fill", p.color)
+      .text(p.yLabel);
+
+    // Moving dot
+    p.dot = g.append("circle").attr("r", 5).attr("fill", p.color).attr("stroke", "#fff").attr("stroke-width", 1.5);
+
+    // Vertical scan line
+    p.scanLine = g.append("line")
+      .attr("y1", 0).attr("y2", panelH)
+      .attr("stroke", "#333").attr("stroke-width", 1).attr("stroke-dasharray", "4,3").attr("opacity", 0.6);
+  });
+
+  function updateTime(t) {
+    panels.forEach(p => {
+      const cx = xScale(t), cy = p.yScale(p.fn(t));
+      p.dot.attr("cx", cx).attr("cy", cy);
+      p.scanLine.attr("x1", cx).attr("x2", cx);
+    });
+    document.getElementById("ch10_d3_pva_val").textContent = `t = ${t.toFixed(2)}`;
+  }
+
+  // Slider
+  const slider = document.getElementById("ch10_d3_pva_slider");
+  slider.addEventListener("input", () => updateTime(+slider.value));
+
+  // Animation
+  let animId = null;
+  function animate() {
+    let t = +slider.value;
+    function step() {
+      t += 0.015;
+      if (t > 4) { t = 0; }
+      slider.value = t;
+      updateTime(t);
+      animId = requestAnimationFrame(step);
+    }
+    animId = requestAnimationFrame(step);
+  }
+
+  document.getElementById("ch10_d3_pva_play").addEventListener("click", function() {
+    if (animId) cancelAnimationFrame(animId);
+    animate();
+  });
+  document.getElementById("ch10_d3_pva_pause").addEventListener("click", function() {
+    if (animId) { cancelAnimationFrame(animId); animId = null; }
+  });
+
+  updateTime(0);
+})();
+</script>
 ```
 
-### 交互演示：有限差分法数值计算二阶导数（Python）
+点击 **Play** 动画展示一条垂直扫描线穿过三个堆叠的图形，分别显示位置 $s(t)$、速度 $v(t) = s'(t)$ 和加速度 $a(t) = s''(t)$（对于 $s(t) = t^3 - 6t^2 + 9t$）。联动的圆点展示每个面板中的值如何与上方面板曲线的斜率相关。注意加速度在 $t = 2$ 处过零，恰好对应速度达到最小值。
+
+### 动画演示：凹凸性指示器
 
 ```{=html}
-<div class="pyodide-container">
-  <textarea class="code-input" id="code_ch10_2">
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Numerically approximate the second derivative using central differences
-def numerical_second_derivative(f, x, h=1e-4):
-    """Compute f''(x) using the central difference formula:
-       f''(x) ≈ [f(x+h) - 2f(x) + f(x-h)] / h^2
-    """
-    return (f(x + h) - 2*f(x) + f(x - h)) / h**2
-
-# Test with f(x) = sin(x), whose exact second derivative is -sin(x)
-f = np.sin
-x = np.linspace(0, 2*np.pi, 200)
-
-exact = -np.sin(x)
-numerical = numerical_second_derivative(f, x)
-
-fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 6), sharex=True)
-
-ax1.plot(x, np.sin(x), color='#2d70b3', linewidth=2, label='$f(x) = \\sin(x)$')
-ax1.plot(x, exact, color='#c74440', linewidth=2, label="$f''(x) = -\\sin(x)$")
-ax1.plot(x, numerical, 'k--', linewidth=1, alpha=0.7, label='Numerical approx')
-ax1.legend()
-ax1.set_ylabel('Value')
-ax1.set_title('Exact vs. numerical second derivative')
-ax1.grid(True, alpha=0.3)
-
-ax2.semilogy(x, np.abs(exact - numerical) + 1e-16, color='#6042a6')
-ax2.set_xlabel('x')
-ax2.set_ylabel('Absolute error')
-ax2.set_title('Error in numerical second derivative ($h = 10^{-4}$)')
-ax2.grid(True, alpha=0.3)
-
-plt.tight_layout()
-plt.show()
-  </textarea>
-  <button class="run-btn" onclick="runPyodide('code_ch10_2', 'output_ch10_2', 'plot_ch10_2')">Run ▶</button>
-  <div class="output" id="output_ch10_2"></div>
-  <div class="plot-output" id="plot_ch10_2"></div>
+<div class="d3-container" id="ch10_d3_concavity"></div>
+<div class="d3-controls">
+  <button id="ch10_d3_concavity_play">Play &#9654;</button>
+  <button id="ch10_d3_concavity_pause">Pause</button>
+  <label>x position:</label>
+  <input type="range" id="ch10_d3_concavity_slider" min="-2.5" max="2.5" value="-2.5" step="0.02">
+  <span class="value-display" id="ch10_d3_concavity_val">x = -2.50</span>
+  <span class="value-display" id="ch10_d3_concavity_fpp"></span>
 </div>
+<script>
+(function() {
+  const W = 700, H = 400, margin = {top: 30, right: 30, bottom: 50, left: 60};
+  const w = W - margin.left - margin.right, h = H - margin.top - margin.bottom;
+
+  // f(x) = x^3 - 3x, f'(x) = 3x^2 - 3, f''(x) = 6x
+  function f(x)   { return x*x*x - 3*x; }
+  function fp(x)  { return 3*x*x - 3; }
+  function fpp(x) { return 6*x; }
+
+  const xMin = -2.8, xMax = 2.8;
+  const pts = d3.range(xMin, xMax + 0.01, 0.02);
+  const yVals = pts.map(f);
+  const yMin = d3.min(yVals) - 1, yMax = d3.max(yVals) + 1;
+
+  const svg = d3.select("#ch10_d3_concavity").append("svg")
+    .attr("viewBox", `0 0 ${W} ${H}`)
+    .append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const xScale = d3.scaleLinear().domain([xMin, xMax]).range([0, w]);
+  const yScale = d3.scaleLinear().domain([yMin, yMax]).range([h, 0]);
+
+  // Axes
+  svg.append("g").attr("transform", `translate(0,${h})`).call(d3.axisBottom(xScale).ticks(8))
+    .append("text").attr("x", w/2).attr("y", 40).attr("fill", "#333")
+    .attr("text-anchor", "middle").attr("font-size", "14px").text("x");
+  svg.append("g").call(d3.axisLeft(yScale).ticks(6))
+    .append("text").attr("x", -h/2).attr("y", -45).attr("fill", "#333")
+    .attr("text-anchor", "middle").attr("transform", "rotate(-90)")
+    .attr("font-size", "14px").text("f(x)");
+
+  // Shaded concavity regions
+  // Concave down: x < 0 (f''(x) = 6x < 0), concave up: x > 0
+  const ptsDown = pts.filter(x => x <= 0.01);
+  const ptsUp   = pts.filter(x => x >= -0.01);
+
+  const areaGen = d3.area()
+    .x(d => xScale(d))
+    .y0(d => yScale(f(d)))
+    .y1(yScale(0) > h ? h : yScale(yMin));
+
+  // Concave down region (red, light)
+  svg.append("path").datum(ptsDown)
+    .attr("d", d3.area().x(d => xScale(d)).y0(h).y1(d => yScale(f(d))))
+    .attr("fill", "#c74440").attr("opacity", 0.1);
+
+  // Concave up region (green, light)
+  svg.append("path").datum(ptsUp)
+    .attr("d", d3.area().x(d => xScale(d)).y0(h).y1(d => yScale(f(d))))
+    .attr("fill", "#388c46").attr("opacity", 0.1);
+
+  // Inflection point marker
+  svg.append("line").attr("x1", xScale(0)).attr("x2", xScale(0))
+    .attr("y1", 0).attr("y2", h)
+    .attr("stroke", "#999").attr("stroke-width", 1).attr("stroke-dasharray", "4,4");
+  svg.append("text").attr("x", xScale(0) + 5).attr("y", 16)
+    .attr("font-size", "11px").attr("fill", "#666").text("inflection point");
+
+  // The curve
+  const line = d3.line().x(d => xScale(d)).y(d => yScale(f(d)));
+  svg.append("path").datum(pts).attr("d", line)
+    .attr("fill", "none").attr("stroke", "#2d70b3").attr("stroke-width", 2.5);
+
+  // Legend
+  svg.append("rect").attr("x", w - 160).attr("y", 5).attr("width", 12).attr("height", 12).attr("fill", "#388c46").attr("opacity", 0.3);
+  svg.append("text").attr("x", w - 143).attr("y", 15).attr("font-size", "11px").attr("fill", "#333").text("Concave up (f'' > 0)");
+  svg.append("rect").attr("x", w - 160).attr("y", 23).attr("width", 12).attr("height", 12).attr("fill", "#c74440").attr("opacity", 0.3);
+  svg.append("text").attr("x", w - 143).attr("y", 33).attr("font-size", "11px").attr("fill", "#333").text("Concave down (f'' < 0)");
+
+  // Tangent line (dynamic)
+  const tangentLine = svg.append("line")
+    .attr("stroke", "#6042a6").attr("stroke-width", 2).attr("stroke-dasharray", "6,3");
+
+  // Moving dot on curve
+  const dot = svg.append("circle").attr("r", 6).attr("fill", "#2d70b3")
+    .attr("stroke", "#fff").attr("stroke-width", 2);
+
+  // f'' label near dot
+  const fppLabel = svg.append("text").attr("font-size", "13px").attr("font-weight", 600);
+
+  function updatePos(xVal) {
+    const yVal = f(xVal);
+    const slope = fp(xVal);
+    const secondDeriv = fpp(xVal);
+
+    dot.attr("cx", xScale(xVal)).attr("cy", yScale(yVal));
+
+    // Tangent segment: extend +/- 0.8 in x
+    const ext = 0.8;
+    const x1t = xVal - ext, x2t = xVal + ext;
+    const y1t = yVal + slope * (x1t - xVal);
+    const y2t = yVal + slope * (x2t - xVal);
+    tangentLine
+      .attr("x1", xScale(x1t)).attr("y1", yScale(y1t))
+      .attr("x2", xScale(x2t)).attr("y2", yScale(y2t));
+
+    // Color tangent by concavity
+    tangentLine.attr("stroke", secondDeriv >= 0 ? "#388c46" : "#c74440");
+
+    // Label
+    fppLabel
+      .attr("x", xScale(xVal) + 10)
+      .attr("y", yScale(yVal) - 12)
+      .attr("fill", secondDeriv >= 0 ? "#388c46" : "#c74440")
+      .text(`f''(${xVal.toFixed(1)}) = ${secondDeriv.toFixed(1)}`);
+
+    document.getElementById("ch10_d3_concavity_val").textContent = `x = ${xVal.toFixed(2)}`;
+    document.getElementById("ch10_d3_concavity_fpp").textContent =
+      `f''(x) = ${secondDeriv.toFixed(2)}  (${secondDeriv > 0.01 ? "concave up" : secondDeriv < -0.01 ? "concave down" : "inflection"})`;
+  }
+
+  // Slider
+  const slider = document.getElementById("ch10_d3_concavity_slider");
+  slider.addEventListener("input", () => updatePos(+slider.value));
+
+  // Animation
+  let animId = null;
+  function animate() {
+    let xv = +slider.value;
+    function step() {
+      xv += 0.012;
+      if (xv > 2.5) { xv = -2.5; }
+      slider.value = xv;
+      updatePos(xv);
+      animId = requestAnimationFrame(step);
+    }
+    animId = requestAnimationFrame(step);
+  }
+
+  document.getElementById("ch10_d3_concavity_play").addEventListener("click", function() {
+    if (animId) cancelAnimationFrame(animId);
+    animate();
+  });
+  document.getElementById("ch10_d3_concavity_pause").addEventListener("click", function() {
+    if (animId) { cancelAnimationFrame(animId); animId = null; }
+  });
+
+  updatePos(-2.5);
+})();
+</script>
 ```
+
+点击 **Play** 观看切线沿 $f(x) = x^3 - 3x$ 扫过。背景阴影显示凹凸性区域：绿色表示 $f''(x) > 0$（上凸），红色表示 $f''(x) < 0$（下凹）。切线颜色在拐点 $x = 0$ 处改变，即 $f''(x)$ 变号的位置。观察切线如何在穿越拐点时从"位于曲线上方"转变为"位于曲线下方"，验证了二阶导数的几何含义。
 
 ## 速查表
 

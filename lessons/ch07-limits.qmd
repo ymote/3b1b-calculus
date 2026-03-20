@@ -28,9 +28,7 @@ powerful technique for evaluating indeterminate forms.
 ## Lecture Video
 
 ```{=html}
-<video controls width="100%" preload="metadata">
-  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/07_Limits%2C%20L%27H%C3%B4pital%27s%20rule%2C%20and%20epsilon%20delta%20definitions%20%EF%BD%9C%20Chapter%207%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
-</video>
+<div class="video-container"><iframe src="https://www.youtube.com/embed/kfF40MiS7zA" title="Limits, L'Hopital's rule, and epsilon delta definitions" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
 ```
 
 ## Key Video Frames
@@ -240,95 +238,344 @@ derivatives of the numerator and denominator in advance. The rule is a tool for
 evaluating limits of known functions, not for deriving the foundational formulas
 of differentiation.
 
-### Interactive Python: Numerical Exploration of the Difference Quotient
+### Animated: Epsilon-Delta Visualization
 
 ```{=html}
-<div class="pyodide-container">
-  <textarea class="code-input" id="code_ch07_1">
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Difference quotient for f(x) = x^3 at x = 2
-def diff_quotient(h):
-    return ((2 + h)**3 - 2**3) / h
-
-h_values = np.linspace(-3, 3, 601)
-h_values = h_values[h_values != 0]  # exclude h = 0
-
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
-
-# Left: the difference quotient as a function of h
-ax1.plot(h_values, diff_quotient(h_values), color='steelblue', linewidth=1.5)
-ax1.axhline(y=12, color='coral', linestyle='--', label='Limit = 12')
-ax1.plot(0, 12, 'o', mfc='white', mec='coral', markersize=8)
-ax1.set_xlabel('h')
-ax1.set_ylabel('Q(h)')
-ax1.set_title('Difference quotient for $x^3$ at $x=2$')
-ax1.legend()
-ax1.grid(True, alpha=0.3)
-
-# Right: convergence as h -> 0
-h_small = np.logspace(-1, -8, 50)
-errors = np.abs(diff_quotient(h_small) - 12)
-ax2.loglog(h_small, errors, 'o-', markersize=3, color='steelblue')
-ax2.set_xlabel('h')
-ax2.set_ylabel('$|Q(h) - 12|$')
-ax2.set_title('Error vs. h (log-log scale)')
-ax2.grid(True, alpha=0.3)
-
-plt.tight_layout()
-plt.show()
-  </textarea>
-  <button class="run-btn" onclick="runPyodide('code_ch07_1', 'output_ch07_1', 'plot_ch07_1')">Run ▶</button>
-  <div class="output" id="output_ch07_1"></div>
-  <div class="plot-output" id="plot_ch07_1"></div>
+<div class="d3-container" id="d3_ch07_epsilon_delta"></div>
+<div class="d3-controls">
+  <button id="d3_ch07_ed_play">Play &#9654;</button>
+  <label>Epsilon:</label>
+  <input type="range" id="d3_ch07_ed_eps" min="0.1" max="5" value="3" step="0.1">
+  <span class="value-display" id="d3_ch07_ed_eps_val">&epsilon; = 3.0</span>
+  <label>Delta:</label>
+  <input type="range" id="d3_ch07_ed_del" min="0.01" max="2" value="1" step="0.01">
+  <span class="value-display" id="d3_ch07_ed_del_val">&delta; = 1.00</span>
+  <span class="value-display" id="d3_ch07_ed_status"></span>
 </div>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+(function() {
+  const W = 700, H = 420, margin = {top: 30, right: 30, bottom: 50, left: 60};
+  const w = W - margin.left - margin.right, h = H - margin.top - margin.bottom;
+
+  // Function: Q(h) = 12 + 6h + h^2  (difference quotient for x^3 at x=2)
+  const L = 12;
+  const a = 0;
+  function Q(t) { return 12 + 6 * t + t * t; }
+
+  const svg = d3.select("#d3_ch07_epsilon_delta").append("svg")
+    .attr("viewBox", `0 0 ${W} ${H}`)
+    .append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const xScale = d3.scaleLinear().domain([-3, 3]).range([0, w]);
+  const yScale = d3.scaleLinear().domain([4, 22]).range([h, 0]);
+
+  // Axes
+  svg.append("g").attr("transform", `translate(0,${h})`).call(d3.axisBottom(xScale).ticks(8))
+    .append("text").attr("x", w / 2).attr("y", 40).attr("fill", "#333")
+    .attr("text-anchor", "middle").attr("font-size", "14px").text("h");
+  svg.append("g").call(d3.axisLeft(yScale).ticks(8))
+    .append("text").attr("x", -h / 2).attr("y", -45).attr("fill", "#333")
+    .attr("text-anchor", "middle").attr("transform", "rotate(-90)")
+    .attr("font-size", "14px").text("Q(h) = 12 + 6h + h\u00B2");
+
+  // Epsilon band (yellow shading)
+  const epsBand = svg.append("rect")
+    .attr("fill", "#ffd700").attr("opacity", 0.2);
+
+  // Delta band (green shading)
+  const delBand = svg.append("rect")
+    .attr("fill", "#388c46").attr("opacity", 0.12);
+
+  // Epsilon lines (red dashed)
+  const epsUpper = svg.append("line").attr("stroke", "#c74440").attr("stroke-dasharray", "6,3").attr("stroke-width", 1.5);
+  const epsLower = svg.append("line").attr("stroke", "#c74440").attr("stroke-dasharray", "6,3").attr("stroke-width", 1.5);
+
+  // Delta lines (green dashed)
+  const delLeft = svg.append("line").attr("stroke", "#388c46").attr("stroke-dasharray", "6,3").attr("stroke-width", 1.5);
+  const delRight = svg.append("line").attr("stroke", "#388c46").attr("stroke-dasharray", "6,3").attr("stroke-width", 1.5);
+
+  // Limit line
+  svg.append("line")
+    .attr("x1", xScale(-3)).attr("x2", xScale(3))
+    .attr("y1", yScale(L)).attr("y2", yScale(L))
+    .attr("stroke", "#999").attr("stroke-dasharray", "3,3").attr("stroke-width", 1);
+
+  // Limit label
+  svg.append("text").attr("x", xScale(3) - 5).attr("y", yScale(L) - 6)
+    .attr("text-anchor", "end").attr("font-size", "12px").attr("fill", "#666").text("L = 12");
+
+  // The curve Q(h)
+  const curveData = d3.range(-3, 3.01, 0.02).map(t => [t, Q(t)]);
+  svg.append("path").datum(curveData)
+    .attr("d", d3.line().x(d => xScale(d[0])).y(d => yScale(d[1])))
+    .attr("fill", "none").attr("stroke", "#2d70b3").attr("stroke-width", 2.5);
+
+  // Open circle at h=0
+  svg.append("circle")
+    .attr("cx", xScale(0)).attr("cy", yScale(12))
+    .attr("r", 5).attr("fill", "white").attr("stroke", "#c74440").attr("stroke-width", 2);
+
+  // Status label
+  const statusEl = document.getElementById("d3_ch07_ed_status");
+
+  function update(eps, del, animate) {
+    const dur = animate ? 400 : 0;
+
+    document.getElementById("d3_ch07_ed_eps_val").textContent = "\u03B5 = " + eps.toFixed(1);
+    document.getElementById("d3_ch07_ed_del_val").textContent = "\u03B4 = " + del.toFixed(2);
+
+    // Epsilon band
+    const yTop = yScale(L + eps), yBot = yScale(L - eps);
+    epsBand.transition().duration(dur)
+      .attr("x", 0).attr("y", yTop).attr("width", w).attr("height", yBot - yTop);
+
+    epsUpper.transition().duration(dur)
+      .attr("x1", 0).attr("x2", w).attr("y1", yTop).attr("y2", yTop);
+    epsLower.transition().duration(dur)
+      .attr("x1", 0).attr("x2", w).attr("y1", yBot).attr("y2", yBot);
+
+    // Delta band
+    const xL = xScale(-del), xR = xScale(del);
+    delBand.transition().duration(dur)
+      .attr("x", xL).attr("y", 0).attr("width", xR - xL).attr("height", h);
+
+    delLeft.transition().duration(dur)
+      .attr("x1", xL).attr("x2", xL).attr("y1", 0).attr("y2", h);
+    delRight.transition().duration(dur)
+      .attr("x1", xR).attr("x2", xR).attr("y1", 0).attr("y2", h);
+
+    // Check if curve stays within epsilon band for all h in (-delta, delta)
+    var contained = true;
+    for (var t = -del + 0.001; t < del; t += 0.005) {
+      if (t === 0) continue;
+      var val = Q(t);
+      if (Math.abs(val - L) >= eps) { contained = false; break; }
+    }
+    statusEl.textContent = contained
+      ? "Curve stays within \u03B5-band -- limit condition satisfied"
+      : "Curve escapes \u03B5-band -- need smaller \u03B4";
+    statusEl.style.color = contained ? "#388c46" : "#c74440";
+  }
+
+  var epsSlider = document.getElementById("d3_ch07_ed_eps");
+  var delSlider = document.getElementById("d3_ch07_ed_del");
+
+  epsSlider.addEventListener("input", function() { update(+epsSlider.value, +delSlider.value, true); });
+  delSlider.addEventListener("input", function() { update(+epsSlider.value, +delSlider.value, true); });
+
+  // Play: animate epsilon shrinking, with delta following
+  document.getElementById("d3_ch07_ed_play").addEventListener("click", function() {
+    var steps = [
+      {eps: 5, del: 0.7},
+      {eps: 3.5, del: 0.48},
+      {eps: 2, del: 0.27},
+      {eps: 1.2, del: 0.16},
+      {eps: 0.7, del: 0.09},
+      {eps: 0.4, del: 0.05},
+      {eps: 0.2, del: 0.025},
+      {eps: 0.1, del: 0.013}
+    ];
+    steps.forEach(function(s, i) {
+      setTimeout(function() {
+        epsSlider.value = s.eps;
+        delSlider.value = s.del;
+        update(s.eps, s.del, true);
+      }, i * 900);
+    });
+  });
+
+  update(3, 1, false);
+})();
+</script>
 ```
 
-### Interactive Python: Verifying L'Hopital's Rule Numerically
+Press **Play** to watch the epsilon and delta bands narrow simultaneously around
+the limit point $L = 12$. For the function $Q(h) = 12 + 6h + h^2$, as the
+adversary shrinks $\varepsilon$, we can always find a $\delta$ that keeps the
+curve inside the yellow output band. The status indicator confirms whether the
+current $(\varepsilon, \delta)$ pair satisfies the limit condition.
+
+### Animated: L'Hopital's Rule -- Ratio of Vanishing Functions
 
 ```{=html}
-<div class="pyodide-container">
-  <textarea class="code-input" id="code_ch07_2">
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Evaluate sin(pi*x) / (x^2 - 1) near x = 1
-def f(x):
-    return np.sin(np.pi * x) / (x**2 - 1)
-
-# Approach x = 1 from both sides
-offsets = np.logspace(-1, -10, 50)
-from_right = [f(1 + d) for d in offsets]
-from_left  = [f(1 - d) for d in offsets]
-
-limit_exact = -np.pi / 2
-
-fig, ax = plt.subplots(figsize=(8, 4))
-ax.semilogx(offsets, from_right, 'o-', markersize=3, color='steelblue',
-            label='From right: $f(1 + \\delta)$')
-ax.semilogx(offsets, from_left, 's-', markersize=3, color='coral',
-            label='From left: $f(1 - \\delta)$')
-ax.axhline(y=limit_exact, color='black', linestyle='--',
-           label=f'$-\\pi/2 \\approx {limit_exact:.6f}$')
-ax.set_xlabel('Offset $\\delta$')
-ax.set_ylabel('$f(1 \\pm \\delta)$')
-ax.set_title("Numerical verification of L'H\\^opital's Rule")
-ax.legend()
-ax.grid(True, alpha=0.3)
-
-plt.tight_layout()
-plt.show()
-
-print(f"Exact limit (L'Hopital): -pi/2 = {limit_exact:.10f}")
-print(f"Numerical at delta=1e-8:  from right = {f(1+1e-8):.10f}")
-print(f"                          from left  = {f(1-1e-8):.10f}")
-  </textarea>
-  <button class="run-btn" onclick="runPyodide('code_ch07_2', 'output_ch07_2', 'plot_ch07_2')">Run ▶</button>
-  <div class="output" id="output_ch07_2"></div>
-  <div class="plot-output" id="plot_ch07_2"></div>
+<div class="d3-container" id="d3_ch07_lhopital"></div>
+<div class="d3-controls">
+  <button id="d3_ch07_lh_play">Play &#9654;</button>
+  <label>Zoom toward x = 1:</label>
+  <input type="range" id="d3_ch07_lh_zoom" min="0" max="60" value="0" step="1">
+  <span class="value-display" id="d3_ch07_lh_zoom_val">Window: &plusmn;2.00</span>
+  <span class="value-display" id="d3_ch07_lh_ratio_val"></span>
 </div>
+<script>
+(function() {
+  const W = 700, H = 420, margin = {top: 30, right: 30, bottom: 50, left: 60};
+  const w = W - margin.left - margin.right, h = H - margin.top - margin.bottom;
+
+  // f(x) = sin(pi*x),  g(x) = x^2 - 1,  limit at x=1
+  const aVal = 1;
+  const limitVal = -Math.PI / 2;
+  function f(x) { return Math.sin(Math.PI * x); }
+  function g(x) { return x * x - 1; }
+  function fPrime(x) { return Math.PI * Math.cos(Math.PI * x); }
+  function gPrime(x) { return 2 * x; }
+
+  const svg = d3.select("#d3_ch07_lhopital").append("svg")
+    .attr("viewBox", `0 0 ${W} ${H}`)
+    .append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  // Axis groups (will be updated on zoom)
+  const xAxisG = svg.append("g").attr("transform", `translate(0,${h})`);
+  const yAxisG = svg.append("g");
+
+  // Axis labels
+  xAxisG.append("text").attr("x", w / 2).attr("y", 40).attr("fill", "#333")
+    .attr("text-anchor", "middle").attr("font-size", "14px").text("x");
+  yAxisG.append("text").attr("x", -h / 2).attr("y", -45).attr("fill", "#333")
+    .attr("text-anchor", "middle").attr("transform", "rotate(-90)")
+    .attr("font-size", "14px").text("y");
+
+  // Clipping rect
+  svg.append("defs").append("clipPath").attr("id", "ch07_lh_clip")
+    .append("rect").attr("width", w).attr("height", h);
+  const plotArea = svg.append("g").attr("clip-path", "url(#ch07_lh_clip)");
+
+  // Paths
+  const fPath = plotArea.append("path").attr("fill", "none").attr("stroke", "#388c46").attr("stroke-width", 2);
+  const gPath = plotArea.append("path").attr("fill", "none").attr("stroke", "#fa7e19").attr("stroke-width", 2);
+  const ratioPath = plotArea.append("path").attr("fill", "none").attr("stroke", "#2d70b3").attr("stroke-width", 2.5);
+
+  // Tangent lines (shown at higher zoom)
+  const fTangent = plotArea.append("line").attr("stroke", "#388c46").attr("stroke-dasharray", "5,3").attr("stroke-width", 1.5).attr("opacity", 0);
+  const gTangent = plotArea.append("line").attr("stroke", "#fa7e19").attr("stroke-dasharray", "5,3").attr("stroke-width", 1.5).attr("opacity", 0);
+
+  // Limit line
+  const limitLine = plotArea.append("line").attr("stroke", "#c74440").attr("stroke-dasharray", "6,3").attr("stroke-width", 1.5);
+
+  // Open circle at limit point
+  const limitDot = plotArea.append("circle")
+    .attr("r", 5).attr("fill", "white").attr("stroke", "#c74440").attr("stroke-width", 2);
+
+  // Legend
+  var legend = svg.append("g").attr("transform", `translate(${w - 180}, 10)`);
+  [{label: "sin(\u03C0x)", color: "#388c46"}, {label: "x\u00B2 \u2212 1", color: "#fa7e19"},
+   {label: "sin(\u03C0x)/(x\u00B2\u22121)", color: "#2d70b3"}, {label: "\u2212\u03C0/2", color: "#c74440"}].forEach(function(d, i) {
+    legend.append("line").attr("x1", 0).attr("x2", 18).attr("y1", i * 18).attr("y2", i * 18)
+      .attr("stroke", d.color).attr("stroke-width", 2);
+    legend.append("text").attr("x", 22).attr("y", i * 18 + 4)
+      .attr("font-size", "11px").attr("fill", "#333").text(d.label);
+  });
+
+  // Ratio readout
+  const ratioEl = document.getElementById("d3_ch07_lh_ratio_val");
+  const zoomEl = document.getElementById("d3_ch07_lh_zoom_val");
+
+  function update(zoomLevel, animate) {
+    var dur = animate ? 500 : 0;
+    // zoomLevel 0..60 maps to half-width 2.0 down to 0.005
+    var halfW = 2.0 * Math.pow(0.005 / 2.0, zoomLevel / 60);
+    var xMin = aVal - halfW, xMax = aVal + halfW;
+
+    zoomEl.textContent = "Window: \u00B1" + halfW.toFixed(3);
+
+    // Evaluate ratio at the boundary to show convergence
+    var edgeX = aVal + halfW * 0.5;
+    if (Math.abs(edgeX - aVal) > 1e-12) {
+      var ratioVal = f(edgeX) / g(edgeX);
+      ratioEl.textContent = "f/g at x=" + edgeX.toFixed(5) + " = " + ratioVal.toFixed(6)
+        + "  |  f'/g' = " + (limitVal).toFixed(6);
+    }
+
+    // Determine y range from the curves
+    var samples = d3.range(xMin, xMax, (xMax - xMin) / 300);
+    var yVals = [];
+    samples.forEach(function(x) {
+      yVals.push(f(x));
+      yVals.push(g(x));
+      if (Math.abs(x - aVal) > 1e-10) {
+        var r = f(x) / g(x);
+        if (isFinite(r)) yVals.push(r);
+      }
+    });
+    yVals.push(limitVal);
+    var yMin = d3.min(yVals) - 0.2;
+    var yMax = d3.max(yVals) + 0.2;
+    // Clamp to avoid extreme ranges
+    if (yMax - yMin < 0.1) { yMin -= 0.5; yMax += 0.5; }
+    if (yMax - yMin > 20) { yMin = Math.max(yMin, -6); yMax = Math.min(yMax, 6); }
+
+    var xScale = d3.scaleLinear().domain([xMin, xMax]).range([0, w]);
+    var yScale = d3.scaleLinear().domain([yMin, yMax]).range([h, 0]);
+
+    // Update axes
+    xAxisG.transition().duration(dur).call(d3.axisBottom(xScale).ticks(6));
+    yAxisG.transition().duration(dur).call(d3.axisLeft(yScale).ticks(6));
+
+    // Generate curve data
+    var step = (xMax - xMin) / 400;
+    var fData = [], gData = [], rData = [];
+    for (var x = xMin; x <= xMax; x += step) {
+      fData.push([x, f(x)]);
+      gData.push([x, g(x)]);
+      if (Math.abs(x - aVal) > step * 0.5) {
+        var r = f(x) / g(x);
+        if (isFinite(r) && r > yMin - 1 && r < yMax + 1) rData.push([x, r]);
+      }
+    }
+
+    var line = d3.line().x(function(d) { return xScale(d[0]); }).y(function(d) { return yScale(d[1]); });
+
+    fPath.transition().duration(dur).attr("d", line(fData));
+    gPath.transition().duration(dur).attr("d", line(gData));
+    ratioPath.transition().duration(dur).attr("d", line(rData));
+
+    // Limit line
+    limitLine.transition().duration(dur)
+      .attr("x1", xScale(xMin)).attr("x2", xScale(xMax))
+      .attr("y1", yScale(limitVal)).attr("y2", yScale(limitVal));
+
+    // Limit dot
+    limitDot.transition().duration(dur)
+      .attr("cx", xScale(aVal)).attr("cy", yScale(limitVal));
+
+    // Tangent lines become visible at higher zoom
+    var tangentOpacity = Math.min(1, Math.max(0, (zoomLevel - 15) / 15));
+    var fSlope = fPrime(aVal);
+    var gSlope = gPrime(aVal);
+    fTangent.transition().duration(dur).attr("opacity", tangentOpacity)
+      .attr("x1", xScale(xMin)).attr("y1", yScale(fSlope * (xMin - aVal)))
+      .attr("x2", xScale(xMax)).attr("y2", yScale(fSlope * (xMax - aVal)));
+    gTangent.transition().duration(dur).attr("opacity", tangentOpacity)
+      .attr("x1", xScale(xMin)).attr("y1", yScale(gSlope * (xMin - aVal)))
+      .attr("x2", xScale(xMax)).attr("y2", yScale(gSlope * (xMax - aVal)));
+  }
+
+  var zoomSlider = document.getElementById("d3_ch07_lh_zoom");
+  zoomSlider.addEventListener("input", function() { update(+zoomSlider.value, true); });
+
+  // Play animation: zoom in progressively
+  document.getElementById("d3_ch07_lh_play").addEventListener("click", function() {
+    var step = 0;
+    var maxStep = 60;
+    var interval = setInterval(function() {
+      step = Math.min(maxStep, step + 1);
+      zoomSlider.value = step;
+      update(step, true);
+      if (step >= maxStep) clearInterval(interval);
+    }, 150);
+  });
+
+  update(0, false);
+})();
+</script>
 ```
+
+Press **Play** to zoom in toward $x = 1$, where both $\sin(\pi x)$ (green) and
+$x^2 - 1$ (orange) vanish. As the window shrinks, the curves become
+indistinguishable from their tangent lines (dashed), and the ratio $f(x)/g(x)$
+(blue) converges visibly to $-\pi/2$ (dashed red). This illustrates the
+geometric content of L'Hopital's Rule: near the shared zero, the ratio of the
+functions equals the ratio of their slopes.
 
 ## Summary
 

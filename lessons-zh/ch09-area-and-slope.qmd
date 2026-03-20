@@ -26,9 +26,7 @@ date: 2023-04-01
 ## 课程视频
 
 ```{=html}
-<video controls width="100%" preload="metadata">
-  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/09_What%20does%20area%20have%20to%20do%20with%20slope%EF%BC%9F%20%EF%BD%9C%20Chapter%209%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
-</video>
+<div class="video-container"><iframe src="https://www.youtube.com/embed/FnJqaIESC2s" title="What does area have to do with slope?" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
 ```
 
 ## 课程关键帧
@@ -184,106 +182,320 @@ $$
 
 这一推导凸显了微积分中反复出现的主题：当我们希望将一个离散运算（此处为有限个值的平均）推广到连续情形时，自然的工具就是积分。
 
-### 交互演示：平均值近似（Python）
+### 动画演示：sin(x) 在 [0, pi] 上的平均值
 
 ```{=html}
-<div class="pyodide-container">
-  <textarea class="code-input" id="code_ch09_1">
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Approximate the average value of sin(x) on [0, pi]
-a, b = 0, np.pi
-N_values = [5, 10, 25, 50, 100, 500]
-exact_avg = 2 / np.pi
-
-fig, axes = plt.subplots(2, 3, figsize=(12, 7))
-axes = axes.flatten()
-
-for idx, N in enumerate(N_values):
-    dx = (b - a) / N
-    x_samples = np.linspace(a + dx/2, b - dx/2, N)
-    heights = np.sin(x_samples)
-    approx_avg = np.mean(heights)
-
-    x_fine = np.linspace(a, b, 500)
-    axes[idx].plot(x_fine, np.sin(x_fine), 'b-', linewidth=1.5)
-    axes[idx].bar(x_samples, heights, width=dx*0.9, alpha=0.4,
-                  color='green', edgecolor='green')
-    axes[idx].axhline(y=exact_avg, color='red', linestyle='--',
-                      linewidth=1, label=f'Exact = {exact_avg:.4f}')
-    axes[idx].axhline(y=approx_avg, color='orange', linestyle=':',
-                      linewidth=1, label=f'Approx = {approx_avg:.4f}')
-    axes[idx].set_title(f'N = {N}')
-    axes[idx].set_xlim(-0.2, 3.5)
-    axes[idx].set_ylim(-0.1, 1.2)
-    axes[idx].legend(fontsize=7)
-
-plt.suptitle('Average value of sin(x) on [0, pi]', fontsize=13)
-plt.tight_layout()
-plt.show()
-  </textarea>
-  <button class="run-btn" onclick="runPyodide('code_ch09_1', 'output_ch09_1', 'plot_ch09_1')">Run ▶</button>
-  <div class="output" id="output_ch09_1"></div>
-  <div class="plot-output" id="plot_ch09_1"></div>
+<div class="d3-container" id="ch09_d3_avg_sin"></div>
+<div class="d3-controls">
+  <button id="ch09_d3_avg_sin_play">Play &#9654;</button>
+  <label>Sample points N:</label>
+  <input type="range" id="ch09_d3_avg_sin_n" min="2" max="200" value="5" step="1">
+  <span class="value-display" id="ch09_d3_avg_sin_n_val">N = 5</span>
+  <span class="value-display" id="ch09_d3_avg_sin_info"></span>
 </div>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+(function() {
+  const W = 700, H = 400, margin = {top: 30, right: 30, bottom: 50, left: 60};
+  const w = W - margin.left - margin.right, h = H - margin.top - margin.bottom;
+  const a = 0, b = Math.PI;
+  const exact = 2 / Math.PI;
+
+  const svg = d3.select("#ch09_d3_avg_sin").append("svg")
+    .attr("viewBox", `0 0 ${W} ${H}`)
+    .append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const xScale = d3.scaleLinear().domain([0, Math.PI]).range([0, w]);
+  const yScale = d3.scaleLinear().domain([0, 1.15]).range([h, 0]);
+
+  // Axes
+  svg.append("g").attr("transform", `translate(0,${h})`)
+    .call(d3.axisBottom(xScale).tickValues([0, Math.PI/4, Math.PI/2, 3*Math.PI/4, Math.PI])
+      .tickFormat(d => {
+        if (d === 0) return "0";
+        if (Math.abs(d - Math.PI/4) < 0.01) return "\u03C0/4";
+        if (Math.abs(d - Math.PI/2) < 0.01) return "\u03C0/2";
+        if (Math.abs(d - 3*Math.PI/4) < 0.01) return "3\u03C0/4";
+        if (Math.abs(d - Math.PI) < 0.01) return "\u03C0";
+        return d.toFixed(2);
+      }))
+    .append("text").attr("x", w/2).attr("y", 40).attr("fill", "#333")
+    .attr("text-anchor", "middle").attr("font-size", "14px").text("x");
+
+  svg.append("g").call(d3.axisLeft(yScale).ticks(6))
+    .append("text").attr("x", -h/2).attr("y", -45).attr("fill", "#333")
+    .attr("text-anchor", "middle").attr("transform", "rotate(-90)")
+    .attr("font-size", "14px").text("sin(x)");
+
+  // sin(x) curve
+  const curveData = d3.range(0, Math.PI + 0.01, 0.01).map(t => [t, Math.sin(t)]);
+  svg.append("path").datum(curveData)
+    .attr("d", d3.line().x(d => xScale(d[0])).y(d => yScale(d[1])))
+    .attr("fill", "none").attr("stroke", "#2d70b3").attr("stroke-width", 2.5);
+
+  // Exact average line
+  svg.append("line")
+    .attr("x1", xScale(0)).attr("x2", xScale(Math.PI))
+    .attr("y1", yScale(exact)).attr("y2", yScale(exact))
+    .attr("stroke", "#c74440").attr("stroke-width", 1.5)
+    .attr("stroke-dasharray", "6,4");
+
+  svg.append("text")
+    .attr("x", xScale(Math.PI) + 5).attr("y", yScale(exact) + 4)
+    .attr("font-size", "12px").attr("fill", "#c74440").text("2/\u03C0 \u2248 0.6366");
+
+  // Approx average line (will be updated)
+  const approxLine = svg.append("line")
+    .attr("x1", xScale(0)).attr("x2", xScale(Math.PI))
+    .attr("stroke", "#e8a735").attr("stroke-width", 1.5)
+    .attr("stroke-dasharray", "3,3");
+
+  const approxLabel = svg.append("text")
+    .attr("x", 5).attr("font-size", "12px").attr("fill", "#e8a735");
+
+  const barsGroup = svg.append("g");
+  const dotsGroup = svg.append("g");
+
+  function update(N, animate) {
+    const dx = (b - a) / N;
+    const samples = d3.range(N).map(i => {
+      const xi = a + (i + 0.5) * dx;
+      return {x: xi, y: Math.sin(xi), left: a + i * dx};
+    });
+    const avg = d3.mean(samples, d => d.y);
+    const error = Math.abs(avg - exact);
+
+    document.getElementById("ch09_d3_avg_sin_n_val").textContent = `N = ${N}`;
+    document.getElementById("ch09_d3_avg_sin_info").textContent =
+      `Approx = ${avg.toFixed(6)}  |  Exact = ${exact.toFixed(6)}  |  Error = ${error.toFixed(6)}`;
+
+    // Update approx average line
+    approxLine
+      .attr("y1", yScale(avg)).attr("y2", yScale(avg));
+    approxLabel
+      .attr("y", yScale(avg) - 6)
+      .text(`Approx = ${avg.toFixed(4)}`);
+
+    // Bars
+    const bars = barsGroup.selectAll("rect").data(samples, (d, i) => i);
+    bars.exit().transition().duration(animate ? 200 : 0).attr("height", 0).attr("y", yScale(0)).remove();
+
+    const barW = Math.max(1, xScale(dx) - xScale(0) - (N < 30 ? 1 : 0));
+    const enter = bars.enter().append("rect")
+      .attr("x", d => xScale(d.left))
+      .attr("y", yScale(0))
+      .attr("width", barW)
+      .attr("height", 0)
+      .attr("fill", "#388c46").attr("opacity", 0.5);
+
+    enter.merge(bars).transition().duration(animate ? 500 : 0)
+      .attr("x", d => xScale(d.left))
+      .attr("width", barW)
+      .attr("y", d => yScale(d.y))
+      .attr("height", d => yScale(0) - yScale(d.y));
+
+    // Dots on curve
+    const dots = dotsGroup.selectAll("circle").data(samples, (d, i) => i);
+    dots.exit().remove();
+    const enterDots = dots.enter().append("circle")
+      .attr("r", N <= 50 ? 3 : 1.5)
+      .attr("fill", "#2d70b3");
+    enterDots.merge(dots)
+      .attr("cx", d => xScale(d.x))
+      .attr("cy", d => yScale(d.y))
+      .attr("r", N <= 50 ? 3 : 1.5);
+  }
+
+  const slider = document.getElementById("ch09_d3_avg_sin_n");
+  slider.addEventListener("input", () => update(+slider.value, true));
+
+  document.getElementById("ch09_d3_avg_sin_play").addEventListener("click", function() {
+    let n = 2;
+    slider.value = n;
+    update(n, true);
+    const steps = [2,3,4,5,6,8,10,13,16,20,25,30,40,50,65,80,100,130,160,200];
+    let idx = 0;
+    const interval = setInterval(() => {
+      idx++;
+      if (idx >= steps.length) { clearInterval(interval); return; }
+      n = steps[idx];
+      slider.value = n;
+      update(n, true);
+    }, 600);
+  });
+
+  update(5, false);
+})();
+</script>
 ```
 
-### 交互演示：原函数斜率等于平均值（Python）
+点击 **Play** 观看采样点数量逐步增长。绿色柱形显示 $\sin(x)$ 的各采样高度，橙色虚线追踪近似平均值。随着 $N$ 增大，近似平均值收敛到精确值 $2/\pi \approx 0.6366$（红色虚线）。
+
+### 动画演示：原函数斜率等于平均值
 
 ```{=html}
-<div class="pyodide-container">
-  <textarea class="code-input" id="code_ch09_2">
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Demonstrate: slope of antiderivative = average value of function
-x = np.linspace(0, 2*np.pi, 500)
-
-# f(x) = sin(x), F(x) = -cos(x)
-f = np.sin(x)
-F = -np.cos(x)
-
-a, b = 0.5, 4.0  # interval endpoints
-avg_value = (-np.cos(b) - (-np.cos(a))) / (b - a)
-secant_slope = ((-np.cos(b)) - (-np.cos(a))) / (b - a)
-
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
-
-# Left panel: f(x) = sin(x) with shaded area
-ax1.plot(x, f, 'b-', linewidth=1.5, label='$f(x) = \\sin(x)$')
-mask = (x >= a) & (x <= b)
-ax1.fill_between(x[mask], f[mask], alpha=0.3, color='blue')
-ax1.axhline(y=avg_value, color='red', linestyle='--',
-            label=f'Avg value = {avg_value:.4f}')
-ax1.axhline(y=0, color='gray', linewidth=0.5)
-ax1.set_xlabel('x')
-ax1.set_title('$f(x) = \\sin(x)$ and its average on $[a, b]$')
-ax1.legend()
-
-# Right panel: F(x) = -cos(x) with secant line
-ax2.plot(x, F, 'g-', linewidth=1.5, label='$F(x) = -\\cos(x)$')
-ax2.plot([a, b], [-np.cos(a), -np.cos(b)], 'ro-', markersize=8)
-secant_line = -np.cos(a) + secant_slope * (x - a)
-ax2.plot(x, secant_line, 'r--', linewidth=1,
-         label=f'Secant slope = {secant_slope:.4f}')
-ax2.axhline(y=0, color='gray', linewidth=0.5)
-ax2.set_xlabel('x')
-ax2.set_title('$F(x) = -\\cos(x)$ and its secant on $[a, b]$')
-ax2.legend()
-
-plt.suptitle(
-    f'Average value = {avg_value:.4f},  '
-    f'Secant slope = {secant_slope:.4f}  (they match)',
-    fontsize=12, fontweight='bold')
-plt.tight_layout()
-plt.show()
-  </textarea>
-  <button class="run-btn" onclick="runPyodide('code_ch09_2', 'output_ch09_2', 'plot_ch09_2')">Run ▶</button>
-  <div class="output" id="output_ch09_2"></div>
-  <div class="plot-output" id="plot_ch09_2"></div>
+<div class="d3-container" id="ch09_d3_secant"></div>
+<div class="d3-controls">
+  <button id="ch09_d3_secant_play">Play &#9654;</button>
+  <label>Interval [0, b]:</label>
+  <input type="range" id="ch09_d3_secant_b" min="0.3" max="6.28" value="3.14" step="0.02">
+  <span class="value-display" id="ch09_d3_secant_b_val">b = &pi;</span>
+  <span class="value-display" id="ch09_d3_secant_info"></span>
 </div>
+<script>
+(function() {
+  const W = 700, H = 420, margin = {top: 30, right: 30, bottom: 50, left: 60};
+  const w = W - margin.left - margin.right, h = H - margin.top - margin.bottom;
+
+  const svg = d3.select("#ch09_d3_secant").append("svg")
+    .attr("viewBox", `0 0 ${W} ${H}`)
+    .append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  // Split into two panels: top for sin(x) + shaded area, bottom for -cos(x) + secant
+  const hTop = h * 0.45, hBot = h * 0.45, gap = h * 0.10;
+
+  const xScale = d3.scaleLinear().domain([0, 2 * Math.PI]).range([0, w]);
+  const yTopScale = d3.scaleLinear().domain([-0.2, 1.15]).range([hTop, 0]);
+  const yBotScale = d3.scaleLinear().domain([-1.3, 1.3]).range([hBot, 0]);
+
+  const topG = svg.append("g");
+  const botG = svg.append("g").attr("transform", `translate(0,${hTop + gap})`);
+
+  // Top axes
+  topG.append("g").attr("transform", `translate(0,${hTop})`)
+    .call(d3.axisBottom(xScale).ticks(7).tickFormat(d => {
+      if (d === 0) return "0";
+      if (Math.abs(d - Math.PI) < 0.1) return "\u03C0";
+      if (Math.abs(d - 2*Math.PI) < 0.1) return "2\u03C0";
+      return d.toFixed(1);
+    }));
+  topG.append("g").call(d3.axisLeft(yTopScale).ticks(4));
+  topG.append("text").attr("x", w/2).attr("y", -10)
+    .attr("text-anchor", "middle").attr("font-size", "13px").attr("font-weight", 600)
+    .attr("fill", "#2d70b3").text("f(x) = sin(x)  \u2014  shaded area / width = average value");
+
+  // Bottom axes
+  botG.append("g").attr("transform", `translate(0,${hBot})`)
+    .call(d3.axisBottom(xScale).ticks(7).tickFormat(d => {
+      if (d === 0) return "0";
+      if (Math.abs(d - Math.PI) < 0.1) return "\u03C0";
+      if (Math.abs(d - 2*Math.PI) < 0.1) return "2\u03C0";
+      return d.toFixed(1);
+    }));
+  botG.append("g").call(d3.axisLeft(yBotScale).ticks(5));
+  botG.append("text").attr("x", w/2).attr("y", -10)
+    .attr("text-anchor", "middle").attr("font-size", "13px").attr("font-weight", 600)
+    .attr("fill", "#388c46").text("F(x) = \u2212cos(x)  \u2014  secant slope = average value");
+
+  // sin(x) curve
+  const sinData = d3.range(0, 2 * Math.PI + 0.01, 0.02).map(t => [t, Math.sin(t)]);
+  topG.append("path").datum(sinData)
+    .attr("d", d3.line().x(d => xScale(d[0])).y(d => yTopScale(d[1])))
+    .attr("fill", "none").attr("stroke", "#2d70b3").attr("stroke-width", 2);
+
+  // -cos(x) curve
+  const cosData = d3.range(0, 2 * Math.PI + 0.01, 0.02).map(t => [t, -Math.cos(t)]);
+  botG.append("path").datum(cosData)
+    .attr("d", d3.line().x(d => xScale(d[0])).y(d => yBotScale(d[1])))
+    .attr("fill", "none").attr("stroke", "#388c46").attr("stroke-width", 2);
+
+  // Zero lines
+  topG.append("line").attr("x1", 0).attr("x2", w)
+    .attr("y1", yTopScale(0)).attr("y2", yTopScale(0))
+    .attr("stroke", "#aaa").attr("stroke-width", 0.5);
+  botG.append("line").attr("x1", 0).attr("x2", w)
+    .attr("y1", yBotScale(0)).attr("y2", yBotScale(0))
+    .attr("stroke", "#aaa").attr("stroke-width", 0.5);
+
+  // Shaded area (clip path for top panel)
+  const areaPath = topG.append("path")
+    .attr("fill", "#2d70b3").attr("opacity", 0.2);
+
+  // Average line on top panel
+  const avgLine = topG.append("line")
+    .attr("stroke", "#c74440").attr("stroke-width", 1.5).attr("stroke-dasharray", "6,4");
+
+  // Secant line on bottom panel
+  const secantLine = botG.append("line")
+    .attr("stroke", "#c74440").attr("stroke-width", 2).attr("stroke-dasharray", "6,4");
+
+  // Endpoint dots on bottom panel
+  const dotA = botG.append("circle").attr("r", 5).attr("fill", "#c74440");
+  const dotB = botG.append("circle").attr("r", 5).attr("fill", "#c74440");
+
+  // Vertical marker line on top panel for b
+  const bMarkerTop = topG.append("line")
+    .attr("stroke", "#999").attr("stroke-width", 1).attr("stroke-dasharray", "3,3");
+  const bMarkerBot = botG.append("line")
+    .attr("stroke", "#999").attr("stroke-width", 1).attr("stroke-dasharray", "3,3");
+
+  function update(bVal) {
+    const aVal = 0;
+    const Fa = -Math.cos(aVal);
+    const Fb = -Math.cos(bVal);
+    const slope = (Fb - Fa) / (bVal - aVal);
+    const avgVal = slope; // average of sin(x) on [0,b] = secant slope
+
+    document.getElementById("ch09_d3_secant_b_val").textContent =
+      `b = ${bVal.toFixed(2)}`;
+    document.getElementById("ch09_d3_secant_info").textContent =
+      `Average sin(x) = ${avgVal.toFixed(4)}  |  Secant slope = ${slope.toFixed(4)}`;
+
+    // Shaded area
+    const pts = d3.range(aVal, bVal + 0.01, 0.02).map(t => [t, Math.max(0, Math.sin(t))]);
+    const areaD = "M" + xScale(aVal) + "," + yTopScale(0) + " " +
+      pts.map(d => `L${xScale(d[0])},${yTopScale(d[1])}`).join(" ") +
+      ` L${xScale(bVal)},${yTopScale(0)} Z`;
+    areaPath.attr("d", areaD);
+
+    // Average line
+    avgLine
+      .attr("x1", xScale(aVal)).attr("x2", xScale(bVal))
+      .attr("y1", yTopScale(avgVal)).attr("y2", yTopScale(avgVal));
+
+    // Secant line on bottom (extend slightly beyond endpoints)
+    const ext = 0.3;
+    secantLine
+      .attr("x1", xScale(Math.max(0, aVal - ext)))
+      .attr("x2", xScale(Math.min(2*Math.PI, bVal + ext)))
+      .attr("y1", yBotScale(Fa + slope * (-ext)))
+      .attr("y2", yBotScale(Fa + slope * (bVal - aVal + ext)));
+
+    // Dots
+    dotA.attr("cx", xScale(aVal)).attr("cy", yBotScale(Fa));
+    dotB.attr("cx", xScale(bVal)).attr("cy", yBotScale(Fb));
+
+    // Vertical markers
+    bMarkerTop
+      .attr("x1", xScale(bVal)).attr("x2", xScale(bVal))
+      .attr("y1", yTopScale(0)).attr("y2", yTopScale(1.15));
+    bMarkerBot
+      .attr("x1", xScale(bVal)).attr("x2", xScale(bVal))
+      .attr("y1", yBotScale(-1.3)).attr("y2", yBotScale(1.3));
+  }
+
+  const slider = document.getElementById("ch09_d3_secant_b");
+  slider.addEventListener("input", () => update(+slider.value));
+
+  document.getElementById("ch09_d3_secant_play").addEventListener("click", function() {
+    let bVal = 0.3;
+    slider.value = bVal;
+    update(bVal);
+    const target = Math.PI;
+    const interval = setInterval(() => {
+      bVal += 0.06;
+      if (bVal >= target) { bVal = target; clearInterval(interval); }
+      slider.value = bVal;
+      update(bVal);
+    }, 40);
+  });
+
+  update(Math.PI);
+})();
+</script>
 ```
+
+点击 **Play** 动画展示右端点 $b$ 从接近 $0$ 扫到 $\pi$。上方面板显示 $\sin(x)$ 的阴影面积和平均高度处的红色虚线。下方面板显示 $F(x) = -\cos(x)$ 及连接 $(0, F(0))$ 和 $(b, F(b))$ 的红色割线。割线斜率始终等于 $\sin(x)$ 在 $[0, b]$ 上的平均值，直观地展示面积与斜率是同一枚硬币的两面。
 
 ## 速查表
 

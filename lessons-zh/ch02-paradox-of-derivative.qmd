@@ -26,9 +26,7 @@ date: 2023-04-08
 ## 课程视频
 
 ```{=html}
-<video controls width="100%" preload="metadata">
-  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/02_The%20paradox%20of%20the%20derivative%20%EF%BD%9C%20Chapter%202%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
-</video>
+<div class="video-container"><iframe src="https://www.youtube.com/embed/9vKqVkMQHKk" title="The paradox of the derivative" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
 ```
 
 ## 课程关键帧
@@ -201,98 +199,328 @@ $$
 
 正确的理解是：$t = 0$ 处导数为零意味着在 $t = 0$ 附近速度的**最佳常数逼近**为零。因此，"瞬时变化率"这一说法应当理解为这个极限概念的简便表述，而非对单一瞬间发生变化的字面描述。
 
-### 交互演示：计算差商（Python）
+### 动画演示：割线趋近切线
 
 ```{=html}
-<div class="pyodide-container">
-  <textarea class="code-input" id="code_ch02_1">
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Distance function and its true derivative
-def s(t):
-    return t**3
-
-def ds_dt_exact(t):
-    return 3 * t**2
-
-# Compute the difference quotient for several values of dt
-t_vals = np.linspace(0, 3, 300)
-dt_values = [1.0, 0.5, 0.1, 0.01]
-
-fig, ax = plt.subplots(figsize=(9, 5))
-
-for dt in dt_values:
-    dq = (s(t_vals + dt) - s(t_vals)) / dt
-    ax.plot(t_vals, dq, alpha=0.7, label=f'dt = {dt}')
-
-ax.plot(t_vals, ds_dt_exact(t_vals), 'k--', linewidth=2, label='True derivative $3t^2$')
-ax.set_xlabel('t')
-ax.set_ylabel('ds / dt')
-ax.set_title('Difference quotient approaching the derivative')
-ax.legend()
-ax.set_ylim(-1, 30)
-ax.grid(True, alpha=0.3)
-plt.tight_layout()
-plt.show()
-  </textarea>
-  <button class="run-btn" onclick="runPyodide('code_ch02_1', 'output_ch02_1', 'plot_ch02_1')">Run ▶</button>
-  <div class="output" id="output_ch02_1"></div>
-  <div class="plot-output" id="plot_ch02_1"></div>
+<div class="d3-container" id="d3_ch02_secant"></div>
+<div class="d3-controls">
+  <button id="d3_ch02_secant_play">Play &#9654;</button>
+  <label>t₀:</label>
+  <input type="range" id="d3_ch02_secant_t0" min="0.2" max="2.8" value="2" step="0.05">
+  <span class="value-display" id="d3_ch02_secant_t0_val">t₀ = 2.00</span>
+  <label>dt:</label>
+  <input type="range" id="d3_ch02_secant_dt" min="0.01" max="2" value="1.5" step="0.01">
+  <span class="value-display" id="d3_ch02_secant_dt_val">dt = 1.50</span>
+  <span class="value-display" id="d3_ch02_secant_slope_val"></span>
 </div>
+<script>
+(function() {
+  var W = 700, H = 420, margin = {top: 30, right: 30, bottom: 50, left: 60};
+  var w = W - margin.left - margin.right, h = H - margin.top - margin.bottom;
+  var tMax = 3.2, sMax = 30;
+
+  function s(t) { return t * t * t; }
+  function dsDt(t) { return 3 * t * t; }
+
+  var svg = d3.select("#d3_ch02_secant").append("svg")
+    .attr("viewBox", "0 0 " + W + " " + H)
+    .append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  var xScale = d3.scaleLinear().domain([0, tMax]).range([0, w]);
+  var yScale = d3.scaleLinear().domain([0, sMax]).range([h, 0]);
+
+  // Axes
+  svg.append("g").attr("transform", "translate(0," + h + ")").call(d3.axisBottom(xScale).ticks(8))
+    .append("text").attr("x", w / 2).attr("y", 40).attr("fill", "#333")
+    .attr("text-anchor", "middle").attr("font-size", "14px").text("t");
+  svg.append("g").call(d3.axisLeft(yScale).ticks(6))
+    .append("text").attr("x", -h / 2).attr("y", -45).attr("fill", "#333")
+    .attr("text-anchor", "middle").attr("transform", "rotate(-90)")
+    .attr("font-size", "14px").text("s(t) = t\u00B3");
+
+  // Curve s(t) = t^3
+  var curveData = d3.range(0, tMax + 0.01, 0.02).map(function(t) { return [t, s(t)]; });
+  svg.append("path").datum(curveData)
+    .attr("d", d3.line().x(function(d) { return xScale(d[0]); }).y(function(d) { return yScale(d[1]); }))
+    .attr("fill", "none").attr("stroke", "#2d70b3").attr("stroke-width", 2.5);
+
+  // Tangent line (dashed red)
+  var tangentLine = svg.append("line")
+    .attr("stroke", "#c74440").attr("stroke-width", 1.5)
+    .attr("stroke-dasharray", "6,4").attr("opacity", 0.8);
+
+  // Secant line (solid green)
+  var secantLine = svg.append("line")
+    .attr("stroke", "#388c46").attr("stroke-width", 2.5).attr("opacity", 0.9);
+
+  // Points
+  var ptA = svg.append("circle").attr("r", 5).attr("fill", "#c74440");
+  var ptB = svg.append("circle").attr("r", 5).attr("fill", "#388c46");
+
+  // Vertical/horizontal guide for ds and dt
+  var guideDt = svg.append("line").attr("stroke", "#888").attr("stroke-width", 1).attr("stroke-dasharray", "3,3");
+  var guideDs = svg.append("line").attr("stroke", "#888").attr("stroke-width", 1).attr("stroke-dasharray", "3,3");
+  var labelDt = svg.append("text").attr("font-size", "12px").attr("fill", "#888").attr("text-anchor", "middle");
+  var labelDs = svg.append("text").attr("font-size", "12px").attr("fill", "#888").attr("text-anchor", "middle");
+
+  // Slope labels
+  var slopeLabel = svg.append("text").attr("font-size", "14px").attr("font-weight", 600)
+    .attr("text-anchor", "start");
+
+  function clampLine(t0, slope, s0) {
+    // Extend a line through (t0, s0) with given slope across the visible region
+    var tL = 0, tR = tMax;
+    var sL = s0 + slope * (tL - t0);
+    var sR = s0 + slope * (tR - t0);
+    // Clamp to y bounds
+    if (sL < 0) { tL = t0 - s0 / slope; sL = 0; }
+    if (sL > sMax) { tL = t0 + (sMax - s0) / slope; sL = sMax; }
+    if (sR < 0) { tR = t0 - s0 / slope; sR = 0; }
+    if (sR > sMax) { tR = t0 + (sMax - s0) / slope; sR = sMax; }
+    return {x1: xScale(tL), y1: yScale(sL), x2: xScale(tR), y2: yScale(sR)};
+  }
+
+  function update(animate) {
+    var t0 = +document.getElementById("d3_ch02_secant_t0").value;
+    var dt = +document.getElementById("d3_ch02_secant_dt").value;
+    var s0 = s(t0);
+    var s1 = s(t0 + dt);
+    var secantSlope = (s1 - s0) / dt;
+    var tangentSlope = dsDt(t0);
+
+    document.getElementById("d3_ch02_secant_t0_val").textContent = "t\u2080 = " + t0.toFixed(2);
+    document.getElementById("d3_ch02_secant_dt_val").textContent = "dt = " + dt.toFixed(2);
+    document.getElementById("d3_ch02_secant_slope_val").textContent =
+      "Secant slope = " + secantSlope.toFixed(3) + "  |  True derivative = " + tangentSlope.toFixed(3);
+
+    var dur = animate ? 400 : 0;
+
+    // Tangent line
+    var tl = clampLine(t0, tangentSlope, s0);
+    tangentLine.transition().duration(dur)
+      .attr("x1", tl.x1).attr("y1", tl.y1).attr("x2", tl.x2).attr("y2", tl.y2);
+
+    // Secant line
+    var sl = clampLine(t0, secantSlope, s0);
+    secantLine.transition().duration(dur)
+      .attr("x1", sl.x1).attr("y1", sl.y1).attr("x2", sl.x2).attr("y2", sl.y2);
+
+    // Points
+    ptA.transition().duration(dur).attr("cx", xScale(t0)).attr("cy", yScale(s0));
+    ptB.transition().duration(dur).attr("cx", xScale(t0 + dt)).attr("cy", yScale(s1));
+
+    // dt guide (horizontal from A to below B)
+    guideDt.transition().duration(dur)
+      .attr("x1", xScale(t0)).attr("y1", yScale(s0))
+      .attr("x2", xScale(t0 + dt)).attr("y2", yScale(s0));
+    labelDt.transition().duration(dur)
+      .attr("x", xScale(t0 + dt / 2)).attr("y", yScale(s0) + 15).text("dt");
+
+    // ds guide (vertical from end of dt guide up to B)
+    guideDs.transition().duration(dur)
+      .attr("x1", xScale(t0 + dt)).attr("y1", yScale(s0))
+      .attr("x2", xScale(t0 + dt)).attr("y2", yScale(s1));
+    labelDs.transition().duration(dur)
+      .attr("x", xScale(t0 + dt) + 15).attr("y", yScale((s0 + s1) / 2)).text("ds");
+
+    // Slope label
+    slopeLabel.transition().duration(dur)
+      .attr("x", 10).attr("y", 20)
+      .text("ds/dt = " + secantSlope.toFixed(3));
+    slopeLabel.attr("fill", Math.abs(secantSlope - tangentSlope) < 0.5 ? "#388c46" : "#2d70b3");
+  }
+
+  document.getElementById("d3_ch02_secant_t0").addEventListener("input", function() { update(true); });
+  document.getElementById("d3_ch02_secant_dt").addEventListener("input", function() { update(true); });
+
+  document.getElementById("d3_ch02_secant_play").addEventListener("click", function() {
+    var slider = document.getElementById("d3_ch02_secant_dt");
+    var dtVals = [2, 1.5, 1.0, 0.7, 0.5, 0.35, 0.25, 0.18, 0.12, 0.08, 0.05, 0.03, 0.02, 0.01];
+    var idx = 0;
+    slider.value = dtVals[0];
+    update(true);
+    var interval = setInterval(function() {
+      idx++;
+      if (idx >= dtVals.length) { clearInterval(interval); return; }
+      slider.value = dtVals[idx];
+      update(true);
+    }, 600);
+  });
+
+  update(false);
+})();
+</script>
 ```
 
-### 交互演示：$t = 0$ 处的悖论（Python）
+点击 **Play** 观察绿色割线如何随着 $dt$ 趋近于零而收敛到红色虚线切线。显示的割线斜率趋近于真实导数 $3t_0^2$。调节 $t_0$ 以在曲线 $s(t) = t^3$ 上的不同点考察收敛过程。
+
+### 动画演示：导数函数逐点浮现
 
 ```{=html}
-<div class="pyodide-container">
-  <textarea class="code-input" id="code_ch02_2">
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Demonstrate the "paradox" at t = 0 for s(t) = t^3
-# The derivative is 0, but the car does move over any finite interval.
-
-dt_values = np.logspace(-1, -8, 50)
-avg_velocities = []
-
-for dt in dt_values:
-    avg_v = ((0 + dt)**3 - 0**3) / dt   # = dt^2
-    avg_velocities.append(avg_v)
-
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4))
-
-# Left: average velocity vs dt (log-log)
-ax1.loglog(dt_values, avg_velocities, 'o-', markersize=3, color='#2d70b3')
-ax1.set_xlabel('dt  (seconds)')
-ax1.set_ylabel('Average velocity  (m/s)')
-ax1.set_title('Average velocity near t = 0')
-ax1.grid(True, alpha=0.3, which='both')
-
-# Right: zoom into s(t) = t^3 near t = 0
-t = np.linspace(-0.5, 0.5, 400)
-ax2.plot(t, t**3, color='#2d70b3', linewidth=2, label='$s(t) = t^3$')
-ax2.plot(t, 0*t, 'r--', linewidth=1, label='Tangent at $t=0$')
-ax2.plot(0, 0, 'ko', markersize=6)
-ax2.set_xlabel('t')
-ax2.set_ylabel('s(t)')
-ax2.set_title('Distance near t = 0 (flat tangent)')
-ax2.legend()
-ax2.grid(True, alpha=0.3)
-
-plt.tight_layout()
-plt.show()
-
-print("As dt shrinks, the average velocity near t = 0 tends to 0,")
-print("confirming that the derivative (best constant approximation) is 0.")
-print(f"Example: dt = 0.1 => avg velocity = {0.1**2:.4f} m/s")
-print(f"         dt = 0.001 => avg velocity = {0.001**2:.8f} m/s")
-  </textarea>
-  <button class="run-btn" onclick="runPyodide('code_ch02_2', 'output_ch02_2', 'plot_ch02_2')">Run ▶</button>
-  <div class="output" id="output_ch02_2"></div>
-  <div class="plot-output" id="plot_ch02_2"></div>
+<div class="d3-container" id="d3_ch02_deriv"></div>
+<div class="d3-controls">
+  <button id="d3_ch02_deriv_play">Play &#9654;</button>
+  <button id="d3_ch02_deriv_reset">Reset</button>
+  <label>dt:</label>
+  <input type="range" id="d3_ch02_deriv_dt" min="0.01" max="1.5" value="0.5" step="0.01">
+  <span class="value-display" id="d3_ch02_deriv_dt_val">dt = 0.50</span>
+  <label>Speed:</label>
+  <input type="range" id="d3_ch02_deriv_speed" min="20" max="200" value="80" step="10">
+  <span class="value-display" id="d3_ch02_deriv_speed_val">80 ms</span>
 </div>
+<script>
+(function() {
+  var W = 700, H = 440, margin = {top: 30, right: 30, bottom: 50, left: 60};
+  var w = W - margin.left - margin.right, h = H - margin.top - margin.bottom;
+  var tMax = 3.2, yMax = 30;
+
+  function s(t) { return t * t * t; }
+  function dsDt(t) { return 3 * t * t; }
+
+  var svg = d3.select("#d3_ch02_deriv").append("svg")
+    .attr("viewBox", "0 0 " + W + " " + H)
+    .append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  var xScale = d3.scaleLinear().domain([0, tMax]).range([0, w]);
+  var yScale = d3.scaleLinear().domain([0, yMax]).range([h, 0]);
+
+  // Axes
+  svg.append("g").attr("transform", "translate(0," + h + ")").call(d3.axisBottom(xScale).ticks(8))
+    .append("text").attr("x", w / 2).attr("y", 40).attr("fill", "#333")
+    .attr("text-anchor", "middle").attr("font-size", "14px").text("t");
+  svg.append("g").call(d3.axisLeft(yScale).ticks(6))
+    .append("text").attr("x", -h / 2).attr("y", -45).attr("fill", "#333")
+    .attr("text-anchor", "middle").attr("transform", "rotate(-90)")
+    .attr("font-size", "14px").text("ds/dt");
+
+  // True derivative curve 3t^2 (drawn faintly as reference)
+  var trueData = d3.range(0, tMax + 0.01, 0.02).map(function(t) { return [t, dsDt(t)]; });
+  svg.append("path").datum(trueData)
+    .attr("d", d3.line().x(function(d) { return xScale(d[0]); }).y(function(d) { return yScale(d[1]); }))
+    .attr("fill", "none").attr("stroke", "#c74440").attr("stroke-width", 2)
+    .attr("stroke-dasharray", "6,4").attr("opacity", 0.5);
+
+  // Label for true derivative
+  svg.append("text").attr("x", xScale(2.9)).attr("y", yScale(dsDt(2.9)) - 10)
+    .attr("fill", "#c74440").attr("font-size", "13px").attr("text-anchor", "end")
+    .text("3t\u00B2 (true derivative)");
+
+  // Group for difference quotient dots
+  var dotsGroup = svg.append("g");
+
+  // Connecting path for the difference quotient points
+  var dqPath = svg.append("path")
+    .attr("fill", "none").attr("stroke", "#2d70b3").attr("stroke-width", 2).attr("opacity", 0.8);
+
+  // Vertical marker showing current sample point
+  var marker = svg.append("line")
+    .attr("stroke", "#388c46").attr("stroke-width", 2).attr("opacity", 0);
+
+  var currentDots = [];
+  var animInterval = null;
+
+  function computePoints(dt) {
+    var pts = [];
+    for (var t = 0; t <= tMax; t += 0.05) {
+      var dq = (s(t + dt) - s(t)) / dt;
+      pts.push({t: t, dq: dq, exact: dsDt(t)});
+    }
+    return pts;
+  }
+
+  function drawAllDots(pts, animate) {
+    var dur = animate ? 300 : 0;
+
+    // Update path
+    var lineGen = d3.line()
+      .x(function(d) { return xScale(d.t); })
+      .y(function(d) { return yScale(d.dq); });
+    dqPath.transition().duration(dur).attr("d", lineGen(pts));
+
+    // Update dots
+    var dots = dotsGroup.selectAll("circle").data(pts, function(d, i) { return i; });
+    dots.exit().transition().duration(dur).attr("r", 0).remove();
+
+    var enter = dots.enter().append("circle")
+      .attr("cx", function(d) { return xScale(d.t); })
+      .attr("cy", function(d) { return yScale(d.dq); })
+      .attr("r", 0)
+      .attr("fill", "#2d70b3").attr("opacity", 0.7);
+
+    enter.merge(dots).transition().duration(dur)
+      .attr("cx", function(d) { return xScale(d.t); })
+      .attr("cy", function(d) { return yScale(d.dq); })
+      .attr("r", 3);
+  }
+
+  function reset() {
+    if (animInterval) { clearInterval(animInterval); animInterval = null; }
+    dotsGroup.selectAll("circle").remove();
+    dqPath.attr("d", null);
+    marker.attr("opacity", 0);
+    currentDots = [];
+  }
+
+  function playAnimation() {
+    reset();
+    var dt = +document.getElementById("d3_ch02_deriv_dt").value;
+    var speed = +document.getElementById("d3_ch02_deriv_speed").value;
+    var allPts = computePoints(dt);
+    var idx = 0;
+
+    animInterval = setInterval(function() {
+      if (idx >= allPts.length) {
+        clearInterval(animInterval);
+        animInterval = null;
+        marker.attr("opacity", 0);
+        return;
+      }
+
+      var p = allPts[idx];
+      currentDots.push(p);
+
+      // Add dot with animation
+      dotsGroup.append("circle")
+        .attr("cx", xScale(p.t)).attr("cy", yScale(p.dq))
+        .attr("r", 0).attr("fill", "#2d70b3").attr("opacity", 0.7)
+        .transition().duration(150).attr("r", 3);
+
+      // Update connecting path
+      var lineGen = d3.line()
+        .x(function(d) { return xScale(d.t); })
+        .y(function(d) { return yScale(d.dq); });
+      dqPath.attr("d", lineGen(currentDots));
+
+      // Marker
+      marker.attr("opacity", 0.6)
+        .attr("x1", xScale(p.t)).attr("y1", yScale(0))
+        .attr("x2", xScale(p.t)).attr("y2", yScale(p.dq));
+
+      idx++;
+    }, speed);
+  }
+
+  document.getElementById("d3_ch02_deriv_play").addEventListener("click", playAnimation);
+  document.getElementById("d3_ch02_deriv_reset").addEventListener("click", reset);
+
+  document.getElementById("d3_ch02_deriv_dt").addEventListener("input", function() {
+    var dt = +this.value;
+    document.getElementById("d3_ch02_deriv_dt_val").textContent = "dt = " + dt.toFixed(2);
+    if (!animInterval && currentDots.length === 0) {
+      // If not animating and nothing drawn, show all at once as preview
+      var pts = computePoints(dt);
+      drawAllDots(pts, true);
+    }
+  });
+
+  document.getElementById("d3_ch02_deriv_speed").addEventListener("input", function() {
+    document.getElementById("d3_ch02_deriv_speed_val").textContent = this.value + " ms";
+  });
+})();
+</script>
 ```
+
+点击 **Play** 观察导数函数 $3t^2$ 如何逐点浮现。在每个采样的 $t$ 值处，差商 $(s(t + dt) - s(t))/dt$ 被计算并绘制为蓝色点。蓝色点描绘出的曲线随着你减小 $dt$ 滑块而收敛到红色虚线参考曲线 $3t^2$。这展示了导数函数如何由整个定义域上的局部斜率测量构建而来。
 
 ## 速查表
 

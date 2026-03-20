@@ -29,9 +29,7 @@ to arbitrary implicit curves.
 ## Lecture Video
 
 ```{=html}
-<video controls width="100%" preload="metadata">
-  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/06_Implicit%20differentiation%2C%20what%27s%20going%20on%20here%EF%BC%9F%20%EF%BD%9C%20Chapter%206%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
-</video>
+<div class="video-container"><iframe src="https://www.youtube.com/embed/qb40J4N1fa4" title="Implicit differentiation" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
 ```
 
 ## Key Video Frames
@@ -271,102 +269,325 @@ $$
 Move the slider $a$ to observe how the tangent slope $1/a$ matches the
 derivative of $\ln(x)$ at each point.
 
-### Interactive Python: Implicit Differentiation on the Circle
+### Animated: Tangent Line on the Circle $x^2 + y^2 = 25$
 
 ```{=html}
-<div class="pyodide-container">
-  <textarea class="code-input" id="code_ch06_1">
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Plot the circle and tangent lines at several points
-theta = np.linspace(0, 2 * np.pi, 500)
-cx, cy = 5 * np.cos(theta), 5 * np.sin(theta)
-
-fig, ax = plt.subplots(figsize=(6, 6))
-ax.plot(cx, cy, color='steelblue', linewidth=2, label='$x^2 + y^2 = 25$')
-ax.set_aspect('equal')
-
-# Tangent lines at selected points on the upper semicircle
-for x0 in [1, 2, 3, 4]:
-    y0 = np.sqrt(25 - x0**2)
-    slope = -x0 / y0            # dy/dx from implicit differentiation
-    xs = np.linspace(x0 - 2, x0 + 2, 50)
-    ys = y0 + slope * (xs - x0)
-    ax.plot(xs, ys, '--', linewidth=1.2,
-            label=f'Tangent at ({x0}, {y0:.2f}), slope = {slope:.3f}')
-    ax.plot(x0, y0, 'o', markersize=6)
-
-ax.set_xlim(-7, 7)
-ax.set_ylim(-7, 7)
-ax.set_xlabel('x')
-ax.set_ylabel('y')
-ax.set_title('Tangent lines to $x^2+y^2=25$ via implicit differentiation')
-ax.legend(fontsize=8, loc='lower right')
-ax.grid(True, alpha=0.3)
-plt.tight_layout()
-plt.show()
-  </textarea>
-  <button class="run-btn" onclick="runPyodide('code_ch06_1', 'output_ch06_1', 'plot_ch06_1')">Run ▶</button>
-  <div class="output" id="output_ch06_1"></div>
-  <div class="plot-output" id="plot_ch06_1"></div>
+<div class="d3-container" id="ch06_d3_circle"></div>
+<div class="d3-controls">
+  <button id="ch06_d3_circle_play">Play &#9654;</button>
+  <button id="ch06_d3_circle_pause">Pause &#9646;&#9646;</button>
+  <label>Angle &theta;:</label>
+  <input type="range" id="ch06_d3_circle_theta" min="0" max="6.2832" value="0.9273" step="0.01">
+  <span class="value-display" id="ch06_d3_circle_info">(3.00, 4.00)  dy/dx = -0.750</span>
 </div>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+(function() {
+  const W = 700, H = 500, margin = {top: 30, right: 30, bottom: 50, left: 60};
+  const w = W - margin.left - margin.right, h = H - margin.top - margin.bottom;
+  const R = 5;
+
+  const svg = d3.select("#ch06_d3_circle").append("svg")
+    .attr("viewBox", `0 0 ${W} ${H}`)
+    .append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const xScale = d3.scaleLinear().domain([-7, 7]).range([0, w]);
+  const yScale = d3.scaleLinear().domain([-7, 7]).range([h, 0]);
+
+  // Grid lines
+  svg.append("g").attr("transform", `translate(0,${h})`).call(d3.axisBottom(xScale).ticks(14))
+    .selectAll("line").attr("stroke", "#ddd");
+  svg.append("g").call(d3.axisLeft(yScale).ticks(14))
+    .selectAll("line").attr("stroke", "#ddd");
+
+  // Axes through origin
+  svg.append("line").attr("x1", xScale(-7)).attr("x2", xScale(7))
+    .attr("y1", yScale(0)).attr("y2", yScale(0))
+    .attr("stroke", "#999").attr("stroke-width", 0.5);
+  svg.append("line").attr("x1", xScale(0)).attr("x2", xScale(0))
+    .attr("y1", yScale(-7)).attr("y2", yScale(7))
+    .attr("stroke", "#999").attr("stroke-width", 0.5);
+
+  // Axis labels
+  svg.append("text").attr("x", w / 2).attr("y", h + 40)
+    .attr("text-anchor", "middle").attr("font-size", "14px").attr("fill", "#333").text("x");
+  svg.append("text").attr("x", -45).attr("y", h / 2)
+    .attr("text-anchor", "middle").attr("font-size", "14px").attr("fill", "#333")
+    .attr("transform", `rotate(-90, -45, ${h / 2})`).text("y");
+
+  // Draw circle
+  const circlePoints = d3.range(0, 2 * Math.PI + 0.01, 0.02).map(t => [R * Math.cos(t), R * Math.sin(t)]);
+  svg.append("path").datum(circlePoints)
+    .attr("d", d3.line().x(d => xScale(d[0])).y(d => yScale(d[1])))
+    .attr("fill", "none").attr("stroke", "#2d70b3").attr("stroke-width", 2.5);
+
+  // Radius line (from origin to point)
+  const radiusLine = svg.append("line")
+    .attr("stroke", "#388c46").attr("stroke-width", 1.5).attr("stroke-dasharray", "5,4");
+
+  // Tangent line
+  const tangentLine = svg.append("line")
+    .attr("stroke", "#c74440").attr("stroke-width", 2);
+
+  // Point on circle
+  const pointDot = svg.append("circle")
+    .attr("r", 6).attr("fill", "#c74440").attr("stroke", "#fff").attr("stroke-width", 1.5);
+
+  // Slope label near point
+  const slopeLabel = svg.append("text")
+    .attr("font-size", "13px").attr("font-weight", 600).attr("fill", "#c74440");
+
+  const slider = document.getElementById("ch06_d3_circle_theta");
+  const infoSpan = document.getElementById("ch06_d3_circle_info");
+  let animId = null;
+
+  function update(theta) {
+    const px = R * Math.cos(theta);
+    const py = R * Math.sin(theta);
+    const slope = (Math.abs(py) < 0.001) ? NaN : -px / py;
+
+    // Point
+    pointDot.attr("cx", xScale(px)).attr("cy", yScale(py));
+
+    // Radius
+    radiusLine.attr("x1", xScale(0)).attr("y1", yScale(0))
+      .attr("x2", xScale(px)).attr("y2", yScale(py));
+
+    // Tangent line: draw from -6 to 6 in x, clipped visually
+    if (isFinite(slope)) {
+      const tLen = 4;
+      const x1 = px - tLen, y1 = py - slope * tLen;
+      const x2 = px + tLen, y2 = py + slope * tLen;
+      tangentLine.attr("x1", xScale(x1)).attr("y1", yScale(y1))
+        .attr("x2", xScale(x2)).attr("y2", yScale(y2))
+        .attr("visibility", "visible");
+    } else {
+      // Vertical tangent at top/bottom
+      tangentLine.attr("x1", xScale(px)).attr("y1", yScale(-7))
+        .attr("x2", xScale(px)).attr("y2", yScale(7))
+        .attr("visibility", "visible");
+    }
+
+    // Slope label
+    const slopeStr = isFinite(slope) ? slope.toFixed(3) : "\u00b1\u221e";
+    slopeLabel.attr("x", xScale(px) + 12).attr("y", yScale(py) - 12)
+      .text(`dy/dx = ${slopeStr}`);
+
+    infoSpan.textContent = `(${px.toFixed(2)}, ${py.toFixed(2)})  dy/dx = ${slopeStr}`;
+  }
+
+  slider.addEventListener("input", function() {
+    update(+this.value);
+  });
+
+  document.getElementById("ch06_d3_circle_play").addEventListener("click", function() {
+    if (animId) return;
+    let theta = +slider.value;
+    animId = setInterval(function() {
+      theta += 0.02;
+      if (theta > 2 * Math.PI) theta -= 2 * Math.PI;
+      slider.value = theta;
+      update(theta);
+    }, 40);
+  });
+
+  document.getElementById("ch06_d3_circle_pause").addEventListener("click", function() {
+    if (animId) { clearInterval(animId); animId = null; }
+  });
+
+  update(+slider.value);
+})();
+</script>
 ```
 
-### Interactive Python: Related Rates -- Sliding Ladder
+Press **Play** to watch a point travel around the circle $x^2 + y^2 = 25$.
+The red tangent line updates in real-time, with slope $dy/dx = -x/y$ displayed
+alongside the point. The dashed green radius is always perpendicular to the
+tangent, confirming the geometric relationship.
+
+### Animated: Sliding Ladder Related Rates
 
 ```{=html}
-<div class="pyodide-container">
-  <textarea class="code-input" id="code_ch06_2">
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Simulate the sliding ladder problem
-# x(t)^2 + y(t)^2 = 25, dy/dt = -1 m/s initially
-# From 2x dx/dt + 2y dy/dt = 0  =>  dx/dt = -y dy/dt / x
-
-dt = 0.01
-t_max = 3.5
-times, xs, ys, dxdt_vals = [], [], [], []
-
-x, y = 3.0, 4.0
-t = 0.0
-
-while y > 0.05 and t < t_max:
-    times.append(t)
-    xs.append(x)
-    ys.append(y)
-    dydt = -1.0
-    dxdt = -y * dydt / x     # from implicit differentiation
-    dxdt_vals.append(dxdt)
-    x += dxdt * dt
-    y += dydt * dt
-    t += dt
-
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
-
-ax1.plot(times, xs, label='x(t) -- base distance', color='steelblue')
-ax1.plot(times, ys, label='y(t) -- height', color='coral')
-ax1.set_xlabel('Time (s)')
-ax1.set_ylabel('Distance (m)')
-ax1.set_title('Ladder positions over time')
-ax1.legend()
-ax1.grid(True, alpha=0.3)
-
-ax2.plot(times, dxdt_vals, color='#6a0dad')
-ax2.set_xlabel('Time (s)')
-ax2.set_ylabel('dx/dt (m/s)')
-ax2.set_title('Rate at which base moves away from wall')
-ax2.grid(True, alpha=0.3)
-
-plt.tight_layout()
-plt.show()
-  </textarea>
-  <button class="run-btn" onclick="runPyodide('code_ch06_2', 'output_ch06_2', 'plot_ch06_2')">Run ▶</button>
-  <div class="output" id="output_ch06_2"></div>
-  <div class="plot-output" id="plot_ch06_2"></div>
+<div class="d3-container" id="ch06_d3_ladder"></div>
+<div class="d3-controls">
+  <button id="ch06_d3_ladder_play">Play &#9654;</button>
+  <button id="ch06_d3_ladder_reset">Reset</button>
+  <label>dy/dt (m/s):</label>
+  <input type="range" id="ch06_d3_ladder_speed" min="-2" max="-0.2" value="-1" step="0.1">
+  <span class="value-display" id="ch06_d3_ladder_speed_val">dy/dt = -1.0</span>
+  <span class="value-display" id="ch06_d3_ladder_info"></span>
 </div>
+<script>
+(function() {
+  const W = 700, H = 500, margin = {top: 20, right: 220, bottom: 50, left: 60};
+  const w = W - margin.left - margin.right, h = H - margin.top - margin.bottom;
+  const L = 5; // ladder length
+
+  const svg = d3.select("#ch06_d3_ladder").append("svg")
+    .attr("viewBox", `0 0 ${W} ${H}`)
+    .append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const xScale = d3.scaleLinear().domain([0, 6]).range([0, w]);
+  const yScale = d3.scaleLinear().domain([0, 6]).range([h, 0]);
+
+  // Wall (y-axis region)
+  svg.append("rect").attr("x", xScale(-0.3)).attr("y", yScale(6))
+    .attr("width", xScale(0) - xScale(-0.3) + 4).attr("height", yScale(0) - yScale(6))
+    .attr("fill", "#b0b0b0").attr("opacity", 0.3);
+  // Floor (x-axis region)
+  svg.append("rect").attr("x", xScale(0)).attr("y", yScale(0))
+    .attr("width", xScale(6) - xScale(0)).attr("height", 4)
+    .attr("fill", "#b0b0b0").attr("opacity", 0.3);
+
+  // Wall line
+  svg.append("line").attr("x1", xScale(0)).attr("x2", xScale(0))
+    .attr("y1", yScale(0)).attr("y2", yScale(6))
+    .attr("stroke", "#555").attr("stroke-width", 2);
+  // Floor line
+  svg.append("line").attr("x1", xScale(0)).attr("x2", xScale(6))
+    .attr("y1", yScale(0)).attr("y2", yScale(0))
+    .attr("stroke", "#555").attr("stroke-width", 2);
+
+  // Quarter-circle guide (constraint curve)
+  const arcPoints = d3.range(0, Math.PI / 2 + 0.01, 0.02).map(t => [L * Math.cos(t), L * Math.sin(t)]);
+  svg.append("path").datum(arcPoints)
+    .attr("d", d3.line().x(d => xScale(d[0])).y(d => yScale(d[1])))
+    .attr("fill", "none").attr("stroke", "#2d70b3").attr("stroke-width", 1)
+    .attr("stroke-dasharray", "4,4").attr("opacity", 0.5);
+
+  // Ladder
+  const ladder = svg.append("line")
+    .attr("stroke", "#d4760a").attr("stroke-width", 5).attr("stroke-linecap", "round");
+
+  // Points at ends
+  const basePoint = svg.append("circle").attr("r", 5).attr("fill", "#c74440");
+  const topPoint = svg.append("circle").attr("r", 5).attr("fill", "#388c46");
+
+  // Dimension lines and labels
+  const xDimLine = svg.append("line").attr("stroke", "#c74440").attr("stroke-width", 1.5);
+  const yDimLine = svg.append("line").attr("stroke", "#388c46").attr("stroke-width", 1.5);
+  const xLabel = svg.append("text").attr("font-size", "13px").attr("fill", "#c74440").attr("font-weight", 600);
+  const yLabel = svg.append("text").attr("font-size", "13px").attr("fill", "#388c46").attr("font-weight", 600);
+
+  // Right-side rate display panel
+  const panel = svg.append("g").attr("transform", `translate(${w + 30}, 30)`);
+  panel.append("text").attr("font-size", "14px").attr("font-weight", 700).attr("fill", "#333").text("Rates:");
+  const rateDydt = panel.append("text").attr("y", 28).attr("font-size", "13px").attr("fill", "#388c46");
+  const rateDxdt = panel.append("text").attr("y", 52).attr("font-size", "13px").attr("fill", "#c74440");
+  const rateTime = panel.append("text").attr("y", 82).attr("font-size", "13px").attr("fill", "#555");
+  const rateFormula = panel.append("text").attr("y", 116).attr("font-size", "12px").attr("fill", "#666");
+  rateFormula.text("2x(dx/dt) + 2y(dy/dt) = 0");
+  const rateFormula2 = panel.append("text").attr("y", 138).attr("font-size", "12px").attr("fill", "#666");
+  rateFormula2.text("dx/dt = -(y/x)(dy/dt)");
+
+  // Arrow heads for velocity vectors
+  const dxArrow = svg.append("line").attr("stroke", "#c74440").attr("stroke-width", 2)
+    .attr("marker-end", "url(#ch06_arrow_red)");
+  const dyArrow = svg.append("line").attr("stroke", "#388c46").attr("stroke-width", 2)
+    .attr("marker-end", "url(#ch06_arrow_green)");
+
+  // Arrow markers
+  const defs = svg.append("defs");
+  function addArrow(id, color) {
+    defs.append("marker").attr("id", id).attr("viewBox", "0 0 10 10")
+      .attr("refX", 10).attr("refY", 5).attr("markerWidth", 8).attr("markerHeight", 8)
+      .attr("orient", "auto")
+      .append("path").attr("d", "M 0 0 L 10 5 L 0 10 z").attr("fill", color);
+  }
+  addArrow("ch06_arrow_red", "#c74440");
+  addArrow("ch06_arrow_green", "#388c46");
+
+  const infoSpan = document.getElementById("ch06_d3_ladder_info");
+  const speedSlider = document.getElementById("ch06_d3_ladder_speed");
+  const speedVal = document.getElementById("ch06_d3_ladder_speed_val");
+  let animId = null;
+  let currentY = 4.0;
+  let time = 0;
+
+  function draw(xv, yv, dydt) {
+    const dxdt = (xv > 0.01) ? -(yv / xv) * dydt : 0;
+
+    ladder.attr("x1", xScale(xv)).attr("y1", yScale(0))
+      .attr("x2", xScale(0)).attr("y2", yScale(yv));
+
+    basePoint.attr("cx", xScale(xv)).attr("cy", yScale(0));
+    topPoint.attr("cx", xScale(0)).attr("cy", yScale(yv));
+
+    // Dimension annotations
+    xDimLine.attr("x1", xScale(0)).attr("y1", yScale(-0.4))
+      .attr("x2", xScale(xv)).attr("y2", yScale(-0.4));
+    xLabel.attr("x", xScale(xv / 2)).attr("y", yScale(-0.8))
+      .attr("text-anchor", "middle").text(`x = ${xv.toFixed(2)}`);
+
+    yDimLine.attr("x1", xScale(-0.4)).attr("y1", yScale(0))
+      .attr("x2", xScale(-0.4)).attr("y2", yScale(yv));
+    yLabel.attr("x", xScale(-0.8)).attr("y", yScale(yv / 2))
+      .attr("text-anchor", "middle").text(`y = ${yv.toFixed(2)}`);
+
+    // Velocity arrows (scaled for visibility)
+    const arrowScale = 0.8;
+    dxArrow.attr("x1", xScale(xv)).attr("y1", yScale(-0.05))
+      .attr("x2", xScale(xv + dxdt * arrowScale)).attr("y2", yScale(-0.05));
+    dyArrow.attr("x1", xScale(-0.05)).attr("y1", yScale(yv))
+      .attr("x2", xScale(-0.05)).attr("y2", yScale(yv + dydt * arrowScale));
+
+    rateDydt.text(`dy/dt = ${dydt.toFixed(2)} m/s`);
+    rateDxdt.text(`dx/dt = ${dxdt.toFixed(2)} m/s`);
+    rateTime.text(`t = ${time.toFixed(2)} s`);
+
+    infoSpan.textContent = `x=${xv.toFixed(2)} y=${yv.toFixed(2)} dx/dt=${dxdt.toFixed(2)} dy/dt=${dydt.toFixed(2)}`;
+  }
+
+  function reset() {
+    if (animId) { clearInterval(animId); animId = null; }
+    currentY = 4.0;
+    time = 0;
+    const xv = Math.sqrt(L * L - currentY * currentY);
+    draw(xv, currentY, +speedSlider.value);
+  }
+
+  speedSlider.addEventListener("input", function() {
+    speedVal.textContent = `dy/dt = ${(+this.value).toFixed(1)}`;
+    if (!animId) {
+      const xv = Math.sqrt(L * L - currentY * currentY);
+      draw(xv, currentY, +this.value);
+    }
+  });
+
+  document.getElementById("ch06_d3_ladder_play").addEventListener("click", function() {
+    if (animId) return;
+    const dt = 0.04;
+    animId = setInterval(function() {
+      const dydt = +speedSlider.value;
+      const xv = Math.sqrt(Math.max(0, L * L - currentY * currentY));
+      const dxdt = (xv > 0.01) ? -(currentY / xv) * dydt : 0;
+
+      currentY += dydt * dt;
+      time += dt;
+
+      if (currentY <= 0.05 || currentY >= L) {
+        currentY = Math.max(0.05, Math.min(L - 0.01, currentY));
+        clearInterval(animId);
+        animId = null;
+      }
+
+      const newX = Math.sqrt(Math.max(0, L * L - currentY * currentY));
+      draw(newX, currentY, dydt);
+    }, 40);
+  });
+
+  document.getElementById("ch06_d3_ladder_reset").addEventListener("click", reset);
+
+  reset();
+})();
+</script>
 ```
+
+Press **Play** to watch the 5-metre ladder slide down the wall. The green
+arrow shows $dy/dt$ (the rate at which the top descends) and the red arrow
+shows $dx/dt$ (the rate at which the base moves away from the wall), computed
+from the relation $dx/dt = -(y/x)\,(dy/dt)$. Adjust the $dy/dt$ slider to
+change the descent speed and observe how $dx/dt$ accelerates as $y \to 0$.
 
 ## Summary
 

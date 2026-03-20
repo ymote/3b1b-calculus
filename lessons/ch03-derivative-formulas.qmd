@@ -29,9 +29,7 @@ the unit circle), we see why the formulas must take the forms they do.
 ## Lecture Video
 
 ```{=html}
-<video controls width="100%" preload="metadata">
-  <source src="https://github.com/ymote/3b1b-calculus/releases/download/v1.0/03_Derivative%20formulas%20through%20geometry%20%EF%BD%9C%20Chapter%203%2C%20Essence%20of%20calculus.mp4" type="video/mp4">
-</video>
+<div class="video-container"><iframe src="https://www.youtube.com/embed/S0_qX4VJhMQ" title="Derivative formulas through geometry" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
 ```
 
 ## Key Video Frames
@@ -233,96 +231,337 @@ The blue curve is $\sin\theta$ and the red curve is $\cos\theta$. The dashed
 green line is the tangent to the sine curve at $\theta = t$. Observe that the
 slope of this tangent always equals the value of the cosine at that point.
 
-### Interactive Python: Verifying the Power Rule Numerically
+### Animated: The Nudged Square — Geometric View of $d(x^2)$
 
 ```{=html}
-<div class="pyodide-container">
-  <textarea class="code-input" id="code_ch03_1">
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Numerically verify the power rule for several values of n
-dx = 1e-8
-x = np.linspace(0.5, 3, 200)
-
-fig, axes = plt.subplots(2, 2, figsize=(10, 8))
-
-for idx, n in enumerate([2, 3, 4, 5]):
-    ax = axes[idx // 2][idx % 2]
-    # Numerical derivative via symmetric difference quotient
-    numerical = (((x + dx)**n) - ((x - dx)**n)) / (2 * dx)
-    # Analytical derivative from the power rule
-    analytical = n * x**(n - 1)
-
-    ax.plot(x, analytical, label=f'Power rule: ${n}x^{{{n-1}}}$', linewidth=2)
-    ax.plot(x, numerical, '--', label='Numerical derivative', linewidth=2)
-    ax.set_title(f'$f(x) = x^{{{n}}}$')
-    ax.set_xlabel('x')
-    ax.set_ylabel("f'(x)")
-    ax.legend(fontsize=9)
-    ax.grid(True, alpha=0.3)
-
-plt.suptitle('Numerical verification of the power rule', fontsize=14)
-plt.tight_layout()
-plt.show()
-  </textarea>
-  <button class="run-btn" onclick="runPyodide('code_ch03_1', 'output_ch03_1', 'plot_ch03_1')">Run ▶</button>
-  <div class="output" id="output_ch03_1"></div>
-  <div class="plot-output" id="plot_ch03_1"></div>
+<div class="d3-container" id="ch03_nudged_square"></div>
+<div class="d3-controls">
+  <button id="ch03_nudged_square_play">Play ▶</button>
+  <label>x:</label>
+  <input type="range" id="ch03_nudged_square_x" min="1" max="4" value="2" step="0.1">
+  <span class="value-display" id="ch03_nudged_square_x_val">x = 2.0</span>
+  <label>dx:</label>
+  <input type="range" id="ch03_nudged_square_dx" min="0.05" max="1.5" value="0.6" step="0.05">
+  <span class="value-display" id="ch03_nudged_square_dx_val">dx = 0.60</span>
+  <span class="value-display" id="ch03_nudged_square_info"></span>
 </div>
+<script>
+(function() {
+  const W = 700, H = 500, margin = {top: 40, right: 40, bottom: 50, left: 60};
+  const w = W - margin.left - margin.right, h = H - margin.top - margin.bottom;
+
+  const svg = d3.select("#ch03_nudged_square").append("svg")
+    .attr("viewBox", `0 0 ${W} ${H}`)
+    .append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  // Title
+  svg.append("text").attr("x", w / 2).attr("y", -15)
+    .attr("text-anchor", "middle").attr("font-size", "16px").attr("font-weight", 600)
+    .text("Nudged Square: (x + dx)² = x² + 2x·dx + dx²");
+
+  const xSlider = document.getElementById("ch03_nudged_square_x");
+  const dxSlider = document.getElementById("ch03_nudged_square_dx");
+  const xVal = document.getElementById("ch03_nudged_square_x_val");
+  const dxVal = document.getElementById("ch03_nudged_square_dx_val");
+  const infoSpan = document.getElementById("ch03_nudged_square_info");
+
+  function draw(animate) {
+    const xv = +xSlider.value;
+    const dxv = +dxSlider.value;
+    const total = xv + dxv;
+    const dur = animate ? 600 : 0;
+
+    xVal.textContent = `x = ${xv.toFixed(1)}`;
+    dxVal.textContent = `dx = ${dxv.toFixed(2)}`;
+
+    const area2x = 2 * xv * dxv;
+    const areaDx2 = dxv * dxv;
+    infoSpan.textContent = `  2x·dx = ${area2x.toFixed(3)}   |   dx² = ${areaDx2.toFixed(4)}   |   dA = ${(area2x + areaDx2).toFixed(3)}`;
+
+    // Scale to fit
+    const scale = d3.scaleLinear().domain([0, 5.5]).range([0, Math.min(w, h)]);
+
+    svg.selectAll(".sq-part").remove();
+    svg.selectAll(".sq-label").remove();
+    svg.selectAll(".sq-brace").remove();
+
+    const g = svg.append("g").attr("class", "sq-part");
+
+    // Original square x²
+    g.append("rect")
+      .attr("x", scale(0)).attr("y", scale(0))
+      .attr("width", 0).attr("height", 0)
+      .attr("fill", "#2d70b3").attr("opacity", 0.35)
+      .attr("stroke", "#1a4a7a").attr("stroke-width", 1.5)
+      .transition().duration(dur)
+      .attr("width", scale(xv)).attr("height", scale(xv));
+
+    // Label x²
+    g.append("text").attr("class", "sq-label")
+      .attr("x", scale(xv / 2)).attr("y", scale(xv / 2) + 5)
+      .attr("text-anchor", "middle").attr("font-size", "18px").attr("font-weight", 700)
+      .attr("fill", "#1a4a7a").attr("opacity", 0)
+      .transition().duration(dur).delay(dur * 0.3).attr("opacity", 1)
+      .text("x²");
+
+    // Right thin rectangle (x · dx)
+    g.append("rect")
+      .attr("x", scale(xv)).attr("y", scale(0))
+      .attr("width", 0).attr("height", scale(xv))
+      .attr("fill", "#c74440").attr("opacity", 0.5)
+      .attr("stroke", "#8b2020").attr("stroke-width", 1)
+      .transition().duration(dur).delay(dur * 0.4)
+      .attr("width", scale(dxv));
+
+    // Top thin rectangle (x · dx)
+    g.append("rect")
+      .attr("x", scale(0)).attr("y", scale(xv))
+      .attr("width", scale(xv)).attr("height", 0)
+      .attr("fill", "#c74440").attr("opacity", 0.5)
+      .attr("stroke", "#8b2020").attr("stroke-width", 1)
+      .transition().duration(dur).delay(dur * 0.4)
+      .attr("height", scale(dxv));
+
+    // Label the two red rectangles
+    g.append("text").attr("class", "sq-label")
+      .attr("x", scale(xv + dxv / 2)).attr("y", scale(xv / 2) + 5)
+      .attr("text-anchor", "middle").attr("font-size", "13px").attr("font-weight", 600)
+      .attr("fill", "#8b2020").attr("opacity", 0)
+      .transition().duration(dur).delay(dur * 0.7).attr("opacity", 1)
+      .text("x·dx");
+
+    g.append("text").attr("class", "sq-label")
+      .attr("x", scale(xv / 2)).attr("y", scale(xv + dxv / 2) + 5)
+      .attr("text-anchor", "middle").attr("font-size", "13px").attr("font-weight", 600)
+      .attr("fill", "#8b2020").attr("opacity", 0)
+      .transition().duration(dur).delay(dur * 0.7).attr("opacity", 1)
+      .text("x·dx");
+
+    // Corner square (dx)²
+    g.append("rect")
+      .attr("x", scale(xv)).attr("y", scale(xv))
+      .attr("width", 0).attr("height", 0)
+      .attr("fill", "#388c46").attr("opacity", 0.6)
+      .attr("stroke", "#1f5e2a").attr("stroke-width", 1)
+      .transition().duration(dur).delay(dur * 0.7)
+      .attr("width", scale(dxv)).attr("height", scale(dxv));
+
+    // Label corner square
+    if (dxv >= 0.3) {
+      g.append("text").attr("class", "sq-label")
+        .attr("x", scale(xv + dxv / 2)).attr("y", scale(xv + dxv / 2) + 5)
+        .attr("text-anchor", "middle").attr("font-size", "11px").attr("font-weight", 600)
+        .attr("fill", "#1f5e2a").attr("opacity", 0)
+        .transition().duration(dur).delay(dur * 0.9).attr("opacity", 1)
+        .text("dx²");
+    }
+
+    // Dimension braces / labels along edges
+    // Bottom edge: x
+    g.append("text").attr("class", "sq-label")
+      .attr("x", scale(xv / 2)).attr("y", scale(0) - 8)
+      .attr("text-anchor", "middle").attr("font-size", "14px").attr("fill", "#333")
+      .text("x");
+
+    // Bottom edge: dx
+    g.append("text").attr("class", "sq-label")
+      .attr("x", scale(xv + dxv / 2)).attr("y", scale(0) - 8)
+      .attr("text-anchor", "middle").attr("font-size", "14px").attr("fill", "#c74440")
+      .text("dx");
+
+    // Left edge: x
+    g.append("text").attr("class", "sq-label")
+      .attr("x", scale(0) - 12).attr("y", scale(xv / 2) + 5)
+      .attr("text-anchor", "middle").attr("font-size", "14px").attr("fill", "#333")
+      .text("x");
+
+    // Left edge: dx
+    g.append("text").attr("class", "sq-label")
+      .attr("x", scale(0) - 14).attr("y", scale(xv + dxv / 2) + 5)
+      .attr("text-anchor", "middle").attr("font-size", "14px").attr("fill", "#c74440")
+      .text("dx");
+  }
+
+  xSlider.addEventListener("input", () => draw(true));
+  dxSlider.addEventListener("input", () => draw(true));
+
+  document.getElementById("ch03_nudged_square_play").addEventListener("click", function() {
+    // Animate dx shrinking from 1.5 to 0.05
+    let dxCur = 1.5;
+    dxSlider.value = dxCur;
+    draw(true);
+    const interval = setInterval(() => {
+      dxCur = Math.max(0.05, dxCur - 0.1);
+      dxSlider.value = dxCur;
+      draw(true);
+      if (dxCur <= 0.05) clearInterval(interval);
+    }, 500);
+  });
+
+  draw(false);
+})();
+</script>
 ```
 
-### Interactive Python: Geometric Area Argument for $x^2$
+Press **Play** to watch $dx$ shrink toward zero. As it does, the two red
+rectangles (each of area $x \cdot dx$) dominate the new area, while the
+green corner square ($dx^2$) becomes negligible -- confirming that
+$\frac{d}{dx}x^2 = 2x$.
+
+### Animated: Power Rule — Derivative vs Finite Difference
 
 ```{=html}
-<div class="pyodide-container">
-  <textarea class="code-input" id="code_ch03_2">
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Visualise the "nudged square" argument for d/dx(x^2) = 2x
-x = 2.0
-dx_vals = [0.5, 0.3, 0.1]
-
-fig, axes = plt.subplots(1, 3, figsize=(12, 4))
-
-for ax, dx in zip(axes, dx_vals):
-    # Original square
-    sq = plt.Rectangle((0, 0), x, x, facecolor='#2d70b3', alpha=0.4,
-                        edgecolor='black', linewidth=1.5)
-    ax.add_patch(sq)
-    # Right thin rectangle
-    r1 = plt.Rectangle((x, 0), dx, x, facecolor='#c74440', alpha=0.5,
-                        edgecolor='black', linewidth=1)
-    ax.add_patch(r1)
-    # Top thin rectangle
-    r2 = plt.Rectangle((0, x), x, dx, facecolor='#c74440', alpha=0.5,
-                        edgecolor='black', linewidth=1)
-    ax.add_patch(r2)
-    # Corner square
-    c = plt.Rectangle((x, x), dx, dx, facecolor='#388c46', alpha=0.6,
-                       edgecolor='black', linewidth=1)
-    ax.add_patch(c)
-
-    total_new = 2 * x * dx + dx**2
-    approx_new = 2 * x * dx
-    ax.set_xlim(-0.2, x + dx + 0.3)
-    ax.set_ylim(-0.2, x + dx + 0.3)
-    ax.set_aspect('equal')
-    ax.set_title(f'dx = {dx}\nnew area = {total_new:.4f}\n2x dx = {approx_new:.4f}')
-    ax.set_xlabel('x')
-    ax.set_ylabel('y')
-
-fig.suptitle(f'Nudged square for x = {x}: red = 2x dx, green = (dx)²',
-             fontsize=12)
-plt.tight_layout()
-plt.show()
-  </textarea>
-  <button class="run-btn" onclick="runPyodide('code_ch03_2', 'output_ch03_2', 'plot_ch03_2')">Run ▶</button>
-  <div class="output" id="output_ch03_2"></div>
-  <div class="plot-output" id="plot_ch03_2"></div>
+<div class="d3-container" id="ch03_power_rule_bars"></div>
+<div class="d3-controls">
+  <button id="ch03_power_rule_bars_play">Play ▶</button>
+  <label>dx (h):</label>
+  <input type="range" id="ch03_power_rule_bars_h" min="0.001" max="0.5" value="0.1" step="0.001">
+  <span class="value-display" id="ch03_power_rule_bars_h_val">h = 0.1000</span>
+  <span class="value-display" id="ch03_power_rule_bars_info"></span>
 </div>
+<script>
+(function() {
+  const W = 700, H = 420, margin = {top: 50, right: 30, bottom: 60, left: 70};
+  const w = W - margin.left - margin.right, h = H - margin.top - margin.bottom;
+
+  const svg = d3.select("#ch03_power_rule_bars").append("svg")
+    .attr("viewBox", `0 0 ${W} ${H}`)
+    .append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  svg.append("text").attr("x", w / 2).attr("y", -25)
+    .attr("text-anchor", "middle").attr("font-size", "16px").attr("font-weight", 600)
+    .text("Power Rule: Analytical nxⁿ⁻¹ vs Finite Difference [f(x+h)−f(x)]/h");
+
+  // Functions to test
+  const funcs = [
+    { label: "x²",  n: 2, x: 2.0, f: x => x**2,  df: x => 2*x       },
+    { label: "x³",  n: 3, x: 2.0, f: x => x**3,  df: x => 3*x**2    },
+    { label: "x⁴",  n: 4, x: 1.5, f: x => x**4,  df: x => 4*x**3    },
+    { label: "x⁵",  n: 5, x: 1.5, f: x => x**5,  df: x => 5*x**4    },
+    { label: "1/x", n: -1, x: 2.0, f: x => 1/x,   df: x => -1/(x*x) },
+    { label: "√x",  n: 0.5, x: 4.0, f: x => Math.sqrt(x), df: x => 0.5/Math.sqrt(x) }
+  ];
+
+  const hSlider = document.getElementById("ch03_power_rule_bars_h");
+  const hVal = document.getElementById("ch03_power_rule_bars_h_val");
+  const infoSpan = document.getElementById("ch03_power_rule_bars_info");
+
+  const xScale = d3.scaleBand()
+    .domain(funcs.map(d => d.label))
+    .range([0, w]).padding(0.25);
+
+  const subScale = d3.scaleBand()
+    .domain(["analytical", "numerical"])
+    .range([0, xScale.bandwidth()]).padding(0.08);
+
+  // Axes (y-axis will be updated)
+  const xAxis = svg.append("g").attr("transform", `translate(0,${h})`);
+  const yAxisG = svg.append("g");
+
+  // Color legend
+  const legend = svg.append("g").attr("transform", `translate(${w - 200}, -10)`);
+  legend.append("rect").attr("width", 14).attr("height", 14).attr("fill", "#2d70b3");
+  legend.append("text").attr("x", 18).attr("y", 12).attr("font-size", "12px").text("Power rule (exact)");
+  legend.append("rect").attr("y", 20).attr("width", 14).attr("height", 14).attr("fill", "#c74440");
+  legend.append("text").attr("x", 18).attr("y", 32).attr("font-size", "12px").text("Finite difference");
+
+  const barsGroup = svg.append("g");
+
+  // Error text group
+  const errGroup = svg.append("g");
+
+  function update(animate) {
+    const hv = +hSlider.value;
+    const dur = animate ? 500 : 0;
+    hVal.textContent = `h = ${hv.toFixed(4)}`;
+
+    // Compute values
+    const data = funcs.map(d => {
+      const exact = d.df(d.x);
+      const numeric = (d.f(d.x + hv) - d.f(d.x)) / hv;
+      return { label: d.label, x: d.x, exact, numeric };
+    });
+
+    const maxVal = d3.max(data, d => Math.max(Math.abs(d.exact), Math.abs(d.numeric)));
+    const yScale = d3.scaleLinear().domain([-maxVal * 0.2, maxVal * 1.15]).range([h, 0]);
+    const zeroY = yScale(0);
+
+    xAxis.call(d3.axisBottom(xScale)).selectAll("text").attr("font-size", "13px");
+    yAxisG.transition().duration(dur).call(d3.axisLeft(yScale).ticks(6));
+
+    // Bars
+    const bars = barsGroup.selectAll(".bar-pair").data(data, d => d.label);
+
+    const enter = bars.enter().append("g").attr("class", "bar-pair");
+
+    // Analytical bar
+    enter.append("rect").attr("class", "bar-exact")
+      .attr("fill", "#2d70b3").attr("opacity", 0.75);
+
+    // Numerical bar
+    enter.append("rect").attr("class", "bar-num")
+      .attr("fill", "#c74440").attr("opacity", 0.75);
+
+    const merged = enter.merge(bars);
+
+    merged.select(".bar-exact").transition().duration(dur)
+      .attr("x", d => xScale(d.label) + subScale("analytical"))
+      .attr("width", subScale.bandwidth())
+      .attr("y", d => d.exact >= 0 ? yScale(d.exact) : zeroY)
+      .attr("height", d => Math.abs(yScale(d.exact) - zeroY));
+
+    merged.select(".bar-num").transition().duration(dur)
+      .attr("x", d => xScale(d.label) + subScale("numerical"))
+      .attr("width", subScale.bandwidth())
+      .attr("y", d => d.numeric >= 0 ? yScale(d.numeric) : zeroY)
+      .attr("height", d => Math.abs(yScale(d.numeric) - zeroY));
+
+    // Error labels above bars
+    errGroup.selectAll(".err-label").remove();
+    data.forEach(d => {
+      const err = Math.abs(d.numeric - d.exact);
+      const relErr = d.exact !== 0 ? (err / Math.abs(d.exact) * 100) : 0;
+      errGroup.append("text").attr("class", "err-label")
+        .attr("x", xScale(d.label) + xScale.bandwidth() / 2)
+        .attr("y", yScale(Math.max(Math.abs(d.exact), Math.abs(d.numeric)) * (d.exact >= 0 ? 1 : -0.05)) - 6)
+        .attr("text-anchor", "middle").attr("font-size", "10px").attr("fill", "#666")
+        .text(`err: ${relErr.toFixed(2)}%`);
+    });
+
+    // Zero line
+    barsGroup.selectAll(".zero-line").remove();
+    barsGroup.append("line").attr("class", "zero-line")
+      .attr("x1", 0).attr("x2", w)
+      .attr("y1", zeroY).attr("y2", zeroY)
+      .attr("stroke", "#999").attr("stroke-dasharray", "4,3");
+
+    const maxErr = d3.max(data, d => Math.abs(d.numeric - d.exact));
+    infoSpan.textContent = `  Max absolute error: ${maxErr.toFixed(6)}`;
+  }
+
+  hSlider.addEventListener("input", () => update(true));
+
+  document.getElementById("ch03_power_rule_bars_play").addEventListener("click", function() {
+    let hCur = 0.5;
+    hSlider.value = hCur;
+    update(true);
+    const interval = setInterval(() => {
+      hCur = Math.max(0.001, hCur * 0.7);
+      hSlider.value = hCur;
+      update(true);
+      if (hCur <= 0.002) clearInterval(interval);
+    }, 450);
+  });
+
+  update(false);
+})();
+</script>
 ```
+
+Press **Play** to watch the step size $h$ shrink toward zero. For each function,
+the red bar (finite difference) converges to the blue bar (analytical derivative
+from the power rule), confirming $\frac{d}{dx}x^n = nx^{n-1}$ numerically
+across integer, negative, and fractional exponents.
 
 ## Summary
 

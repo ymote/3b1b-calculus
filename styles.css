@@ -17,52 +17,82 @@ body {
   overflow: hidden;
 }
 
-.pyodide-container {
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%;
+  margin: 1.5em 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.d3-container {
   width: 100%;
   margin: 1.5em 0;
   border: 1px solid #ddd;
   border-radius: 8px;
   overflow: hidden;
-  background: #1e1e2e;
+  background: #fafafa;
 }
 
-.pyodide-container .code-input {
+.d3-container svg {
+  display: block;
   width: 100%;
-  min-height: 150px;
-  padding: 1em;
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  font-size: 14px;
-  background: #1e1e2e;
-  color: #cdd6f4;
-  border: none;
-  resize: vertical;
+  height: auto;
 }
 
-.pyodide-container .run-btn {
-  padding: 0.5em 1.5em;
-  margin: 0.5em;
-  background: #89b4fa;
-  color: #1e1e2e;
+.d3-controls {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  padding: 0.75em 1em;
+  background: #f0f0f0;
+  border-top: 1px solid #ddd;
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  flex-wrap: wrap;
+}
+
+.d3-controls label {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.d3-controls input[type="range"] {
+  flex: 1;
+  min-width: 120px;
+  accent-color: #2d70b3;
+}
+
+.d3-controls .value-display {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 13px;
+  min-width: 60px;
+}
+
+.d3-controls button {
+  padding: 0.4em 1.2em;
+  background: #2d70b3;
+  color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-family: 'Manrope', sans-serif;
   font-weight: 600;
+  font-size: 13px;
 }
 
-.pyodide-container .output {
-  padding: 1em;
-  background: #181825;
-  color: #a6e3a1;
-  font-family: monospace;
-  min-height: 50px;
-  border-top: 1px solid #313244;
-}
-
-.pyodide-container .plot-output {
-  background: white;
-  text-align: center;
-  padding: 1em;
+.d3-controls button:hover {
+  background: #1a5490;
 }
 
 .key-formula {
