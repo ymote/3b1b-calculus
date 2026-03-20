@@ -193,7 +193,6 @@ $$
   <span class="value-display" id="ch09_d3_avg_sin_n_val">N = 5</span>
   <span class="value-display" id="ch09_d3_avg_sin_info"></span>
 </div>
-<script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
 (function() {
   const W = 700, H = 400, margin = {top: 30, right: 30, bottom: 50, left: 60};

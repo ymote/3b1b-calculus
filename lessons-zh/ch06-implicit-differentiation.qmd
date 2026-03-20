@@ -247,7 +247,6 @@ $$
   <input type="range" id="ch06_d3_circle_theta" min="0" max="6.2832" value="0.9273" step="0.01">
   <span class="value-display" id="ch06_d3_circle_info">(3.00, 4.00)  dy/dx = -0.750</span>
 </div>
-<script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
 (function() {
   const W = 700, H = 500, margin = {top: 30, right: 30, bottom: 50, left: 60};

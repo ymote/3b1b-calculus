@@ -223,7 +223,6 @@ $$
   <span class="value-display" id="d3_ch08_riemann_n_val">N = 8</span>
   <span class="value-display" id="d3_ch08_riemann_approx"></span>
 </div>
-<script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
 (function() {
   const W = 700, H = 400, margin = {top: 30, right: 30, bottom: 50, left: 60};

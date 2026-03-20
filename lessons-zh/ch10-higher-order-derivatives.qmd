@@ -190,7 +190,6 @@ $$
   <input type="range" id="ch10_d3_pva_slider" min="0" max="4" value="0" step="0.02">
   <span class="value-display" id="ch10_d3_pva_val">t = 0.00</span>
 </div>
-<script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
 (function() {
   const W = 700, H = 520, margin = {top: 25, right: 30, bottom: 35, left: 60};

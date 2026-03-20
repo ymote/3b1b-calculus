@@ -230,7 +230,6 @@ This graph plots $g'(x) = -1/x^2$. The shaded band marks the **stability region*
   <span class="value-display" id="ch12_transform_x0_val">x&#8320; = 1.0</span>
   <span class="value-display" id="ch12_transform_info"></span>
 </div>
-<script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
 (function() {
   const W = 700, H = 340, margin = {top: 30, right: 30, bottom: 30, left: 30};

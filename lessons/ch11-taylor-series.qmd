@@ -336,7 +336,6 @@ faithful approximation over a wider neighborhood of the center.
   <input type="range" id="ch11_d3_taylor_cos_order" min="0" max="16" value="0" step="2">
   <span class="value-display" id="ch11_d3_taylor_cos_order_val">Order 0</span>
 </div>
-<script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
 (function() {
   const W = 720, H = 400, margin = {top: 30, right: 30, bottom: 50, left: 60};
